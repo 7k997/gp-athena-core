@@ -1,4 +1,6 @@
 import * as alt from 'alt-shared';
+import { ISharedItem } from '../../../gp-items-shared/shared/interfaces';
+import { ItemEx } from '@AthenaShared/interfaces/item';
 // import * as iObjectRef from '@AthenaShared/interfaces/iObject';
 
 declare module '@AthenaShared/interfaces/iObject' {
