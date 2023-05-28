@@ -23,6 +23,17 @@ const InternalFunctions = {
     },
 };
 
+//Corechange: shared-items plugin
+export function getDataBaseItems(): BaseItem<DefaultItemBehavior, {}>[] {
+    return databaseItems;
+}
+
+//Corechange: shared-items plugin
+export async function getDataBaseItemsAsync(): Promise<BaseItem<DefaultItemBehavior, {}>[]> {
+    await isDoneLoadingAsync();
+    return databaseItems;
+}
+
 /**
  * Wait until the `isDoneLoading` variable is set to `true` before continuing.
  */

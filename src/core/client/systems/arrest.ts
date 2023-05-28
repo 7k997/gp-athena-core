@@ -2,6 +2,7 @@ import * as alt from 'alt-client';
 import * as native from 'natives';
 import { SYSTEM_EVENTS } from '@AthenaShared/enums/system';
 import { playAnimation } from './animations';
+import { ANIMATION_FLAGS } from '@AthenaShared/flags/animationFlags';
 
 let interval: number;
 let cuffer: alt.Player;
@@ -27,7 +28,12 @@ const ArrestController = {
         }
 
         if (!native.isEntityPlayingAnim(alt.Player.local.scriptID, 'mp_arresting', 'idle', 3)) {
-            await playAnimation('mp_arresting', 'idle', 49);
+            //Corechange:
+            await playAnimation(
+                'mp_arresting',
+                'idle',
+                ANIMATION_FLAGS.UPPERBODY_ONLY | ANIMATION_FLAGS.ENABLE_PLAYER_CONTROL | ANIMATION_FLAGS.REPEAT,
+            );
         }
 
         const fwd = native.getEntityForwardVector(cuffer);

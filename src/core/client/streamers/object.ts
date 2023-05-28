@@ -58,7 +58,9 @@ const InternalFunctions = {
             createdObject.toggleCollision(false, false);
         }
 
-        createdObject.setPositionFrozen(true);
+        //Corechange
+        //CreatedObject.setPositionFrozen(true);
+        createdObject.positionFrozen = true;
         dataRef[uid].createdObject = createdObject;
     },
     populate(newObjects: Array<IObject>) {
@@ -99,7 +101,9 @@ const InternalFunctions = {
                 createdObject.toggleCollision(false, false);
             }
 
-            createdObject.setPositionFrozen(true);
+            //Corechange
+            //createdObject.setPositionFrozen(true);
+            createdObject.positionFrozen = true;
 
             serverObjects[objRef.uid] = {
                 ...objRef,
@@ -147,7 +151,9 @@ export function addObject(newObject: IObject) {
         createdObject.toggleCollision(false, false);
     }
 
-    createdObject.setPositionFrozen(true);
+    //Corechange
+    // createdObject.setPositionFrozen(true);
+    createdObject.positionFrozen = true;
     clientObjects[newObject.uid] = {
         ...newObject,
         createdObject,

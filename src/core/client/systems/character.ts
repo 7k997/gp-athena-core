@@ -2,7 +2,7 @@ import * as alt from 'alt-client';
 import * as native from 'natives';
 import { Appearance } from '@AthenaShared/interfaces/appearance';
 import { SYSTEM_EVENTS } from '@AthenaShared/enums/system';
-import { Item } from '@AthenaShared/interfaces/item';
+import { ClothingComponent, Item } from '@AthenaShared/interfaces/item';
 
 export const CharacterSystem = {
     /**
@@ -107,7 +107,7 @@ export const CharacterSystem = {
      * @param {Array<ClothingComponent>} components
      *
      */
-    applyEquipment(ped: number, components: Array<Item>, isMale = false) {
+    applyEquipment(ped: number, components: Array<Item<ClothingComponent>>, isMale = false) {
         // if (!ped || !native.doesEntityExist(ped)) {
         //     return;
         // }

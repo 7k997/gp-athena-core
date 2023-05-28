@@ -256,7 +256,8 @@ export function update(player: alt.Player, document: Character = undefined) {
         player.setDlcClothes(0, parseInt(key), parseInt(dataSet[key]), 0, 0);
     });
 
-    if (typeof data.inventory === 'undefined') {
+    // Corechange / FIXME: Inventory sometimes resetted to null
+    if (data.inventory === null || typeof data.inventory === 'undefined') {
         data.inventory = [];
     }
 

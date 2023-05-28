@@ -65,4 +65,5 @@ export async function changeTo(nextWeather: string, timeInSeconds: number) {
     }, timeInMs - 500);
 }
 
-alt.onServer(SYSTEM_EVENTS.WEATHER_CHANGE_TO, changeTo);
+//Corechange weather replaced with gp-weather.
+//alt.onServer(SYSTEM_EVENTS.WEATHER_CHANGE_TO, changeTo);

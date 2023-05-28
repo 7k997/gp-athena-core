@@ -109,6 +109,24 @@ export function get<T = Character>(player: alt.Player): T | undefined {
     return <T>Athena.session.player.get(player, SessionKey);
 }
 
+//Corechange - getById chars
+// export function getById<T = Character>(id: number): T | undefined {
+//     // if (Overrides.get) {
+//     //     return Overrides.get(player);
+//     // }
+
+//     return <T>Athena.session.player.get(player, SessionKey);
+// }
+
+// //Corechange - getAll chars
+// export function getAll(): { [id: string]: Character } {
+//     // if (Overrides.get) {
+//     //     return Overrides.get(player);
+//     // }
+
+//     return cache;
+// }
+
 /**
  * Get the current value of a specific field inside of the player data object.
  * Can be extended to obtain any value easily.

@@ -63,6 +63,32 @@ export interface KeyBindRestrictions {
 }
 
 export interface KeyInfo extends BaseKeyInfo {
+
+     /**
+     * Call this function when the key is pressed and directly released once.
+     *
+     * @type {Function}
+     *
+     */
+    singlePress?: Function;
+
+    /**
+     * Call this function when the key is pressed longer. Same as delacyedKeyDown but with fixed msToTrigger.
+     *
+     * @type {Function}
+     *
+     */
+    longPress?: Function;
+
+    /**
+     * Call this function when the key is pressed and directly released two times.
+     * (Just an idea, no use case yet)
+     *
+     * @type {Function}
+     *
+     */
+    doublePress?: Function;
+
     /**
      * Call this function when the key is pressed down once.
      *

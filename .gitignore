@@ -3,8 +3,6 @@ altv-server
 *.dll
 *.exe
 update.json
-modules/
-data/
 *.log
 cache/
 athena.json
@@ -30,14 +28,16 @@ doc
 !scripts/streamer/dist
 package-lock.json
 
+!AltV.Net.Host.dll
+!/modules/*
+!/modules/csharp-module.dll
+
 # Plugin stuff
 scripts/buildresource/*.json
 src-webviews/src/plugins/imports.ts
 src-webviews/src/plugins/vue-plugin-imports.ts
 src-webviews/public/plugins/*
 !src-webviews/public/plugins/*/.gitkeep
-src/core/plugins/private-*
-src/core/plugins/athena-plugin-*
 src/core/plugins/sandbox*
 docs/
 
@@ -49,4 +49,17 @@ yarn.lock
 resources/core/**
 resources/webviews/**
 
-typedefs.d.ts
+#typedefs.d.ts
+
+# For gp-cards plugin, add user photos for backup to git
+!resources/webviews/
+!resources/webviews/photos/
+!resources/webviews/photos/**
+
+#SaltyChat
+!/resources/mods/addon_saltychat/*.dll
+
+#Mods
+!resources/mods/**/*.dll
+!data/
+!server/data/

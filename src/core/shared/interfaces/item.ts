@@ -74,7 +74,8 @@ export interface ClothingComponent {
      * @type {boolean}
      *
      */
-    isProp?: boolean;
+    isProp?: boolean;   
+    
 }
 
 /**
@@ -193,7 +194,7 @@ export interface SharedItem<CustomData = {}> {
      * @type {string}
      *
      */
-    dbName: string;
+    dbName?: string;
 
     /**
      * Any custom data assigned to this item.
@@ -238,10 +239,11 @@ export interface StoredItem<CustomData = {}> extends SharedItem<CustomData> {
     /**
      * Where this item should be displayed in a toolbar, equipment bar, or inventory bar.
      *
+     * //Corechange, set slot to optional. //TODO: Check dependencies
      * @type {number}
      *
      */
-    slot: number;
+    slot?: number;
 
     /**
      * A generic way to flag an item to be equipped.
@@ -275,16 +277,6 @@ export interface StoredItem<CustomData = {}> extends SharedItem<CustomData> {
      *
      */
     disableCrafting?: boolean;
-
-    /**
-     * A new name to associate with this item.
-     *
-     * This is completely optional, and uses the base item name by default
-     *
-     * @type {string}
-     * @memberof StoredItem
-     */
-    name?: string;
 }
 
 /**
@@ -318,6 +310,15 @@ export interface BaseItem<Behavior = DefaultItemBehavior, CustomData = {}> exten
      *
      */
     name: string;
+
+    /**
+    * Corechange: Added description
+     * The name of this item.
+     *
+     * @type {string}
+     *
+     */
+    description?: string;
 
     /**
      * A client-side icon name.

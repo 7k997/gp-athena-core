@@ -126,7 +126,7 @@ Athena.commands.register(
 
         const attachable: IAttachable = {
             model: 'prop_tool_fireaxe',
-            bone: 57005,
+            bone: PedBone.SKEL_R_Hand,
             pos: {
                 x: 0.1,
                 y: -0.1,

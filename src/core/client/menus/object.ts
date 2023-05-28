@@ -4,9 +4,11 @@ import * as AthenaClient from '@AthenaClient/api';
 
 import { IWheelOptionExt } from '../../shared/interfaces/wheelMenu';
 import { CreatedObject } from '@AthenaClient/streamers/object';
+import { StoredItem } from '../../shared/interfaces/item';
+import { CreatedDrop } from '@AthenaClient/streamers/item';
 
 export type ObjectMenuInjection = (
-    existingObject: CreatedObject,
+    existingObject: CreatedObject | CreatedDrop,
     options: Array<IWheelOptionExt>,
 ) => Array<IWheelOptionExt>;
 
@@ -42,7 +44,7 @@ export function addInjection(callback: ObjectMenuInjection): void {
  * @return {void}
  *
  */
-export function open(object: CreatedObject): void {
+export function open(object: CreatedObject | CreatedDrop): void {
     if (Overrides.open) {
         return Overrides.open(object);
     }

@@ -7,10 +7,21 @@ import { MARKER_TYPE } from '@AthenaShared/enums/markerTypes';
 import { SYSTEM_EVENTS } from '@AthenaShared/enums/system';
 import { Interaction } from '@AthenaShared/interfaces/interaction';
 import { KEY_BINDS } from '@AthenaShared/enums/keyBinds';
+import {
+    ClosestTarget,
+    MapObjectTarget,
+} from '@AthenaPlugins/gp-athena-overrides/client/src/replacements/mapObjectTarget';
+import { model } from '@AthenaClient/utility';
+import { IObject } from '@AthenaShared/interfaces/iObject';
+import { IWheelOptionExt } from '@AthenaShared/interfaces/wheelMenu';
+import { CreatedDrop } from '@AthenaClient/streamers/item';
+
+//Corechange: TODO remove entity selector over vehicles and maybe more
 
 export type ValidEntityTypes = 'object' | 'pos' | 'npc' | 'player' | 'vehicle' | 'interaction';
 export type TargetInfo = { id: number; pos: alt.IVector3; type: ValidEntityTypes; dist: number; height: number };
 
+let MAX_DISTANCE = 5;
 let MAX_TARGETS = 50;
 let everyTick: number;
 let selections: Array<TargetInfo> = [];
@@ -76,6 +87,17 @@ const Internal = {
 
         return entityInfo;
     },
+    convertMapObject(mapObject: ClosestTarget, type: ValidEntityTypes): Array<TargetInfo> {
+        let entityInfo: Array<TargetInfo> = [];
+
+        const model = native.getEntityModel(mapObject.scriptID);
+        const [_, min, max] = native.getModelDimensions(model);
+        const height = Math.abs(min.z) + Math.abs(max.z);
+        const dist = AthenaClient.utility.vector.distance2d(alt.Player.local.pos, mapObject.pos);
+        entityInfo.push({ id: mapObject.scriptID, dist, type, pos: mapObject.pos, height });
+
+        return entityInfo;
+    },
     updateSelectionList() {
         const players = [...alt.Player.streamedIn];
         const vehicles = [...alt.Vehicle.streamedIn];
@@ -84,6 +106,13 @@ const Internal = {
         let entityInfo: Array<TargetInfo> = Internal.convert(players, 'player');
         entityInfo = entityInfo.concat(Internal.convert(vehicles, 'vehicle'));
         entityInfo = entityInfo.concat(Internal.convert(objects, 'object'));
+
+        //corechange: Raycast for default map objects
+        const closestObject = MapObjectTarget.get();
+        if (closestObject) {
+            entityInfo = entityInfo.concat(Internal.convertMapObject(closestObject, 'object'));
+        }
+
         if (latestInteraction) {
             const dist = AthenaClient.utility.vector.distance2d(alt.Player.local.pos, latestInteraction.position);
             entityInfo.push({ dist, height: 1, id: -1, pos: latestInteraction.position, type: 'interaction' });
@@ -94,6 +123,9 @@ const Internal = {
         });
 
         selections = entityInfo.slice(0, entityInfo.length < 5 ? entityInfo.length : MAX_TARGETS);
+
+        //Corechange filter by Max Distance
+        selections = entityInfo.filter((entityInfo) => entityInfo.dist <= MAX_DISTANCE);
 
         if (typeof lastSelection === 'undefined') {
             if (selections.length >= 1) {
@@ -135,77 +167,228 @@ const Internal = {
         AthenaClient.systems.sound.frontend('SKIP', 'HUD_FRONTEND_DEFAULT_SOUNDSET');
     },
     invokeSelection() {
-        if (latestInteraction) {
-            AthenaClient.systems.interaction.invoke();
-            return;
+        //Corechange completly reworked
+        // if (latestInteraction) {
+        //     AthenaClient.systems.interaction.invoke();
+        //     return;
+        // }
+
+        // //TODO Implement config setting
+        const configPreSelectMenu = true;
+        let selected = selections;
+
+        //No pre selection menu
+        if (!configPreSelectMenu) {
+            selected = [selections[selectionIndex]];
         }
 
-        const selection = selections[selectionIndex];
-        if (typeof selection === 'undefined') {
-            return;
-        }
+        // //More then one selection -> Open pre selection menu
 
-        switch (selection.type) {
-            case 'npc':
-                AthenaClient.menu.npc.open(selection.id);
+        // Here we will construct a dynamic wheel menu based on the amount of options we have.
+        const wheelOptions: Array<IWheelOptionExt> = [];
+
+        for (const selection of selected) {
+            if (typeof selection === 'undefined') {
                 break;
-            case 'player':
-                const targetPlayer = alt.Player.all.find((x) => x.scriptID === selection.id);
-                if (!targetPlayer || !targetPlayer.valid) {
-                    break;
-                }
+            }
 
-                AthenaClient.menu.player.open(targetPlayer);
-                break;
-            case 'vehicle':
-                const targetVehicle = alt.Vehicle.all.find((x) => x.scriptID === selection.id);
-                if (!targetVehicle || !targetVehicle.valid) {
+            switch (selection.type) {
+                case 'npc':
+                    wheelOptions.push({
+                        name: `NPC`,
+                        icon: 'icon-user-tie',
+                        data: [selection.id],
+                        callback: (_scriptID: number) => {
+                            AthenaClient.menu.npc.open(_scriptID);
+                        },
+                    });
                     break;
-                }
-
-                AthenaClient.menu.vehicle.open(targetVehicle);
-                break;
-            case 'object':
-                const object = alt.Object.all.find((x) => x.scriptID === selection.id);
-                if (typeof object === 'undefined') {
+                case 'player':
+                    const targetPlayer = alt.Player.all.find((x) => x.scriptID === selection.id);
+                    if (!targetPlayer || !targetPlayer.valid) {
+                        break;
+                    }
+                    wheelOptions.push({
+                        name: `Player`,
+                        icon: 'icon-person',
+                        data: [targetPlayer],
+                        callback: (_targetPlayer: alt.Player) => {
+                            AthenaClient.menu.player.open(_targetPlayer);
+                        },
+                    });
                     break;
-                }
-
-                const droppedItem = AthenaClient.streamers.item.getDropped(object.scriptID);
-                if (typeof droppedItem !== 'undefined') {
+                case 'vehicle':
+                    const targetVehicle = alt.Vehicle.all.find((x) => x.scriptID === selection.id);
+                    if (!targetVehicle || !targetVehicle.valid) {
+                        break;
+                    }
+                    const model = native.getDisplayNameFromVehicleModel(targetVehicle.model);
+                    wheelOptions.push({
+                        name: model,
+                        icon: 'icon-directions_car',
+                        data: [targetVehicle],
+                        callback: (_targetVehicle: alt.Vehicle) => {
+                            AthenaClient.menu.vehicle.open(_targetVehicle);
+                        },
+                    });
+                    break;
+                case 'object':
                     if (alt.Player.local.vehicle) {
-                        return;
+                        break;
                     }
 
-                    native.taskGoToCoordAnyMeans(
-                        alt.Player.local.scriptID,
-                        droppedItem.pos.x,
-                        droppedItem.pos.y,
-                        droppedItem.pos.z,
-                        2,
-                        0,
-                        false,
-                        786603,
-                        0,
-                    );
+                    const object = alt.Object.all.find((x) => x.scriptID === selection.id);
+                    if (typeof object === 'undefined') {
+                        //Corechange: Its maybe a map object and not alt.Object check if it exists...
+                        const model = native.getEntityModel(selection.id);
+                        const rot = native.getEntityRotation(selection.id, 2);
+                        if (model) {
+                            //Create dummy alt.Object
+                            const createdObject: alt.Object = {
+                                model: model,
+                                pos: new alt.Vector3(selection.pos),
+                                rot: new alt.Vector3(rot),
+                                dynamic: true,
+                                visible: false,
+                                count: 0,
+                                alpha: 0,
+                                resetAlpha: undefined,
+                                lodDistance: 0,
+                                hasGravity: false,
+                                isRemote: false,
+                                isStreamedIn: false,
+                                useStreaming: false,
+                                streamingDistance: 0,
+                                detach: undefined,
+                                isCollisionEnabled: false,
+                                toggleCollision: undefined,
+                                placeOnGroundProperly: undefined,
+                                positionFrozen: false,
+                                activatePhysics: undefined,
+                                textureVariation: 0,
+                                isWorldObject: false,
+                                waitForSpawn: undefined,
+                                id: 0,
+                                scriptID: selection.id,
+                                isSpawned: false,
+                                setMeta: undefined,
+                                deleteMeta: undefined,
+                                getMeta: undefined,
+                                hasMeta: undefined,
+                                getSyncedMeta: undefined,
+                                hasSyncedMeta: undefined,
+                                getStreamSyncedMeta: undefined,
+                                hasStreamSyncedMeta: undefined,
+                                getStreamSyncedMetaKeys: undefined,
+                                dimension: 0,
+                                getByID: undefined,
+                                getByRemoteID: undefined,
+                                valid: false,
+                                destroy: undefined,
+                                getMetaDataKeys: undefined,
+                                refCount: 0,
+                                attachToEntity: undefined,
+                                netOwner: undefined,
+                                getSyncedMetaKeys: undefined,
+                                type: undefined,
+                            };
 
-                    alt.emitServer(SYSTEM_EVENTS.INTERACTION_PICKUP_ITEM, droppedItem._id);
+                            const mapObjectInstance: AthenaClient.CreatedObject = {
+                                pos: selection.pos,
+                                model: 'seehash', //Just a very very dirty hack to get the model hash in a plugin
+                                hash: model,
+                                createdObject,
+                            };
+
+                            if (typeof mapObjectInstance !== 'undefined') {
+                                wheelOptions.push({
+                                    name: model + '[' + mapObjectInstance.hash + ']',
+                                    icon: 'icon-lightbulb',
+                                    data: [mapObjectInstance],
+                                    callback: (_mapObjectInstance: AthenaClient.CreatedObject) => {
+                                        AthenaClient.menu.object.open(_mapObjectInstance);
+                                    },
+                                });
+
+                                break;
+                            }
+                        }
+                        break;
+                    }
+
+                    //Corechange: gp-athena-overrides
+                    const droppedItem = AthenaClient.streamers.item.getDropped(object.scriptID);
+                    if (typeof droppedItem !== 'undefined') {
+                        wheelOptions.push({
+                            name: droppedItem.name,
+                            icon: 'icon-lightbulb',
+                            data: [droppedItem],
+                            callback: (_droppedItem: CreatedDrop) => {
+                                AthenaClient.menu.object.open(_droppedItem);
+                            },
+                        });
+                        break;
+                    }
+
+                    const objectInstance = AthenaClient.streamers.object.getFromScriptId(selection.id);
+                    if (typeof objectInstance !== 'undefined') {
+                        wheelOptions.push({
+                            name: 'Object',
+                            icon: 'icon-lightbulb',
+                            data: [objectInstance],
+                            callback: (_objectInstance: AthenaClient.CreatedObject) => {
+                                AthenaClient.menu.object.open(_objectInstance);
+                            },
+                        });
+                        break;
+                    }
+
                     break;
-                }
-
-                const objectInstance = AthenaClient.streamers.object.getFromScriptId(selection.id);
-                if (typeof objectInstance === 'undefined') {
+                case 'pos':
                     break;
-                }
+                case 'interaction':
+                    wheelOptions.push({
+                        name: 'Interaction',
+                        icon: 'icon-lightbulb',
+                        data: [],
+                        callback: () => {
+                            AthenaClient.systems.interaction.invoke();
+                        },
+                    });
 
-                AthenaClient.menu.object.open(objectInstance);
-                break;
-            case 'pos':
-                break;
-            case 'interaction':
-                AthenaClient.systems.interaction.invoke();
-                break;
+                    break;
+            }
         }
+
+        // Force Single Option Invoke
+        if (wheelOptions.length === 1) {
+            const option = wheelOptions[0];
+
+            if (option.callback) {
+                const data = option.data ? option.data : [];
+                option.callback(...data);
+                return;
+            }
+
+            if (option.emitServer) {
+                const data = option.data ? option.data : [];
+                alt.emitServer(option.emitServer, ...data);
+                return;
+            }
+
+            if (option.emitClient) {
+                const data = option.data ? option.data : [];
+                alt.emit(option.emitClient, ...data);
+            }
+
+            return;
+        }
+
+        if (wheelOptions.length <= 0) {
+            return;
+        }
+
+        AthenaClient.systems.wheelMenu.open('Select', wheelOptions);
     },
     tick() {
         if (AthenaClient.webview.isAnyMenuOpen()) {

@@ -1,0 +1,71 @@
+{
+  "name": "",
+  "isOrdered": true,
+  "folders": {
+    "cache": {
+      "name": "cache",
+      "isOrdered": true,
+      "folders": {},
+      "files": {}
+    },
+    "configs": {
+      "name": "configs",
+      "isOrdered": true,
+      "folders": {},
+      "files": {}
+    },
+    "data": {
+      "name": "data",
+      "isOrdered": true,
+      "folders": {},
+      "files": {}
+    },
+    "modules": {
+      "name": "modules",
+      "isOrdered": true,
+      "folders": {},
+      "files": {}
+    },
+    "resources": {
+      "name": "resources",
+      "isOrdered": true,
+      "folders": {},
+      "files": {}
+    },
+    "screenshots": {
+      "name": "screenshots",
+      "isOrdered": true,
+      "folders": {},
+      "files": {}
+    },
+    "scripts": {
+      "name": "scripts",
+      "isOrdered": true,
+      "folders": {},
+      "files": {}
+    },
+    "src": {
+      "name": "src",
+      "isOrdered": true,
+      "folders": {},
+      "files": {}
+    },
+    "src-webviews": {
+      "name": "src-webviews",
+      "isOrdered": true,
+      "folders": {},
+      "files": {}
+    },
+    "vscode": {
+      "name": "vscode",
+      "isOrdered": true,
+      "folders": {},
+      "files": {}
+    }
+  },
+  "files": {
+    "CONTRIBUTING": 0,
+    "CHANGELOG": 1,
+    "README": 2
+  }
+}

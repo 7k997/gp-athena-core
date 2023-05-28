@@ -109,7 +109,9 @@ export async function remove(player: alt.Player, slot: number): Promise<boolean>
  * @param {string} baseItem
  * @return {void}
  */
-export async function has(player: alt.Player, dbName: string, quantity: number, version = undefined) {
+
+//Corechange: Fixed the return type
+export async function has(player: alt.Player, dbName: string, quantity: number, version = undefined): Promise<boolean> {
     if (Overrides.has) {
         return Overrides.has(player, dbName, quantity, version);
     }

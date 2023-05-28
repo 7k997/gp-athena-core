@@ -7,7 +7,14 @@ import { KeyBindRestrictions, KeyInfo } from '@AthenaClient/interface/hotkeys';
 
 export type KeyInfoDefault = KeyInfo & { default: number };
 
+const singlePressDelay = 200;
+const longPressDelay = 1000;
+
 const keyMappings: Array<KeyInfoDefault> = [];
+
+const singlePressKeyDownTime: { [identifier: string]: number } = {};
+const longPressKeyDownTime: { [identifier: string]: number } = {};
+
 const keyDownTime: { [identifier: string]: number } = {};
 const keyCooldown: { [identifier: string]: number } = {};
 
@@ -138,11 +145,17 @@ const Internal = {
                 keyDownTime[keyInfo.identifier] = Date.now() + keyInfo.delayedKeyDown.msToTrigger;
             }
 
-            if (!keyInfo.keyDown) {
-                continue;
+            if (keyInfo.singlePress) {
+                singlePressKeyDownTime[keyInfo.identifier] = Date.now() + singlePressDelay;
             }
 
-            keyInfo.keyDown();
+            if (keyInfo.longPress) {
+                longPressKeyDownTime[keyInfo.identifier] = Date.now() + longPressDelay;
+            }
+
+            if (keyInfo.keyDown) {
+                keyInfo.keyDown();
+            }
         }
     },
     keyUp(key: number) {
@@ -154,6 +167,8 @@ const Internal = {
             }
 
             delete keyDownTime[keyInfo.identifier];
+            delete singlePressKeyDownTime[keyInfo.identifier];
+            delete longPressKeyDownTime[keyInfo.identifier];
 
             if (keyInfo.disabled) {
                 return;
@@ -172,11 +187,9 @@ const Internal = {
                 return;
             }
 
-            if (!keyInfo.keyUp) {
-                return;
+            if (keyInfo.keyUp) {
+                keyInfo.keyUp();
             }
-
-            keyInfo.keyUp();
         }
     },
     keyHeld() {
@@ -212,6 +225,36 @@ const Internal = {
             keyInfo.delayedKeyDown.callback();
         });
 
+        // Check matching keys in singlePressKeyDownTime
+        Object.keys(singlePressKeyDownTime).forEach((identifier) => {
+            const timeToExceed = singlePressKeyDownTime[identifier];
+            if (Date.now() < timeToExceed) {
+                return;
+            }
+
+            delete singlePressKeyDownTime[identifier];
+            const keyInfo = Internal.getKeyInfo(identifier);
+            if (keyInfo.singlePress) {
+                keyInfo.singlePress();
+            }
+        });
+
+        // Check matching keys in longPressKeyDownTime
+        Object.keys(longPressKeyDownTime).forEach((identifier) => {
+            const timeToExceed = longPressKeyDownTime[identifier];
+            if (Date.now() < timeToExceed) {
+                return;
+            }
+
+            delete longPressKeyDownTime[identifier];
+            const keyInfo = Internal.getKeyInfo(identifier);
+            if (keyInfo.longPress) {
+                keyInfo.longPress();
+            }
+        });
+
+        // keyInfo.doublePress();
+
         // Check for whilePressed functions, and execute
         for (let keyInfo of keyMappings) {
             if (!keyInfo.whilePressed) {
@@ -238,6 +281,7 @@ const Internal = {
  * @param {KeyInfo} keyBind
  */
 export function add(keyBind: KeyInfo) {
+    alt.logWarning(`Add kebind ${keyBind.key} ${keyBind.identifier}`);
     const userDefinedHotkey = alt.LocalStorage.get(`keybind-${keyBind.key}`);
 
     if (typeof userDefinedHotkey !== 'undefined') {

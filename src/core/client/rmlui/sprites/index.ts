@@ -104,7 +104,7 @@ const InternalFunctions = {
         element.addClass('image');
         element.setAttribute('width', `${elements[index].width}px`);
         element.setAttribute('height', `${elements[index].height}px`);
-        element.id = uid;
+        element.rmlId = uid;
         elements[index].element = element;
         document.appendChild(element);
     },

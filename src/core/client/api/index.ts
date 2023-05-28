@@ -6,4 +6,5 @@ export * as streamers from '@AthenaClient/streamers';
 export * as systems from '@AthenaClient/systems';
 export * as utility from '@AthenaClient/utility';
 export * as webview from '@AthenaClient/webview';
+export * as webviewCinema from '@AthenaClient/webviewCinema';
 export * as world from '@AthenaClient/world';

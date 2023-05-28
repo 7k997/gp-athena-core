@@ -72,7 +72,10 @@ const InternalFunctions = {
                 false,
             );
             items[existingIndex].createdObject.toggleCollision(false, false);
-            items[existingIndex].createdObject.setPositionFrozen(true);
+
+            //Corechange
+            //items[existingIndex].createdObject.setPositionFrozen(true);
+            items[existingIndex].createdObject.positionFrozen = true;
         }
 
         if (!interval) {
