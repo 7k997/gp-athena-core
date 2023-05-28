@@ -1,11 +1,13 @@
-<h2>This is a modified experimental version of the athena framework V5.x. It can be used as basis for all my plugins.</h2>My Idea is a realistic roleplay server and this is my version which includes all my changes.
+<h2>This is a modified experimental version of the athena framework V5.x. It can be used as basis for all my plugins.</h2>
+
+My Idea is a realistic roleplay server and this is my version which includes all my "core changes".
 
 Please note that some of the changes implemented in this modified version may not have explicit explanations. However, these changes are essential for achieving a realistic server. Certain core functionalities, like vehicle despawn on disconnect, have been intentionally omitted. Rest assured that through the inclusion of other plugins, these functionalities will be reintroduced in a more realistic and immersive manner.
 
 I try to make all core changes via plugin if possible. But sometimes this is not possible for technical and time reasons. Utilities and overrides are in the following plugins which are already integrated in this version:
 
-* gp-athena-overrides
-* gp-athena-utils
+-   gp-athena-overrides
+-   gp-athena-utils
 
 Direct core changes are marked with comment //corechange, so u can find these easly.
 
@@ -27,20 +29,20 @@ Ever wanted to start your own GTA:V Roleplay Server? No idea where to start? Wel
 
 ## Important Links
 
-* [Guides / Installation](https://athenaframework.com)
-* [Discord & Forums](https://ares.stuyk.com/v1/get/discord)
-* [Discord Membership](https://discord.com/servers/athena-framework-790039623648542760)
-* [Issues](https://github.com/Stuyk/altv-athena/issues)
-* [alt:V Client](https://altv.mp)
+-   [Guides / Installation](https://athenaframework.com)
+-   [Discord & Forums](https://ares.stuyk.com/v1/get/discord)
+-   [Discord Membership](https://discord.com/servers/athena-framework-790039623648542760)
+-   [Issues](https://github.com/Stuyk/altv-athena/issues)
+-   [alt:V Client](https://altv.mp)
 
 ## Quick Start
 
 ### Software to Install
 
-* [Install MongoDB Server](https://www.mongodb.com/try/download/community)
-* [Install Git](https://git-scm.com/downloads)
-* [NodeJS 18+](https://nodejs.org/en/download/)
-* [alt:V Client](https://altv.mp/)
+-   [Install MongoDB Server](https://www.mongodb.com/try/download/community)
+-   [Install Git](https://git-scm.com/downloads)
+-   [NodeJS 18+](https://nodejs.org/en/download/)
+-   [alt:V Client](https://altv.mp/)
 
 ### Run Commands in Terminal or Powershell
 
