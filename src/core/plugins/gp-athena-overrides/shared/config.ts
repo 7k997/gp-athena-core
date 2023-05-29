@@ -7,4 +7,5 @@ export const Config = {
     DISABLE_DEFAULT_AMMO: true, //Disable the default ammo.
     DISABLE_DEFAULT_TIME_SYNC: false, //Disable the default time sync.
     DISABLE_HOSPITAL_BLIPS: false, //Disable the hospital blips.
+    WEATHER_SYNC_INTERVAL: 1000 * 60 * 1, //1 minutes, DO NOT SET IT BELOW 1 MINUTE.
 };

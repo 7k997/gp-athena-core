@@ -2,6 +2,7 @@ import * as alt from 'alt-client';
 import * as native from 'natives';
 import { WEATHER_EVENTS } from '@AthenaPlugins/core-weather/shared/events';
 import { WORLD_WEATHER } from '@AthenaPlugins/core-weather/shared/weather';
+import { Config } from '@AthenaPlugins/gp-athena-overrides/shared/config';
 
 let isTransitioning = false;
 let isFrozen = false;
@@ -33,7 +34,7 @@ export class World {
 
     static init() {
         alt.onServer(WEATHER_EVENTS.UPDATE_WEATHER, World.updateWeather);
-        alt.setInterval(World.getWeatherUpdate, 10000); //For test all 10 seconds, Later 1 or 10 minutes?
+        alt.setInterval(World.getWeatherUpdate, Config.WEATHER_SYNC_INTERVAL);
         // alt.onServer(SYSTEM_EVENTS.WORLD_UPDATE_TIME, World.updateTime);
     }
 
