@@ -1,5 +1,4 @@
 import * as alt from 'alt-shared';
-// import * as iObjectRef from '@AthenaShared/interfaces/iObject';
 
 declare module '@AthenaShared/interfaces/iObject' {
     export interface IObject {
