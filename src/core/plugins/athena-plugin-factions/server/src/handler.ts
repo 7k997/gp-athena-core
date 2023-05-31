@@ -367,6 +367,22 @@ export class FactionHandler {
         return Object.values(factions) as Array<Faction>;
     }
 
+    // /**
+    //  * Get Faction from DB and update cache.
+    //  * @param faction
+    //  * @returns
+    //  */
+    // static async getFactionAndUpdateCache(faction): Promise<Faction> {
+    //     const factionData = await Database.fetchAllByField<Faction>('_id', faction._id, FACTION_COLLECTION);
+    //     if (!factionData) {
+    //         return null;
+    //     }
+
+    //     factions[faction._id] = faction;
+
+    //     return faction;
+    // }
+
     /**
      * Reloads blips, markers, parking spots, etc.
      *
@@ -387,23 +403,25 @@ export class FactionHandler {
                 shortRange: true,
             });
 
-            let factionPos = new alt.Vector3(
-                faction.settings.position.x,
-                faction.settings.position.y,
-                faction.settings.position.z,
-            );
-
             Athena.controllers.interaction.append({
                 description: faction.name,
                 uid: faction._id.toString(),
-                position: factionPos,
+                position: new alt.Vector3(
+                    faction.settings.position.x,
+                    faction.settings.position.y,
+                    faction.settings.position.z - 0.5,
+                ),
                 data: [faction._id.toString()],
                 callback: FactionHandler.openFactionMenu,
             });
 
             Athena.controllers.marker.append({
                 uid: faction._id.toString(),
-                pos: factionPos,
+                pos: new alt.Vector3(
+                    faction.settings.position.x,
+                    faction.settings.position.y,
+                    faction.settings.position.z,
+                ),
                 type: 31,
                 color: new alt.RGBA(255, 255, 255, 100),
             });

@@ -84,9 +84,13 @@ export class FactionFuncs {
      * @param {Faction} faction
      * @memberof FactionFuncs
      */
-    static updateMembers(faction: Faction) {
+    static async updateMembers(faction: Faction) {
         const memberIdentifiers = Object.keys(faction.members);
-        const members = alt.Player.all.filter((p) => p && p.valid && p && memberIdentifiers.includes(p.id.toString()));
+
+        const players = alt.Player.all;
+        const members = alt.Player.all.filter(
+            (p) => p && p.valid && p && memberIdentifiers.includes(p.character._id.toString()),
+        );
 
         alt.emitClient(members, FACTION_EVENTS.PROTOCOL.REFRESH, faction);
     }

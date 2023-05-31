@@ -7,17 +7,65 @@ import { FactionPlayerFuncs } from './playerFuncs';
 
 const lastInvite: { [character: string]: string } = {};
 
-/**
- * It creates a new faction.
- * @param player - alt.Player - The player who created the faction.
- * @param {string[]} name - The name of the faction.
- * @returns The result of the add function.
- */
-Athena.systems.messenger.commands.register(
-    'fcreate',
-    '/fcreate [type: (Neutral, State, Gang)] [name] - Open faction panel if in faction.',
-    ['admin'],
-    async (player: alt.Player, type: string, ...name: string[]) => {
+export class FactionCommands {
+    static init() {
+        /**
+         * It creates a new faction.
+         * @param player - alt.Player - The player who created the faction.
+         * @param {string[]} name - The name of the faction.
+         * @returns The result of the add function.
+         */
+        Athena.systems.messenger.commands.register(
+            'fcreate',
+            '/fcreate [type: (NEUTRAL, STATE, GANG)] [name] - Create faction.',
+            ['admin'],
+            FactionCommands.handleFactionCreate,
+        );
+
+        Athena.systems.messenger.commands.register(
+            'fadmincreate',
+            '/fadmincreate [type: (NEUTRAL, STATE, GANG)] [ownerId] [name] - Create faction for playerId.',
+            ['admin'],
+            FactionCommands.handleAdminCreate,
+        );
+
+        Athena.systems.messenger.commands.register(
+            'fopen',
+            '/fopen - Open faction panel if in faction.',
+            [],
+            FactionCommands.handleFactionOpen,
+        );
+
+        Athena.systems.messenger.commands.register(
+            'fjoin',
+            '/fjoin [uid] - Quits Current Faction & Joins Another',
+            ['admin'],
+            FactionCommands.handleFactionJoin,
+        );
+
+        Athena.systems.messenger.commands.register(
+            'finvite',
+            '/finvite [id] - Invite to faction',
+            [],
+            FactionCommands.handleFactionInvite,
+        );
+
+        Athena.systems.messenger.commands.register(
+            'faccept',
+            '/faccept - Join last invited to faction',
+            [],
+            FactionCommands.handleFactionAccept,
+        );
+
+        Athena.systems.messenger.commands.register(
+            'fsetowner',
+            '/fsetowner <player_id> - Set a member inside a faction to the owner of their faction.',
+            ['admin'],
+            FactionCommands.handleFactionSetOwner,
+        );
+    }
+
+    static async handleFactionCreate(player: alt.Player, type: string, ...name: string[]) {
         const playerData = Athena.document.character.get(player);
         const factionName = name.join(' ');
         if (!playerData._id) {
@@ -38,14 +86,9 @@ Athena.systems.messenger.commands.register(
 
         const id = result.response;
         Athena.player.emit.message(player, `Created Faction with ID: ${id}`);
-    },
-);
+    }
 
-Athena.systems.messenger.commands.register(
-    'fadmincreate',
-    '/fadmincreate [type: (Neutral, State, Gang)] [ownerId] [name] - Create faction for playerId.',
-    ['admin'],
-    async (player: alt.Player, type: string, ownerId: any, ...name: string[]) => {
+    static async handleAdminCreate(player: alt.Player, type: string, ownerId: any, ...name: string[]) {
         const factionName = name.join(' ');
 
         const target = Athena.systems.identifier.getPlayer(ownerId);
@@ -68,14 +111,9 @@ Athena.systems.messenger.commands.register(
 
         const id = result.response;
         Athena.player.emit.message(player, `Created Faction with ID: ${id}`);
-    },
-);
+    }
 
-Athena.systems.messenger.commands.register(
-    'fopen',
-    '/fopen - Open faction panel if in faction.',
-    [],
-    (player: alt.Player) => {
+    static async handleFactionOpen(player: alt.Player) {
         const playerData = Athena.document.character.get(player);
         if (!playerData.faction) {
             Athena.player.emit.message(player, 'You are not in a faction.');
@@ -84,19 +122,14 @@ Athena.systems.messenger.commands.register(
 
         const faction = FactionHandler.get(playerData.faction);
         if (!faction) {
-            Athena.player.emit.message(player, 'You are not in a faction.');
+            Athena.player.emit.message(player, 'Your faction not found!');
             return;
         }
 
         alt.emitClient(player, FACTION_EVENTS.PROTOCOL.OPEN, faction);
-    },
-);
+    }
 
-Athena.systems.messenger.commands.register(
-    'fjoin',
-    '/fjoin [uid] - Quits Current Faction & Joins Another',
-    ['admin'],
-    async (player: alt.Player, uid: string) => {
+    static async handleFactionJoin(player: alt.Player, uid: string) {
         const playerData = Athena.document.character.get(player);
         if (!uid) {
             Athena.player.emit.message(player, `You must specify a faction UID to join.`);
@@ -118,14 +151,9 @@ Athena.systems.messenger.commands.register(
 
         FactionFuncs.addMember(faction, playerData._id);
         Athena.player.emit.message(player, `Moved to Faction: ${faction.name}`);
-    },
-);
+    }
 
-Athena.systems.messenger.commands.register(
-    'finvite',
-    '/finvite [id] - Invite to faction',
-    [],
-    (player: alt.Player, playerId: any) => {
+    static async handleFactionInvite(player: alt.Player, playerId: any) {
         const playerData = Athena.document.character.get(player);
         const faction = FactionHandler.get(playerData.faction);
         if (!faction) {
@@ -165,14 +193,9 @@ Athena.systems.messenger.commands.register(
         Athena.player.emit.message(player, `${target.data.name} was invited to the faction.`);
         Athena.player.emit.message(target.player, `${playerData.name} invited you to faction ${faction.name}.`);
         Athena.player.emit.message(target.player, `Type '/faccept' to join`);
-    },
-);
+    }
 
-Athena.systems.messenger.commands.register(
-    'faccept',
-    '/faccept - Join last invited to faction',
-    [],
-    (player: alt.Player) => {
+    static async handleFactionAccept(player: alt.Player) {
         const playerData = Athena.document.character.get(player);
         if (playerData.faction) {
             Athena.player.emit.message(player, `Already in a faction.`);
@@ -201,14 +224,9 @@ Athena.systems.messenger.commands.register(
         }
 
         Athena.player.emit.message(player, `Joined faction ${faction.name}`);
-    },
-);
+    }
 
-Athena.systems.messenger.commands.register(
-    'fsetowner',
-    '/fsetowner <player_id> - Set a member inside a faction to the owner of their faction.',
-    ['admin'],
-    async (player: alt.Player, id: string) => {
+    static async handleFactionSetOwner(player: alt.Player, id: string) {
         const target = Athena.systems.identifier.getPlayer(id);
         const targetData = Athena.document.character.get(alt.Player.all.find((p) => p.id === target.id));
         if (!target) {
@@ -229,11 +247,5 @@ Athena.systems.messenger.commands.register(
         }
 
         Athena.player.emit.message(player, `${targetData.name} was set to owner of ${faction.name}`);
-    },
-);
-
-export class FactionCommands {
-    static init() {
-        // leave empty
     }
 }

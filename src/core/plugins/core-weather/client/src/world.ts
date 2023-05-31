@@ -56,8 +56,7 @@ export class World {
         }
 
         const timeInMs = timeInSeconds * 1000;
-        //TODO Transition issue -> [00:57:32][Error] [V8] Unhandled promise rejection at core:plugins/core-weather/client/src/world.js:84 (Error: Failed to wait for callback: ()=>isTransitioning === false)
-        // [00:57:32][Error]   at updateWeather (plugins/core-weather/client/src/world.js:84)
+
         await alt.Utils.waitFor(() => isTransitioning === false, timeInMs);
 
         isTransitioning = true;
