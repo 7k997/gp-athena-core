@@ -25,14 +25,12 @@ class InternalFunctions {
      * @memberof InternalFunctions
      */
     static create(faction: Faction) {
-        alt.logWarning('Faction create...');
         faction._id = faction._id.toString();
         factions[faction._id as string] = faction;
 
         if (!faction.settings) {
             faction.settings = {};
         }
-        alt.logWarning('Faction create end...');
         FactionHandler.updateSettings(faction);
     }
 }
@@ -107,8 +105,7 @@ export class FactionHandler {
      * @return {Promise<IGenericResponse>} _id
      * @memberof FactionHandler
      */
-    static async add(characterOwnerID: string, _faction: FactionCore): Promise<any> {
-        alt.logWarning('Faction add...');
+    static async add(owner: alt.Player, _faction: FactionCore): Promise<any> {
         if (!_faction.name) {
             alt.logWarning(`Cannot create faction, missing faction name.`);
             return { status: false, response: `Cannot create faction, missing faction name.` };
@@ -119,18 +116,15 @@ export class FactionHandler {
                 'Cannot find faction-type ' + _faction.type + '! Type will be now ' + this.factionTypes.neutral,
             );
             _faction.type = this.factionTypes.neutral;
+        } else {
+            _faction.type = this.factionTypes[_faction.type];
         }
 
         if (_faction.bank === null || _faction.bank === undefined) {
             _faction.bank = 0;
         }
 
-        const character = await Database.fetchData<Character>('_id', characterOwnerID, Collections.Characters);
-        if (!character) {
-            alt.logWarning(`Could not find a character with identifier: ${characterOwnerID}`);
-            return { status: false, response: `Could not find a character with identifier: ${characterOwnerID}` };
-        }
-
+        const character = Athena.document.character.get(owner);
         if (character.faction) {
             return { status: false, response: `Character is already in a faction.` };
         }
@@ -143,8 +137,8 @@ export class FactionHandler {
         const faction: Faction = {
             ..._faction,
             members: {
-                [characterOwnerID]: {
-                    id: characterOwnerID,
+                [character._id]: {
+                    id: character._id,
                     name: character.name,
                     rank: defaultRanks[0].uid,
                     hasOwnership: true,
@@ -157,31 +151,22 @@ export class FactionHandler {
             tickActions: [],
         };
 
+        const existingFaction = await Database.fetchAllByField<Faction>(FACTION_COLLECTION, 'name', _faction.name);
+        if (existingFaction.length > 0) {
+            alt.logWarning(`Cannot create faction, name already exists.`);
+            return { status: false, response: `Cannot create faction, name already exists.` };
+        }
+
         const document = await Database.insertData<Faction>(faction, FACTION_COLLECTION, true);
         if (!document) {
             alt.logWarning(`Cannot insert faction into database.`);
             return { status: false, response: `Cannot insert faction into database.` };
         }
 
-        character.faction = document._id.toString();
-        await Database.updatePartialData(
-            character._id,
-            {
-                faction: character.faction,
-            },
-            Collections.Characters,
-        );
-
-        const xTarget = alt.Player.all.find((x) => x && x && x.id.toString() === character._id.toString());
-        const targetData = Athena.document.character.get(xTarget);
-
-        if (targetData) {
-            targetData.faction = character.faction;
-        }
-
-        alt.logWarning('Faction add... END');
+        Athena.document.character.set(owner, 'faction', document._id.toString());
         InternalFunctions.create(document);
-        return { status: false, response: document._id.toString() };
+
+        return { status: true, response: `Created Faction ${document.name}` };
     }
 
     /**

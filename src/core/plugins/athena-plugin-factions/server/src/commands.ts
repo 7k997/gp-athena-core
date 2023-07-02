@@ -66,26 +66,16 @@ export class FactionCommands {
     }
 
     static async handleFactionCreate(player: alt.Player, type: string, ...name: string[]) {
-        const playerData = Athena.document.character.get(player);
         const factionName = name.join(' ');
-        if (!playerData._id) {
-            Athena.player.emit.message(player, 'playerData._id is: ' + playerData._id);
-            return;
-        }
-        const result = await FactionHandler.add(playerData._id, {
+
+        const result = await FactionHandler.add(player, {
             bank: 0,
             canDisband: true,
             name: factionName,
             type: type.toLowerCase(),
         });
 
-        if (!result.status) {
-            Athena.player.emit.message(player, result.response);
-            return;
-        }
-
-        const id = result.response;
-        Athena.player.emit.message(player, `Created Faction with ID: ${id}`);
+        Athena.player.emit.message(player, result.response);
     }
 
     static async handleAdminCreate(player: alt.Player, type: string, ownerId: any, ...name: string[]) {
@@ -97,20 +87,14 @@ export class FactionCommands {
             return;
         }
 
-        const result = await FactionHandler.add(target.id.toString(), {
+        const result = await FactionHandler.add(player, {
             bank: 0,
             canDisband: true,
             name: factionName,
             type: type.toLowerCase(),
         });
 
-        if (!result.status) {
-            Athena.player.emit.message(player, result.response);
-            return;
-        }
-
-        const id = result.response;
-        Athena.player.emit.message(player, `Created Faction with ID: ${id}`);
+        Athena.player.emit.message(player, result.response);
     }
 
     static async handleFactionOpen(player: alt.Player) {
