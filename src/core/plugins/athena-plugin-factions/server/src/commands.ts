@@ -76,7 +76,7 @@ export class FactionCommands {
             bank: 0,
             canDisband: true,
             name: factionName,
-            type: type.toUpperCase(),
+            type: type.toLowerCase(),
         });
 
         if (!result.status) {
