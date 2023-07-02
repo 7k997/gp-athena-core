@@ -1,4 +1,7 @@
 <h2>This is a modified experimental version of the athena framework V5.x. It can be used as basis for all my plugins.</h2>
+<p align="center">
+    <img src="https://i.imgur.com/iCY59PR.png" width="100">
+</p>
 
 My Idea is a realistic roleplay server and this is my version which includes all my "core changes".
 

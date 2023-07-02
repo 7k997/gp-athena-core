@@ -1,116 +1,5 @@
 # Changelog
 
-## 5.1.0
-
-```
-- Athena.systems.plugins.useAPI
-- Athena.systems.plugins.addAPI
-- AthenaClient.systems.plugins.useAPI
-- AthenaClient.systems.plugins.addAPI
-
-- Athena.database.singleton.get
-- Athena.database.singleton.create
-- Athena.database.singleton.updateField
-- Athena.database.singleton.updateBulk
-
-- Athena.document.character.getAllOnline
-- Athena.document.vehicle.getAllOnline
-
-- Athena.getters.players.asCharacters
-- Athena.getters.vehicles.asOwnedVehicles
-
-- Athena.vehicles.get.ownedVehicles -> vehiclesWithOwnership
-- Athena.vehicles.get.playerOwnedVehicles -> vehiclesSpawnedByPlayer
-- Athena.vehicles.get.spawnedVehicleByEntityID
-- Athena.vehicles.get.spawnedVehicleByDatabaseID
-- Athena.vehicles.get.spawnedVehicleByDocumentID
-- Athena.vehicles.get.ownedVehicleByDocumentID
-- Athena.vehicles.get.ownedVehicleByDatabaseID
-- Athena.vehicles.get.ownedVehiclesByPlayer
-
-- Athena.player.get.accountPermissions
-- Athena.player.get.bank
-- Athena.player.get.cash
-- Athena.player.get.food
-- Athena.player.get.groups
-- Athena.player.get.inventory
-- Athena.player.get.isDead
-- Athena.player.get.job
-- Athena.player.get.name
-- Athena.player.get.permissions
-- Athena.player.get.toolbar
-- Athena.player.get.water
-
-Sessions
-- Sessions are a common key value pair mapping that are used across Athena.
-- Creating this wrapper will allow session data to be stored in memory.
-- This allows for small things to be checked against a player easily.
-- Athena.session.player.set
-- Athena.session.player.get
-- Athena.session.player.has
-- Athena.session.player.clearKey
-- Athena.session.player.clearAll
-- Athena.session.vehicle.set
-- Athena.session.vehicle.get
-- Athena.session.vehicle.has
-- Athena.session.vehicle.clearKey
-- Athena.session.vehicle.clearAll
-
-- AthenaClient.utility.DirectionVector -> AthenaClient.utility.vector.DirectionVector
-- Athena.utility.vector.DirectionVector
-
-Bugs
-- Fix vehicles not spawning with dimension
-- Fix JSON Parse error for all documents, when setting bulk with previous data being undefined
----- Error: Unexpected token u in JSON at position 0
-- Fix Clothing Crafting Removing Wrong Items
-- Fix Various rmlui Menu Bugs
-- Fix Bug where if object.rot was not set, it would not spawn. Defaulted to 0,0,0
-
-attachment editor plugin
-- Added an attachment editor plugin
-- Command '/attachmenteditor'
-
-rmlui Menu
-- Added new text 'input' option
-- Added various fixes
-- Fixed controls
-
-ColShapes
-- Added onEnterCallback to the interface. Triggers when player enters the ColShape.
-- This allows for dual functionality for Callbacks.
-
-Rebind Default Keybinds
-- In a shared plugin folder, you can overwrite a default keybind.
-- import { overwriteDefaultKeybind } from '@AthenaShared/enums/keyBinds';
-- overwriteDefaultKeybind('INTERACT', 76);
-
-Dynamic Doors
-- Create a two way door for vehicles, or players.
-- Automatically moves passengers in a vehicle on vehicle teleport.
-- Dynamic doors can teleport to any dimension, or position.
-- Dynamic doors also have onEnter, or beforeEnter callbacks for additional door functionality.
-- Includes better handling of ytyp, and ipl loading; no more falling through map.
-- Utilizes Session Storage
-
-Drop Tables
-- Create a drop table and pull random loot from it.
-- Athena.systems.dropTable.get
-
-Documents (Account, Character, Vehicle)
-- Utilizes Session Storage
-
-Athena.commands
-- Just a wrapper of Athena.system.messenger.commands
-- Gives it a shorter pathway, for the sake of ease of use
-
-Equip Namespace
-- Used to listen to unequip / equip from specific item types
-Athena.systems.inventory.equip.on
-Athena.systems.invnetory.equip.invoke 
-
-```
-
 ## 5.0.0
 
 ```
@@ -545,7 +434,6 @@ Discord Login
 - Starting Sunset of V4/V5 Discord Authentication with External APIs
 ```
 
-
 ## 4.0.0
 
 ```
@@ -584,7 +472,7 @@ Add sounds to Question Box
 RMLUI based menu similar to NativeUI -> AthenaClient.rmlui.menu
 Added console command in-client in debug mode: 'rmluicontrols'
 Change sprite interface for RMLUI to be 3D only
-Fix TextLabel update bug 
+Fix TextLabel update bug
 RMLUI based 3D in-world menu -> AthenaClient.rmlui.menu3D
 AthenaClient.webview.page -> A page constructor made easy.
 AthenaClient.spinner -> AthenaClient.screen.spinner
@@ -636,7 +524,7 @@ Created 'example-sprite' plugin for code references.
 AthenaClient.camera.target -> Used for the [E] interactions you see in-world
 AthenaClient.camera.target.addIgnoredEntity -> Lets you specify an entity handle to ignore interactions with
 AthenaClient.camera.target.removeIgnoredEntity -> Lets you specify an entity handle to remove from ignored interactions
-Updated Vehicle List -> Now Includes Fuel Types 
+Updated Vehicle List -> Now Includes Fuel Types
 Updated Fuel Stations to Specify Fuel Amount
 Interactions now display in-world descriptions
 Character Select does switch-out-switch-in
