@@ -135,7 +135,8 @@ async function run() {
 
     for (const fileOrDirectory of filesAndDirectories) {
         const fullPath = sanitizePath(path.join(resourcesFolder, fileOrDirectory)).replace(/\\/g, '/');
-        if (!fullPath.includes('core') && !fullPath.includes('webviews')) {
+        //Corechange prevent deletion of resources/folder like resources/mods if the project or path contains "*core*" or "*webviews*"
+        if (!fullPath.includes('resources/core') && !fullPath.includes('resources/webviews')) {
             continue;
         }
 
