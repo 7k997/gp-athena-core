@@ -133,7 +133,7 @@ export class ClothingFunctions {
 
         interaction.callback = (player: alt.Player) => {
             const playerData = Athena.document.character.get(player);
-            playerData._id
+            playerData._id;
             if (!playerData) return;
 
             const data = ClothingFunctions.getClothingStoreData(store.uid);
@@ -224,13 +224,13 @@ export class ClothingFunctions {
      * @return {*}
      * @memberof ClothingFunctions
      */
-    static getDlcHash(
+    static getDlc(
         player: alt.Player,
         id: number,
         drawable: number,
         texture: number,
         isProp: boolean = false,
-    ): { dlcName: string | number; drawable: number; texture: number } {
+    ): { dlcName: number; drawable: number; texture: number; isProp: boolean } {
         if (!player || !player.valid) {
             return null;
         }
@@ -245,11 +245,12 @@ export class ClothingFunctions {
         alt.log('defaultMaxSize: ' + defaultMaxSize);
         alt.log('drawable: ' + drawable);
         if (drawable <= defaultMaxSize) {
-            const dlcData = isProp ? player.getDlcProp(id) : player.getDlcClothes(id);
+            //const dlcData = isProp ? player.getDlcProp(id) : player.getDlcClothes(id);
             return {
-                dlcName: dlcData.dlc,
-                drawable: dlcData.drawable,
-                texture: dlcData.texture,
+                dlcName: 0,
+                drawable: drawable,
+                texture: texture,
+                isProp: isProp,
             };
         }
 
@@ -282,9 +283,10 @@ export class ClothingFunctions {
                 if (currentSize === drawable) {
                     alt.log('DLC INIT WHAT EVER!!!!!!!: ' + info.dlcName);
                     return {
-                        dlcName: DLC_CLOTH_HASH[playerData.appearance.sex] + info.dlcName,
+                        dlcName: alt.hash(DLC_CLOTH_HASH[playerData.appearance.sex] + info.dlcName),
                         drawable: drawableIndex,
                         texture,
+                        isProp,
                     };
                 }
             }
@@ -294,29 +296,43 @@ export class ClothingFunctions {
     }
 
     static async update(player: alt.Player, pages: Array<IClothingStorePage>, justSync = false, populateData = false) {
-        alt.logWarning('update serverside: ' + JSON.stringify(pages));
-        for (let i = 0; i < pages.length; i++) {
-            const page = pages[i];
+        //alt.logWarning('update serverside: ' + JSON.stringify(pages));
+        for (const page of pages) {
             if (!page || !page.drawables) {
                 continue;
             }
 
-            for (let index = 0; index < page.drawables.length; index++) {
-                alt.logWarning('update serverside: ' + JSON.stringify(page));
-                const id = page.ids[index];
-                let drawable = page.drawables[index];
-                const texture = page.textures[index];
-                const isProp = page.isProp;
-                let palette = 0;
-                if(page.palettes && page.palettes.length >= index){
-                    palette = page.palettes[index];
+            for (let i = 0; i < page.drawables.length; i++) {
+                //alt.logWarning('update serverside: ' + JSON.stringify(page));
+                const id = page.ids[i];
+                let drawable = page.drawables[i];
+                let texture = page.textures[i];
+                let isProp = page.isProp;
+                let dlc = 0;
+
+                const dlcInfo = ClothingFunctions.getDlc(player, id, drawable, texture, isProp);
+                if (dlcInfo) {
+                    drawable = dlcInfo.drawable;
+                    texture = dlcInfo.texture;
+                    dlc = dlcInfo.dlcName;
                 }
 
-                if (page.dlcs && page.dlcs.length >= 1) {
-                    let dlc = page.dlcs[index];
-                    if (typeof dlc === 'string') {
-                        dlc = alt.hash(dlc);
-                    }
+                let palette = 0;
+                if (page.palettes && page.palettes.length >= i) {
+                    palette = page.palettes[i];
+                }
+
+                if (id === 11) {
+                    alt.logWarning('dlcs: ' + JSON.stringify(page.dlcs));
+                }
+
+                // if (page.dlcs && page.dlcs.length >= 1) {
+                // let dlc = page.dlcs[i];
+                // if (typeof dlc === 'string') {
+                //     dlc = alt.hash(dlc);
+                // }
+
+                if (dlc != 0) {
                     if (isProp) {
                         if (drawable <= -1) {
                             player.clearProp(id);
@@ -324,8 +340,22 @@ export class ClothingFunctions {
                             player.setDlcProp(dlc, id, drawable, texture);
                         }
                     } else {
+                        if (id === 11) {
+                            alt.logWarning(
+                                'update serverside setDlcClothes: dlc: ' +
+                                    dlc +
+                                    ' id: ' +
+                                    id +
+                                    ' drawable: ' +
+                                    drawable +
+                                    ' texture: ' +
+                                    texture +
+                                    ' palette: ' +
+                                    palette,
+                            );
+                        }
                         player.setDlcClothes(dlc, id, drawable, texture, palette);
-                    }               
+                    }
                 } else {
                     if (isProp) {
                         if (drawable <= -1) {
@@ -334,10 +364,23 @@ export class ClothingFunctions {
                             player.setProp(id, drawable, texture);
                         }
                     } else {
+                        if (id === 11) {
+                            alt.logWarning(
+                                'update serverside setClothes: dlc: ' +
+                                    ' id: ' +
+                                    id +
+                                    ' drawable: ' +
+                                    drawable +
+                                    ' texture: ' +
+                                    texture +
+                                    ' palette: ' +
+                                    palette,
+                            );
+                        }
                         player.setClothes(id, drawable, texture, palette);
-                    }  
+                    }
                 }
-            }          
+            }
         }
 
         // const result = await Athena.systems.inventory.manager.get(storableItem, data.inventory, 'inventory');
@@ -394,21 +437,25 @@ export class ClothingFunctions {
                 const texture: number = page.textures[i];
                 const isProp: boolean = page.isProp;
 
-                const dlcInfo = ClothingFunctions.getDlcHash(
-                    player,
-                    id,
-                    drawable,
-                    texture,
-                    isProp,
-                );
+                const dlcInfo = ClothingFunctions.getDlc(player, id, drawable, texture, isProp);
 
-                if(dlcInfo && (typeof dlcInfo.dlcName === "number")) 
-                {
-                    clothes.push({ id: id, drawable: dlcInfo.drawable, texture: dlcInfo.texture, dlc: dlcInfo.dlcName, isProp: isProp });
+                if (dlcInfo) {
+                    clothes.push({
+                        id: id,
+                        drawable: dlcInfo.drawable,
+                        texture: dlcInfo.texture,
+                        dlc: dlcInfo.dlcName,
+                        isProp: isProp,
+                    });
                 } else {
-                    clothes.push({ id: id, drawable: dlcInfo.drawable, texture: dlcInfo.texture, dlc: 0, isProp: isProp});
+                    clothes.push({
+                        id: id,
+                        drawable: drawable,
+                        texture: texture,
+                        dlc: 0,
+                        isProp: isProp,
+                    });
                 }
-                
 
                 // Price based on component id in individual shop.
                 if (shop.clothingPrices[id]) {
@@ -452,7 +499,7 @@ export class ClothingFunctions {
 
         if (!noSound) {
             Athena.player.emit.sound2D(player, 'item_purchase');
-        }       
+        }
 
         return true;
     }
