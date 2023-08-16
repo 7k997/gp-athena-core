@@ -38,7 +38,11 @@ let isOpen = false;
  * Do Not Export Internal Only
  */
 class InternalFunctions implements ViewModel {
-    static async open(_storeData: IClothingStore, _appearance: Appearance, _equipment: Array<ItemEx<ClothingComponent>>) {
+    static async open(
+        _storeData: IClothingStore,
+        _appearance: Appearance,
+        _equipment: Array<ItemEx<ClothingComponent>>,
+    ) {
         if (AthenaClient.webview.isAnyMenuOpen(true)) {
             return;
         }
@@ -46,7 +50,7 @@ class InternalFunctions implements ViewModel {
         storeData = _storeData;
         appearance = _appearance;
         equipment = _equipment;
-       
+
         AthenaClient.webview.on(CLOTHING_INTERACTIONS.CLOSE, InternalFunctions.close);
         AthenaClient.webview.on(CLOTHING_INTERACTIONS.UPDATE, InternalFunctions.update);
         AthenaClient.webview.on(CLOTHING_INTERACTIONS.PURCHASE, InternalFunctions.purchase);
@@ -55,11 +59,11 @@ class InternalFunctions implements ViewModel {
         AthenaClient.webview.on(CLOTHING_INTERACTIONS.PAGE_UPDATE, InternalFunctions.pageUpdate);
 
         native.doScreenFadeOut(100);
-        
+
         await alt.Utils.wait(100);
-        
+
         if (AthenaClient.camera.pedEdit.exists()) {
-             await AthenaClient.camera.pedEdit.destroy();
+            await AthenaClient.camera.pedEdit.destroy();
         }
 
         await AthenaClient.camera.pedEdit.create(alt.LocalPlayer.local.scriptID, { x: -0.2, y: 0, z: 0 }, false);
@@ -135,13 +139,19 @@ class InternalFunctions implements ViewModel {
 
     static async ready() {
         AthenaClient.webview.emit(CLOTHING_INTERACTIONS.SET_DATA, storeData);
-        AthenaClient.webview.emit(CLOTHING_INTERACTIONS.SET_BANK_DATA, alt.Player.local.meta.bank + alt.Player.local.meta.cash);
+        AthenaClient.webview.emit(
+            CLOTHING_INTERACTIONS.SET_BANK_DATA,
+            alt.Player.local.meta.bank + alt.Player.local.meta.cash,
+        );
         native.doScreenFadeIn(100);
     }
 
     static async handleMetaChanged(key: string, _items: Array<Item>, _oldValue: any) {
-        if (key === 'bank' || (key === 'cash' && isOpen)) {            
-            AthenaClient.webview.emit(CLOTHING_INTERACTIONS.SET_BANK_DATA, alt.Player.local.meta.bank + alt.Player.local.meta.cash);
+        if (key === 'bank' || (key === 'cash' && isOpen)) {
+            AthenaClient.webview.emit(
+                CLOTHING_INTERACTIONS.SET_BANK_DATA,
+                alt.Player.local.meta.bank + alt.Player.local.meta.cash,
+            );
         }
     }
 
@@ -178,36 +188,10 @@ class InternalFunctions implements ViewModel {
             }
         }
 
-        // Default Components
-        // alt.logWarning('Setting default components');
-        // if (alt.Player.local.model !== 1885233650) {
-        //     // Check if not male
-        //     native.setPedComponentVariation(PedCharacter.get(), 1, 0, 0, 0); // mask
-        //     native.setPedComponentVariation(PedCharacter.get(), 3, 0, 0, 0); // arms
-        //     native.setPedComponentVariation(PedCharacter.get(), 4, 14, 0, 0); // pants
-        //     native.setPedComponentVariation(PedCharacter.get(), 5, 0, 0, 0); // bag
-        //     native.setPedComponentVariation(PedCharacter.get(), 6, 35, 0, 0); // shoes
-        //     native.setPedComponentVariation(PedCharacter.get(), 7, 0, 0, 0); // accessories
-        //     native.setPedComponentVariation(PedCharacter.get(), 8, 15, 0, 0); // undershirt
-        //     native.setPedComponentVariation(PedCharacter.get(), 9, 0, 0, 0); // body armour
-        //     native.setPedComponentVariation(PedCharacter.get(), 11, 0, 0, 0); // torso
-        // } else {
-        //     native.setPedComponentVariation(PedCharacter.get(), 1, 0, 0, 0); // mask
-        //     native.setPedComponentVariation(PedCharacter.get(), 3, 15, 0, 0); // arms
-        //     native.setPedComponentVariation(PedCharacter.get(), 5, 0, 0, 0); // bag
-        //     native.setPedComponentVariation(PedCharacter.get(), 4, 14, 0, 0); // pants
-        //     native.setPedComponentVariation(PedCharacter.get(), 6, 34, 0, 0); // shoes
-        //     native.setPedComponentVariation(PedCharacter.get(), 7, 0, 0, 0); // accessories
-        //     native.setPedComponentVariation(PedCharacter.get(), 8, 15, 0, 0); // undershirt
-        //     native.setPedComponentVariation(PedCharacter.get(), 9, 0, 0, 0); // body armour
-        //     native.setPedComponentVariation(PedCharacter.get(), 11, 91, 0, 0); // torso
-        // }
-
         if (!items || !Array.isArray(items)) {
             return;
         }
 
-        alt.logWarning('Setting clothing components 1');
         InternalFunctions.update(pages, true);
     }
 
@@ -239,33 +223,23 @@ class InternalFunctions implements ViewModel {
      * @param {string} desc
      * @memberof InternalFunctions
      */
-    static purchase(
-        uid: string,
-        pages: Array<IClothingStorePage>,
-        noSound = false,
-    ) {
+    static purchase(uid: string, pages: Array<IClothingStorePage>, noSound = false) {
         alt.emitServer(CLOTHING_INTERACTIONS.PURCHASE, uid, pages, noSound);
     }
 
     static async populate(pages: Array<IClothingStorePage>) {
-        alt.logWarning('Populating Clothing: ' + JSON.stringify(pages));
-
         if (typeof pages === 'string') {
             pages = JSON.parse(pages);
         }
 
-        for (let i = 0; i < pages.length; i++) {           
+        for (let i = 0; i < pages.length; i++) {
             const page = pages[i];
-            alt.logWarning('Populating Clothing Page: ' + JSON.stringify(page));
             if (!page || !page.drawables) {
                 continue;
             }
 
-            alt.logWarning("Count Drawables: " + page.drawables.length + "");
-            for (let index = 0; index < page.drawables.length; index++) {   
-                alt.logWarning("Index: " + index + "");            
+            for (let index = 0; index < page.drawables.length; index++) {
                 const id = page.ids[index];
-                alt.log('test id: ' + id );
 
                 let value = page.drawables[index];
                 let textureValue = page.textures[index];
@@ -274,12 +248,11 @@ class InternalFunctions implements ViewModel {
                 let maxDrawables = 0;
 
                 if (page.isProp) {
-                    alt.log('test5');
                     // Get Current Value of Prop Player is Wearing
                     value = native.getPedPropIndex(alt.LocalPlayer.local, id, 0);
-                    
+
                     if (typeof page.startValue === 'undefined') {
-                            page.startValue = value;
+                        page.startValue = value;
                     }
 
                     page.drawables[index] = value;
@@ -294,42 +267,30 @@ class InternalFunctions implements ViewModel {
                     maxTextures = native.getNumberOfPedPropTextureVariations(alt.LocalPlayer.local, id, value);
                 } else {
                     // Get Current Value of Component Player is Wearing
-                    alt.log('populate!!!!: ' + value);
                     value = native.getPedDrawableVariation(alt.LocalPlayer.local, id);
-                    
-                    alt.log('populate!!!!: ' + value);
-                    page.drawables[index] = value;
 
-                    alt.log('test2');
+                    page.drawables[index] = value;
                     if (typeof page.startValue === 'undefined') {
                         page.startValue = value;
                     }
 
                     textureValue = native.getPedTextureVariation(alt.LocalPlayer.local, id);
                     page.textures[index] = textureValue;
-
-                    alt.log('test3');
                     maxDrawables =
                         CLOTHING_CONFIG.MAXIMUM_COMPONENT_VALUES[appearance.sex][id] +
                         InternalFunctions.getDlcClothingCount(appearance.sex, id, false);
-
-                        alt.log('test4');
                     maxTextures = native.getNumberOfPedTextureVariations(alt.LocalPlayer.local, id, value);
                 }
 
                 page.maxDrawables[index] = maxDrawables;
                 page.maxTextures[index] = maxTextures;
-                alt.log('test1');
-                
             }
         }
 
-        alt.log('Komm ich hier hin?');
         AthenaClient.webview.emit(CLOTHING_INTERACTIONS.PROPAGATE, pages);
     }
 
     static async update(pages: Array<IClothingStorePage>, justSync = false, populateData = false) {
-        alt.log('update pages: ' + JSON.stringify(pages));
         if (typeof pages === 'string') {
             pages = JSON.parse(pages);
         }
@@ -346,7 +307,7 @@ class InternalFunctions implements ViewModel {
         if (!populateData) {
             return;
         }
-        
+
         // InternalFunctions.populate(pages);
     }
 }

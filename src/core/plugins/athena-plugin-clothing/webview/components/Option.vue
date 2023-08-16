@@ -25,7 +25,7 @@
                     </span>
                     <input
                         type="range"
-                        :min="page.isProp ? -1 : 0"
+                        :min="page.isProp ? -1 : -1"
                         :max="getMaximumDrawables(page, index)"
                         :value="page.drawables[index]"
                         @input="
@@ -70,7 +70,7 @@
                         </span>
                         <input
                             type="range"
-                            :min="page.isProp ? -1 : 0"
+                            :min="page.isProp ? -1 : -1"
                             :max="getMaximumTextures(page, index)"
                             :value="page.textures[index]"
                             @input="

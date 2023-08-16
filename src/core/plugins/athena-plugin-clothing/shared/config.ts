@@ -7,6 +7,19 @@ export const CLOTHING_CONFIG: IClothingConfig = {
      */
     MAXIMUM_COMPONENT_VALUES: {
         // Female
+        [ORIENTATION.FEMALE]: {
+            [CLOTHING_IDS.MASKS]: 231, //215, // Masks (01/2023)
+            [CLOTHING_IDS.TORSOS]: 243, //243, // Torsos (01/2023)
+            [CLOTHING_IDS.LEGS]: 173, //168, // Legs (01/2023)
+            [CLOTHING_IDS.BAGS]: 110, //110, // Bags (01/2023)
+            [CLOTHING_IDS.SHOES]: 142, //129, // Shoes (01/2023)
+            [CLOTHING_IDS.ACCESSORIES]: 144, //122, // Accessories (01/2023)
+            [CLOTHING_IDS.UNDERSHIRTS]: 246, //237, // Undershirts (01/2023)
+            [CLOTHING_IDS.BODY_ARMOUR]: 33, //33, // body armour (01/2023)
+            [CLOTHING_IDS.TOP]: 543, //472, // Tops / Shirts (01/2023)
+        },
+
+        // Male
         [ORIENTATION.MALE]: {
             [CLOTHING_IDS.MASKS]: 225, //215, // Masks (01/2023) -> 225
             [CLOTHING_IDS.TORSOS]: 209, //209, // Torsos (01/2023) -> 209
@@ -18,18 +31,6 @@ export const CLOTHING_CONFIG: IClothingConfig = {
             [CLOTHING_IDS.BODY_ARMOUR]: 28, //28, // body armour (01/2023) -> 28
             [CLOTHING_IDS.TOP]: 453, // Tops / Shirts (01/2023 -> 441 06/2023 -> 453)
         },
-        // Male
-        [ORIENTATION.FEMALE]: {
-            [CLOTHING_IDS.MASKS]: 1000, //215, // Masks (01/2023)
-            [CLOTHING_IDS.TORSOS]: 1000, //243, // Torsos (01/2023)
-            [CLOTHING_IDS.LEGS]: 1000, //168, // Legs (01/2023)
-            [CLOTHING_IDS.BAGS]: 1000, //110, // Bags (01/2023)
-            [CLOTHING_IDS.SHOES]: 1000, //129, // Shoes (01/2023)
-            [CLOTHING_IDS.ACCESSORIES]: 1000, //122, // Accessories (01/2023)
-            [CLOTHING_IDS.UNDERSHIRTS]: 1000, //237, // Undershirts (01/2023)
-            [CLOTHING_IDS.BODY_ARMOUR]: 1000, //33, // body armour (01/2023)
-            [CLOTHING_IDS.TOP]: 1000, //472, // Tops / Shirts (01/2023)
-        },
     },
     /**
      * Adjusting this may result in game crashing. Use with caution.
@@ -37,10 +38,10 @@ export const CLOTHING_CONFIG: IClothingConfig = {
     MAXIMUM_PROP_VALUES: {
         [ORIENTATION.FEMALE]: {
             [PROP_IDS.HATS]: 172, //171, //
-            [PROP_IDS.GLASSES]: 1000, //42, // Glasses
-            [PROP_IDS.EARS]: 1000, //22, // Ears
-            [PROP_IDS.WATCHES]: 1000, //33, // Watches
-            [PROP_IDS.BRACELETS]: 1000, //17, // Bracelets
+            [PROP_IDS.GLASSES]: 55, //42, // Glasses
+            [PROP_IDS.EARS]: 22, //22, // Ears
+            [PROP_IDS.WATCHES]: 36, //33, // Watches
+            [PROP_IDS.BRACELETS]: 21, //17, // Bracelets
         },
         [ORIENTATION.MALE]: {
             [PROP_IDS.HATS]: 172, //172, // Hats -> 172

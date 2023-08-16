@@ -229,8 +229,9 @@ export class ClothingFunctions {
         id: number,
         drawable: number,
         texture: number,
+        palette: number,
         isProp: boolean = false,
-    ): { dlcName: number; drawable: number; texture: number; isProp: boolean } {
+    ): { dlcName: number; drawable: number; texture: number; palette: number; isProp: boolean } {
         if (!player || !player.valid) {
             return null;
         }
@@ -242,14 +243,41 @@ export class ClothingFunctions {
             ? CLOTHING_CONFIG.MAXIMUM_PROP_VALUES[playerData.appearance.sex][id]
             : CLOTHING_CONFIG.MAXIMUM_COMPONENT_VALUES[playerData.appearance.sex][id];
 
-        alt.log('defaultMaxSize: ' + defaultMaxSize);
-        alt.log('drawable: ' + drawable);
         if (drawable <= defaultMaxSize) {
-            //const dlcData = isProp ? player.getDlcProp(id) : player.getDlcClothes(id);
+            //Attention: Needed...
+            //Set clothes by drawable non relative
+            //Read correct dlc value
+            //Set clothes by dlc and relative drawable
+            if (isProp) {
+                if (drawable <= -1) {
+                    player.clearProp(id);
+                } else {
+                    alt.logWarning('Setting prop: ' + id + ' ' + drawable + ' ' + texture);
+                    player.setProp(id, drawable, texture);
+                }
+            } else {
+                alt.logWarning('Setting clothes: ' + id + ' ' + drawable + ' ' + texture);
+                player.setClothes(id, drawable, texture, palette);
+            }
+            const dlcData = isProp ? player.getDlcProp(id) : player.getDlcClothes(id);
+            alt.logWarning(
+                'ID: ' +
+                    id +
+                    'DLC Name: ' +
+                    dlcData.dlc +
+                    ' Drawable: ' +
+                    dlcData.drawable +
+                    ' Texture: ' +
+                    dlcData.texture +
+                    ' IsProp: ' +
+                    isProp +
+                    '',
+            );
             return {
-                dlcName: 0,
-                drawable: drawable,
-                texture: texture,
+                dlcName: dlcData.dlc,
+                drawable: dlcData.drawable,
+                texture: dlcData.texture,
+                palette: palette,
                 isProp: isProp,
             };
         }
@@ -281,11 +309,11 @@ export class ClothingFunctions {
                 currentSize += 1;
 
                 if (currentSize === drawable) {
-                    alt.log('DLC INIT WHAT EVER!!!!!!!: ' + info.dlcName);
                     return {
                         dlcName: alt.hash(DLC_CLOTH_HASH[playerData.appearance.sex] + info.dlcName),
                         drawable: drawableIndex,
                         texture,
+                        palette,
                         isProp,
                     };
                 }
@@ -296,90 +324,53 @@ export class ClothingFunctions {
     }
 
     static async update(player: alt.Player, pages: Array<IClothingStorePage>, justSync = false, populateData = false) {
-        //alt.logWarning('update serverside: ' + JSON.stringify(pages));
         for (const page of pages) {
             if (!page || !page.drawables) {
                 continue;
             }
 
             for (let i = 0; i < page.drawables.length; i++) {
-                //alt.logWarning('update serverside: ' + JSON.stringify(page));
                 const id = page.ids[i];
                 let drawable = page.drawables[i];
                 let texture = page.textures[i];
                 let isProp = page.isProp;
                 let dlc = 0;
 
-                const dlcInfo = ClothingFunctions.getDlc(player, id, drawable, texture, isProp);
+                let palette = 0;
+                if (page.palettes && page.palettes.length >= i) {
+                    palette = page.palettes[i];
+                }
+
+                const dlcInfo = ClothingFunctions.getDlc(player, id, drawable, texture, palette, isProp);
                 if (dlcInfo) {
                     drawable = dlcInfo.drawable;
                     texture = dlcInfo.texture;
                     dlc = dlcInfo.dlcName;
                 }
 
-                let palette = 0;
-                if (page.palettes && page.palettes.length >= i) {
-                    palette = page.palettes[i];
-                }
-
-                if (id === 11) {
-                    alt.logWarning('dlcs: ' + JSON.stringify(page.dlcs));
-                }
-
-                // if (page.dlcs && page.dlcs.length >= 1) {
-                // let dlc = page.dlcs[i];
-                // if (typeof dlc === 'string') {
-                //     dlc = alt.hash(dlc);
-                // }
-
-                if (dlc != 0) {
-                    if (isProp) {
-                        if (drawable <= -1) {
-                            player.clearProp(id);
-                        } else {
-                            player.setDlcProp(dlc, id, drawable, texture);
-                        }
+                // if (dlc != 0) {
+                if (isProp) {
+                    if (drawable <= -1) {
+                        player.clearProp(id);
                     } else {
-                        if (id === 11) {
-                            alt.logWarning(
-                                'update serverside setDlcClothes: dlc: ' +
-                                    dlc +
-                                    ' id: ' +
-                                    id +
-                                    ' drawable: ' +
-                                    drawable +
-                                    ' texture: ' +
-                                    texture +
-                                    ' palette: ' +
-                                    palette,
-                            );
-                        }
-                        player.setDlcClothes(dlc, id, drawable, texture, palette);
+                        player.setDlcProp(dlc, id, drawable, texture);
                     }
                 } else {
-                    if (isProp) {
-                        if (drawable <= -1) {
-                            player.clearProp(id);
-                        } else {
-                            player.setProp(id, drawable, texture);
-                        }
-                    } else {
-                        if (id === 11) {
-                            alt.logWarning(
-                                'update serverside setClothes: dlc: ' +
-                                    ' id: ' +
-                                    id +
-                                    ' drawable: ' +
-                                    drawable +
-                                    ' texture: ' +
-                                    texture +
-                                    ' palette: ' +
-                                    palette,
-                            );
-                        }
-                        player.setClothes(id, drawable, texture, palette);
-                    }
+                    player.setDlcClothes(dlc, id, drawable, texture, palette);
                 }
+                // } else {
+
+                //     if (isProp) {
+                //         if (drawable <= -1) {
+                //             player.clearProp(id);
+                //         } else {
+                //             player.setProp(id, drawable, texture);
+                //         }
+                //     } else {
+                //         player.setClothes(id, drawable, texture, palette);
+
+                //     }
+                // }
             }
         }
 
