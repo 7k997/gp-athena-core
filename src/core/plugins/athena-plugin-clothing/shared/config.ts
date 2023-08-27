@@ -54,7 +54,7 @@ export const CLOTHING_CONFIG: IClothingConfig = {
     DLC_CLOTHING: {
         // A word of warning before adding DLCs
         // The DLC order is **VERY IMPORTANT**
-        // Make sure that your configuration in configs/prod, configs/dev, configs/devtest all match dlc order here.
+        // Make sure that your configuration in configs/prod, configs/dev, configs/devtest all match dlc order here. Update Jonas -> Order is no longer important.
         // Otherwise the wrong hash will be used for everything.
         // Always append to the bottom of the array. Never the top.
         [CLOTHING_IDS.MASKS]: [
@@ -79,8 +79,9 @@ export const CLOTHING_CONFIG: IClothingConfig = {
         [CLOTHING_IDS.UNDERSHIRTS]: [],
         [CLOTHING_IDS.BODY_ARMOUR]: [],
         [CLOTHING_IDS.TOP]: [
-            { dlcName: 'gpfemale', count: { [ORIENTATION.FEMALE]: 1, [ORIENTATION.MALE]: 0 } },
             { dlcName: 'addon_clothing_u', count: { [ORIENTATION.FEMALE]: 7, [ORIENTATION.MALE]: 7 } },
+            { dlcName: 'dettop', count: { [ORIENTATION.FEMALE]: 5, [ORIENTATION.MALE]: 0 } },
+            { dlcName: 'gpfemale', count: { [ORIENTATION.FEMALE]: 1, [ORIENTATION.MALE]: 0 } },
         ],
     },
     DLC_PROPS: {

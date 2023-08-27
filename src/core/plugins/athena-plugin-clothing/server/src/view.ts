@@ -252,27 +252,12 @@ export class ClothingFunctions {
                 if (drawable <= -1) {
                     player.clearProp(id);
                 } else {
-                    alt.logWarning('Setting prop: ' + id + ' ' + drawable + ' ' + texture);
                     player.setProp(id, drawable, texture);
                 }
             } else {
-                alt.logWarning('Setting clothes: ' + id + ' ' + drawable + ' ' + texture);
                 player.setClothes(id, drawable, texture, palette);
             }
             const dlcData = isProp ? player.getDlcProp(id) : player.getDlcClothes(id);
-            alt.logWarning(
-                'ID: ' +
-                    id +
-                    'DLC Name: ' +
-                    dlcData.dlc +
-                    ' Drawable: ' +
-                    dlcData.drawable +
-                    ' Texture: ' +
-                    dlcData.texture +
-                    ' IsProp: ' +
-                    isProp +
-                    '',
-            );
             return {
                 dlcName: dlcData.dlc,
                 drawable: dlcData.drawable,
@@ -428,7 +413,12 @@ export class ClothingFunctions {
                 const texture: number = page.textures[i];
                 const isProp: boolean = page.isProp;
 
-                const dlcInfo = ClothingFunctions.getDlc(player, id, drawable, texture, isProp);
+                let palette = 0;
+                if (page.palettes && page.palettes.length >= i) {
+                    palette = page.palettes[i];
+                }
+
+                const dlcInfo = ClothingFunctions.getDlc(player, id, drawable, texture, palette, isProp);
 
                 if (dlcInfo) {
                     clothes.push({
