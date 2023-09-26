@@ -140,7 +140,8 @@ export interface Character {
     /**
      * Current player interior number. Usually bound to dimension.
      *
-     * @type {(number | undefined)}
+     * //Corechange: This is now a number instead of a string. Why? Replaced it with string!
+     * @type {(string | undefined)}
      *
      */
     interior: number | undefined;

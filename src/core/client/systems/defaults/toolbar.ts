@@ -4,20 +4,25 @@ import * as AthenaClient from '@AthenaClient/api';
 
 import { SYSTEM_EVENTS } from '@AthenaShared/enums/system';
 import { Item } from '@AthenaShared/interfaces/item';
+import { KEY_BINDS } from '@AthenaShared/enums/keyBinds';
+import { Config } from '@AthenaPlugins/gp-athena-overrides/shared/config';
 
-const DELAY_TIME = 1000;
+const DELAY_TIME_BEFORE_USE = Config.TOOLBAR_COOLDOWN_DELAY_TIME_BEFORE_USE;
+const DELAY_TIME_AFTER_USE = Config.TOOLBAR_COOLDOWN_DELAY_TIME_AFTER_USE;
 const KeyBinds = {
-    49: 0,
-    50: 1,
-    51: 2,
-    52: 3,
-    53: 4,
+    [KEY_BINDS.TOOLBAR_ONE]: 0,
+    [KEY_BINDS.TOOLBAR_TWO]: 1,
+    [KEY_BINDS.TOOLBAR_THREE]: 2,
+    [KEY_BINDS.TOOLBAR_FOUR]: 3,
+    [KEY_BINDS.TOOLBAR_FIVE]: 4,
 };
 
 let toolbar: Array<Item> = [];
-let debounce = Date.now();
+let debounceAfter = Date.now();
+let debounceBefore = Date.now();
 let enabled = true;
-let interval: number;
+let intervalAfter: number;
+let intervalBefore: number;
 let lastKey: number;
 
 const Internal = {
@@ -35,10 +40,10 @@ const Internal = {
 
         toolbar = _toolbar;
     },
-    drawCooldown() {
-        if (Date.now() > debounce) {
-            alt.clearInterval(interval);
-            interval = undefined;
+    drawCooldownAfter() {
+        if (Date.now() >= debounceAfter) {
+            alt.clearInterval(intervalAfter);
+            intervalAfter = undefined;
             alt.emitServer(SYSTEM_EVENTS.PLAYER_TOOLBAR_INVOKE, lastKey);
             return;
         }
@@ -47,9 +52,31 @@ const Internal = {
             return;
         }
 
-        const timeLeft = ((debounce - Date.now()) / 1000).toFixed(2);
-        const offsetPos = native.getOffsetFromEntityInWorldCoords(alt.Player.local.scriptID, 0.5, 0, 0.2);
-        AthenaClient.screen.text.drawText3D(`${timeLeft}s`, offsetPos, 0.5, new alt.RGBA(255, 255, 255, 150));
+        //TODO: Corechange quick fix. Remove drawText3D
+        if (!Config.DISABLE_TOOLBAR_COOLDOWN_DRAWING) {
+            const timeLeft = ((debounceAfter - Date.now()) / 1000).toFixed(2);
+            const offsetPos = native.getOffsetFromEntityInWorldCoords(alt.Player.local.scriptID, 0.5, 0, 0.2);
+            AthenaClient.screen.text.drawText3D(`${timeLeft}s`, offsetPos, 0.5, new alt.RGBA(255, 255, 255, 150));
+        }
+    },
+    drawCooldownBefore() {
+        if (Date.now() >= debounceBefore) {
+            alt.clearInterval(intervalBefore);
+            intervalBefore = undefined;
+            alt.emitServer(SYSTEM_EVENTS.PLAYER_TOOLBAR_INVOKE, lastKey);
+            return;
+        }
+
+        if (!enabled) {
+            return;
+        }
+
+        //TODO: Corechange quick fix. Remove drawText3D
+        if (!Config.DISABLE_TOOLBAR_COOLDOWN_DRAWING) {
+            const timeLeft = ((debounceBefore - Date.now()) / 1000).toFixed(2);
+            const offsetPos = native.getOffsetFromEntityInWorldCoords(alt.Player.local.scriptID, 0.5, 0, 0.2);
+            AthenaClient.screen.text.drawText3D(`${timeLeft}s`, offsetPos, 0.5, new alt.RGBA(255, 255, 255, 150));
+        }
     },
     handleKeyPress(key: number) {
         if (!enabled) {
@@ -64,30 +91,37 @@ const Internal = {
             return;
         }
 
-        if (Date.now() < debounce) {
-            if (typeof interval === 'undefined') {
-                interval = alt.setInterval(Internal.drawCooldown, 0);
+        //TODO: Corechange quick fix. Remove Cooldown
+        if (Config.DISABLE_TOOLBAR_COOLDOWN) {
+            lastKey = KeyBinds[key];
+            alt.emitServer(SYSTEM_EVENTS.PLAYER_TOOLBAR_INVOKE, lastKey);
+        } else {
+            if (Date.now() < debounceAfter) {
+                if (typeof intervalAfter === 'undefined') {
+                    intervalAfter = alt.setInterval(Internal.drawCooldownAfter, 0);
+                }
+
+                AthenaClient.systems.sound.play2d('error', 0.2);
+                return;
             }
 
-            AthenaClient.systems.sound.play2d('error', 0.2);
-            return;
-        }
+            if (typeof intervalBefore !== 'undefined') {
+                alt.clearInterval(intervalBefore);
+            }
 
-        if (typeof interval !== 'undefined') {
-            alt.clearInterval(interval);
-        }
+            debounceAfter = Date.now() + DELAY_TIME_AFTER_USE;
+            debounceBefore = Date.now() + DELAY_TIME_BEFORE_USE;
+            const index = toolbar.findIndex((x) => x.slot === KeyBinds[key]);
+            if (index <= -1) {
+                return;
+            }
 
-        debounce = Date.now() + DELAY_TIME;
-        const index = toolbar.findIndex((x) => x.slot === KeyBinds[key]);
-        if (index <= -1) {
-            return;
-        }
+            if (typeof intervalBefore === 'undefined') {
+                intervalBefore = alt.setInterval(Internal.drawCooldownBefore, 0);
+            }
 
-        if (typeof interval === 'undefined') {
-            interval = alt.setInterval(Internal.drawCooldown, 0);
+            lastKey = KeyBinds[key];
         }
-
-        lastKey = KeyBinds[key];
     },
 };
 

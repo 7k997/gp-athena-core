@@ -1,4 +1,5 @@
 import * as alt from 'alt-shared';
+import { type } from 'os';
 
 /**
  * Default Weapon Data Information
@@ -19,7 +20,13 @@ export type ItemDrop = {
 /**
  * Default Clothing Information
  */
-export type ClothingInfo = { sex: number; components: Array<ClothingComponent> };
+export type ClothingInfo = {
+    sex: number;
+    components: Array<ClothingComponent>;
+    //Corechange: Added componentsAlternatives, TODO: Make it required
+    componentsAlternatives?: Array<ClothingComponent>;
+    options?: Array<ClothingComponent>;
+};
 
 /**
  * dlc information for given clothing data
@@ -35,6 +42,33 @@ export interface ClothingComponent {
      *
      */
     id: number;
+
+    /**
+     * Corechange:
+     * The associated name for a given dlc clothing component.
+     * Used in menus to select and for clothing outfit crafting for restoring items.
+     *
+     * Optional: if not set the component can not be moved out of clothing info
+     *
+     */
+    name?: string;
+
+    /**
+     * Corechange:
+     * 0 - female component
+     * 1 - Male component
+     * 2 - bisexual component
+     *
+     * Optional: if not set the sex is used from clothing info
+     */
+    sex?: number;
+
+    /**
+     * Corechange:
+     *
+     * Just a remark for the component, not used yet
+     */
+    type?: string;
 
     /**
      * The associated relative drawing id for a given dlc clothing component
@@ -74,8 +108,7 @@ export interface ClothingComponent {
      * @type {boolean}
      *
      */
-    isProp?: boolean;   
-    
+    isProp?: boolean;
 }
 
 /**
@@ -179,6 +212,22 @@ export interface CustomContextAction {
      * The events which should be triggered.
      */
     eventToCall: string | Array<string>;
+}
+
+export interface CustomSubMenu {
+    /**
+     * The visible name of this action.
+     */
+    name: string;
+
+    isOpen: boolean;
+
+    /**
+     * The events which should be triggered.
+     */
+    contextActions?: Array<CustomContextAction>;
+
+    customSubMenus?: Array<CustomSubMenu>;
 }
 
 /**
@@ -322,7 +371,7 @@ export interface BaseItem<Behavior = DefaultItemBehavior, CustomData = {}> exten
     name: string;
 
     /**
-    * Corechange: Added description
+     * Corechange: Added description
      * The name of this item.
      *
      * @type {string}
@@ -378,6 +427,8 @@ export interface BaseItem<Behavior = DefaultItemBehavior, CustomData = {}> exten
      *
      */
     customEventsToCall?: Array<CustomContextAction>;
+
+    customSubMenus?: Array<CustomSubMenu>;
 
     /**
      * The drop model of this item when it is on the ground.

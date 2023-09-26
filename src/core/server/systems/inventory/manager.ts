@@ -823,6 +823,7 @@ export async function useItem(
     }
 
     if (baseItem.behavior && baseItem.behavior.isClothing && !baseItem.behavior.isEquippable) {
+        alt.logWarning(`[Athena] Clothing items must be equippable. type: ${type} slot: ${slot}`);
         await toggleItem(player, slot, type);
     }
 
@@ -905,14 +906,15 @@ export async function toggleItem(player: alt.Player, slot: number, type: Invento
     }
 
     const eventToTrigger = dataCopy[index].isEquipped ? 'item-equipped' : 'item-unequipped';
+    alt.logWarning(`[Athena] ${eventToTrigger} ${dataCopy[index].dbName} ${dataCopy[index].version}`);
     Athena.player.events.trigger(eventToTrigger, player, dataCopy[index].slot, type);
     Athena.systems.inventory.equip.invoke(eventToTrigger, player, dataCopy[index]);
-
     if (type === 'toolbar') {
         Athena.player.emit.sound2D(player, dataCopy[index].isEquipped ? 'item_equip' : 'item_remove', 0.2);
     }
 
     if (shouldUpdateClothing) {
+        alt.logWarning('Update Clothing.');
         Athena.systems.inventory.clothing.update(player);
     }
 

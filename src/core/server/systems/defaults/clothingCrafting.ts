@@ -1,7 +1,7 @@
 import * as alt from 'alt-server';
 
 import * as Athena from '@AthenaServer/api';
-import { ClothingInfo, StoredItem } from '@AthenaShared/interfaces/item';
+import { ClothingComponent, ClothingInfo, StoredItem } from '@AthenaShared/interfaces/item';
 
 /**
  * THIS IS A DEFAULT SYSTEM.
@@ -17,7 +17,7 @@ const SYSTEM_NAME = 'Clothing Crafting';
 let enabled = true;
 
 const Internal = {
-    combineData(item1: StoredItem<ClothingInfo>, item2: StoredItem<ClothingInfo>): Required<ClothingInfo> | undefined {
+    combineData(item1: StoredItem<ClothingInfo>, item2: StoredItem<ClothingInfo>): ClothingInfo | undefined {
         if (item1.data.sex !== item2.data.sex) {
             return undefined;
         }
@@ -25,10 +25,66 @@ const Internal = {
         const data: ClothingInfo = {
             sex: item1.data.sex,
             components: [],
+            componentsAlternatives: [],
         };
 
-        data.components = data.components.concat(item1.data.components, item2.data.components);
+        //Corechange: Prevent crafting of same clothing components
+
+        const mergedComponents = Internal.mergeComponents(item1.data.components, item2.data.components);
+        if (!mergedComponents) {
+            return undefined;
+        }
+
+        data.components = mergedComponents;
+        data.componentsAlternatives = Internal.generateAlternativeComponents(mergedComponents);
+
+        // data.components = data.components.concat(item1.data.components, item2.data.components);
+        // data.componentsAlternatives = data.componentsAlternatives.concat(item1.data.components, item2.data.components);
         return data;
+    },
+    componentExistsInList(component: ClothingComponent, list: ClothingComponent[]): boolean {
+        return list.some((c) => c.id === component.id);
+    },
+    mergeComponents(components1: ClothingComponent[], components2: ClothingComponent[]): ClothingComponent[] | null {
+        const mergedComponents: ClothingComponent[] = [];
+
+        for (const component of components1) {
+            if (!Internal.componentExistsInList(component, mergedComponents)) {
+                mergedComponents.push({
+                    ...component,
+                    name: component.name || Internal.generateComponentName(component),
+                });
+            }
+        }
+
+        for (const component of components2) {
+            if (!Internal.componentExistsInList(component, mergedComponents)) {
+                mergedComponents.push({
+                    ...component,
+                    name: component.name || Internal.generateComponentName(component),
+                });
+            } else {
+                // If the component already exists, do nothing and return null
+                return null;
+            }
+        }
+
+        return mergedComponents.length > 0 ? mergedComponents : null;
+    },
+    generateAlternativeComponents(components: ClothingComponent[]): ClothingComponent[] {
+        // Logic to generate alternative components based on the merged components
+        // These can have similar IDs but with different names
+        const alternativeComponents: ClothingComponent[] = [];
+        for (const component of components) {
+            alternativeComponents.push({
+                ...component,
+                name: component.name || Internal.generateComponentName(component),
+            });
+        }
+        return alternativeComponents;
+    },
+    generateComponentName(component: ClothingComponent) {
+        return `Component_${component.id}_${component.drawable}_${component.texture}_${component.palette}_${component.dlc}`;
     },
     async init() {
         if (!enabled) {

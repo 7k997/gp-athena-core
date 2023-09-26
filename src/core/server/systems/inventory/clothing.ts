@@ -236,6 +236,12 @@ export function update(player: alt.Player, document: Character = undefined) {
         player.clearProp(propComponents[i]);
     }
 
+    //Clear components (Test for masks only)
+    const components = [1];
+    for (let i = 0; i < components.length; i++) {
+        player.setDlcClothes(0, components[i], 0, 0, 0);
+    }
+
     if (isNullOrUndefined(data.skin)) {
         const useModel = data.appearance.sex === 1 ? mModel : fModel;
         if (player.model !== useModel) {

@@ -48,6 +48,15 @@ declare module '@AthenaShared/interfaces/iObject' {
         maxDistance?: number;
 
         /**
+         * Corechange
+         * Is this object interior only.
+         * Will only show in a matching interior dimension.
+         * @type {boolean}
+         * @memberof IObject
+         */
+        isInterior?: boolean;
+
+        /**
          * Will show across all dimensions.
          * @type {number}
          *

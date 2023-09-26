@@ -14,6 +14,7 @@ export function getImagePath(item: Item): string {
 
     // Attempt to construct data for icon.
     // Uses first drawable item in array as icon.
+    // TODO: Render Outfits images differently. Mark as outfit or render multiple images. Caruselle?
     if (typeof convertedItem.data.sex === 'undefined') {
         return ResolvePath(convertedItem.icon.includes('.png') ? convertedItem.icon : convertedItem.icon + '.png');
     }

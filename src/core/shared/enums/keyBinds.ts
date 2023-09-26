@@ -29,6 +29,8 @@ export const KEY_BINDS = {
     TOOLBAR_TWO: 50,
     TOOLBAR_THREE: 51,
     TOOLBAR_FOUR: 52,
+    TOOLBAR_FIVE: 52,
+
     // E - Interact outside of vehicle
     INTERACT: 69,
     // X - Interact in vehicle
@@ -64,8 +66,6 @@ export const KEY_BINDS = {
 
     //F7
     OPTIONS: 118,
-
-    //Numpad 1 - 9
 
     //0
     KEYBIND_CHECKOWNERSHIP: 96,

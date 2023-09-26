@@ -16,7 +16,10 @@
                     "
                 >
                     <template v-slot:image v-if="hasItem('custom', index)">
-                        <img :src="getImagePath(getItem('custom', index))" />
+                        <img
+                            :src="getImagePath(getItem('custom', index))"
+                            :class="`outlined-image-${getItemSex('custom',index)}`"
+                        />
                     </template>
                     <template v-slot:index v-else>
                         <template v-if="config.showGridNumbers">
@@ -82,7 +85,10 @@
                     "
                 >
                     <template v-slot:image v-if="hasItem('inventory', index)">
-                        <img :src="getImagePath(getItem('inventory', index))" />
+                        <img
+                            :src="getImagePath(getItem('inventory', index))"
+                            :class="`outlined-image-${getItemSex('inventory', index)}`"
+                        />
                     </template>
                     <template v-slot:index v-else>
                         <template v-if="config.showGridNumbers">
@@ -101,11 +107,31 @@
                     </span>
                 </div>
             </div>
-            <Context :contextTitle="context.title" :x="context.x" :y="context.y" v-if="context">
+            <Context :contextTitle="context.title" :x="context.x" :y="context.y" v-if="context && contextShow">
                 <div v-if="context.hasUseEffect" @click="contextAction('use')">Use</div>
                 <template v-for="customAction in context.customEvents">
                     <div @click="contextAction('use', customAction.eventToCall)">{{ customAction.name }}</div>
                 </template>
+
+                <!-- Hier beginnt die Hinzufügung der rekursiven Untermenüs -->
+                <template v-for="customSub in context.customSubMenus">
+                    <ContextSub
+                        :subContextTitle="customSub.name"
+                        :submenus="customSub.customSubMenus"
+                        :actions="customSub.contextActions"
+                        :isTopLevel="true"
+                        @contextParentAction="contextAction"
+                    >
+                        <!-- Hier wird das rekursive Untermenü angezeigt -->
+                        <!-- <template v-for="subMenuAction in customSub.contextActions">
+                            <div class="sub-menu-itemstest" @click="contextAction('use', subMenuAction.eventToCall)">
+                                {{ subMenuAction.name }}
+                            </div>
+                        </template> -->
+                    </ContextSub>
+                </template>
+                <!-- Hier endet die Hinzufügung der rekursiven Untermenüs -->
+
                 <div @click="contextAction('split')">Split</div>
                 <div @click="contextAction('drop')">Drop</div>
                 <div @click="contextAction('give')">Give</div>
@@ -117,7 +143,7 @@
 
 <script lang="ts">
 import { defineComponent, defineAsyncComponent } from 'vue';
-import { CustomContextAction, Item } from '@AthenaShared/interfaces/item';
+import { CustomContextAction, CustomSubMenu, Item } from '@AthenaShared/interfaces/item';
 import { makeDraggable } from '@ViewUtility/drag';
 import WebViewEvents from '@ViewUtility/webViewEvents';
 import { INVENTORY_EVENTS } from '../../shared/events';
@@ -134,6 +160,7 @@ export default defineComponent({
         Split: defineAsyncComponent(() => import('./Split.vue')),
         Give: defineAsyncComponent(() => import('./Give.vue')),
         Context: defineAsyncComponent(() => import('./ContextCustom.vue')),
+        ContextSub: defineAsyncComponent(() => import('./ContextCustomSub.vue')),
         Icon: defineAsyncComponent(() => import('@ViewComponents/Icon.vue')),
     },
     props: {
@@ -152,6 +179,7 @@ export default defineComponent({
                 toolbar: 5,
                 custom: 35,
             },
+            contextShow: false,
             context: undefined as
                 | {
                       x: number;
@@ -160,6 +188,7 @@ export default defineComponent({
                       slot: number;
                       hasUseEffect: boolean;
                       customEvents: Array<CustomContextAction>;
+                      customSubMenus: Array<CustomSubMenu>;
                   }
                 | undefined,
             itemSingleClick: undefined as { type: InventoryType; index: number },
@@ -306,6 +335,23 @@ export default defineComponent({
             const items = [...this[type]] as Array<Item>;
             return items.findIndex((item) => item && item.slot === slot) !== -1;
         },
+        getItemSex(type: InventoryType, slot: number): number {
+            if (typeof this[type] === undefined) {
+                return 3;
+            }
+            const items = [...this[type]] as Array<Item>;
+            let index = items.findIndex((item) => item && item.slot === slot);
+            if (index === -1) {
+                return 3;
+            }
+
+            let item = items[index];
+            if (item && item.data) {
+                return items[index].data['sex'] as number;
+            }
+
+            return 3;
+        },
         getItem(type: InventoryType, slot: number): Item | undefined {
             if (typeof this[type] === undefined) {
                 return undefined;
@@ -350,6 +396,8 @@ export default defineComponent({
             }
         },
         contextMenu(e: MouseEvent, slot: number) {
+            //TODO: Allow running with inventory.
+
             e.preventDefault();
             if (!this.hasItem('inventory', slot)) {
                 return;
@@ -362,6 +410,7 @@ export default defineComponent({
                 typeof item.consumableEventToCall !== 'undefined' ||
                 (item.behavior && (item.behavior.isEquippable || item.behavior.isWeapon || item.behavior.isClothing));
 
+            this.contextShow = false;
             this.context = {
                 title: item.name,
                 slot: item.slot,
@@ -369,9 +418,23 @@ export default defineComponent({
                 y: e.clientY,
                 hasUseEffect: hasUseEffect,
                 customEvents: item.customEventsToCall,
+                customSubMenus: item.customSubMenus,
             };
+
+            if (e.altKey) {
+                // Use item direct if Ctrl is pressed
+                this.contextAction('use');
+                return;
+            } else {
+                this.contextShow = true;
+            }
         },
-        contextAction(type: 'use' | 'split' | 'drop' | 'give' | 'cancel', eventToCall: string | string[] = undefined) {
+        contextAction(
+            type: 'use' | 'split' | 'drop' | 'give' | 'cancel' | 'custom',
+            eventToCall: string | string[] = undefined,
+        ) {
+            console.log('eventToCall: ' + eventToCall);
+
             const slot = this.context.slot;
             this.context = undefined;
 
@@ -384,6 +447,12 @@ export default defineComponent({
             }
 
             if (!debounceReady()) {
+                return;
+            }
+
+            // Send custom Event
+            if (type === 'custom') {
+                WebViewEvents.emitServer(eventToCall, 'inventory', slot);
                 return;
             }
 
@@ -452,6 +521,12 @@ export default defineComponent({
         },
         cancelGive() {
             this.giveData = undefined;
+        },
+        openSubMenuOnHover(customSub) {
+            customSub.isOpen = true;
+        },
+        closeSubMenuOnLeave(customSub) {
+            customSub.isOpen = false;
         },
     },
     mounted() {
@@ -598,5 +673,70 @@ export default defineComponent({
     font-size: 12px;
     font-family: 'Consolas';
     padding-top: 3px;
+}
+
+.sub-menu {
+    position: relative; /* Ermöglicht die Positionierung der Untermenü-Elemente */
+}
+.sub-menu-indicator {
+    margin-left: 4px; /* Geringer Abstand zwischen Menüpunkt und Pfeil */
+    color: #ccc;
+    font-size: 12px;
+    transform: rotate(90deg);
+}
+.sub-menu-items {
+    position: absolute;
+    top: 0;
+    left: 100%; /* Positioniert das Untermenü rechts von seinem Elternelement */
+    min-width: 200px; /* Breite des Untermenüs */
+    background-color: rgba(0, 0, 0, 0.75);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    padding: 4px; /* Etwas Abstand zwischen Untermenü und Inhalt */
+    display: flex;
+    flex-direction: column;
+    z-index: 1; /* Sorgt dafür, dass das Untermenü über anderen Inhalten liegt */
+}
+.sub-menu-indicator {
+    margin-left: auto; /* Verschiebt das Symbol nach rechts */
+    color: #ccc; /* Farbe des Symbols */
+    font-size: 12px;
+    transform: rotate(90deg); /* Drehung um 90 Grad */
+}
+
+/* Stil für Untermenüeinträge in der zweiten Ebene */
+.sub-menu-items .sub-menu:hover {
+    background: #353535;
+    cursor: pointer;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.outlined-image-0 {
+    border-radius: 50%; /* Runde Ecken */
+    padding: 0px; /* Platz um das Bild herum */
+    background: radial-gradient(
+        ellipse farthest-side at 30% 30%,
+        rgba(212, 17, 203, 0.5),
+        rgba(0, 0, 255, 0)
+    ); /* Glow-Effekt (pink) */
+}
+
+.outlined-image-1 {
+    border-radius: 50%; /* Runde Ecken */
+    padding: 0px; /* Platz um das Bild herum */
+    background: radial-gradient(
+        ellipse farthest-side at 30% 30%,
+        rgba(17, 118, 212, 0.5),
+        rgba(0, 0, 255, 0)
+    ); /* Glow-Effekt (blue) */
+}
+.outlined-image-2 {
+    border-radius: 50%; /* Runde Ecken */
+    padding: 0px; /* Platz um das Bild herum */
+    background: radial-gradient(
+        ellipse farthest-side at 0% 0%,
+        rgba(212, 17, 203, 0.5) 60%,
+        /* Pink (oben links) */ rgba(17, 118, 212, 0.5) 100% /* Blau (unten rechts) */
+    ); /* Glow-Effekt (Mischung aus pink und blue) */
 }
 </style>

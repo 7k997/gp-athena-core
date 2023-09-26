@@ -1,4 +1,6 @@
-const THE_LETTER_I = 73;
+import { KEY_BINDS } from '@AthenaShared/enums/keyBinds';
+
+const THE_LETTER_I = KEY_BINDS.INVENTORY;
 
 export const INVENTORY_CONFIG = {
     PLUGIN_FOLDER_NAME: 'core-inventory',

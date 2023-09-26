@@ -9,6 +9,7 @@ import { onTicksStart } from '@AthenaClient/events/onTicksStart';
 import { onInventoryUpdate } from '@AthenaClient/events/onInventoryUpdate';
 import { Page } from '@AthenaClient/webview/page';
 import { PLAYER_SYNCED_META } from '@AthenaShared/enums/playerSynced';
+import { Config } from '@AthenaPlugins/gp-athena-overrides/shared/config';
 
 let page: Page;
 
@@ -109,28 +110,30 @@ function init() {
 
                 // Draws a ped clone in-menu; but not currently working during this version of alt:V
                 // Will be available in next build...
-                native.activateFrontendMenu(native.getHashKey('FE_MENU_VERSION_EMPTY_NO_BACKGROUND'), false, -1);
-                ped = native.clonePed(alt.Player.local.scriptID, false, false, true);
-                native.setEntityCoordsNoOffset(
-                    ped,
-                    alt.Player.local.pos.x,
-                    alt.Player.local.pos.y,
-                    alt.Player.local.pos.z - 100,
-                    false,
-                    false,
-                    false,
-                );
-                await alt.Utils.wait(300);
-                native.requestScaleformMovie('PAUSE_MP_MENU_PLAYER_MODEL');
-                native.freezeEntityPosition(ped, true);
-                native.setMouseCursorVisible(false);
-                native.givePedToPauseMenu(ped, 0);
-                native.setPauseMenuPedLighting(true);
-                native.setPauseMenuPedSleepState(true);
+                if (Config.INVENTORY_AVATAR) {
+                    native.activateFrontendMenu(native.getHashKey('FE_MENU_VERSION_EMPTY_NO_BACKGROUND'), false, -1);
+                    ped = native.clonePed(alt.Player.local.scriptID, false, false, true);
+                    native.setEntityCoordsNoOffset(
+                        ped,
+                        alt.Player.local.pos.x,
+                        alt.Player.local.pos.y,
+                        alt.Player.local.pos.z - 100,
+                        false,
+                        false,
+                        false,
+                    );
+                    await alt.Utils.wait(300);
+                    native.requestScaleformMovie('PAUSE_MP_MENU_PLAYER_MODEL');
+                    native.freezeEntityPosition(ped, true);
+                    native.setMouseCursorVisible(false);
+                    native.givePedToPauseMenu(ped, 0);
+                    native.setPauseMenuPedLighting(true);
+                    native.setPauseMenuPedSleepState(true);
 
-                const [_, r, g, b, a] = native.getHudColour(177);
-                previousHudColor = new alt.RGBA(r, g, b, a);
-                native.replaceHudColourWithRgba(117, 0, 0, 0, 0);
+                    const [_, r, g, b, a] = native.getHudColour(177);
+                    previousHudColor = new alt.RGBA(r, g, b, a);
+                    native.replaceHudColourWithRgba(117, 0, 0, 0, 0);
+                }
 
                 AthenaClient.systems.sound.play2d(
                     `@plugins/sounds/${INVENTORY_CONFIG.PLUGIN_FOLDER_NAME}/inv_open.ogg`,
@@ -140,22 +143,24 @@ function init() {
             onClose: () => {
                 isOpen = false;
 
-                native.clearPedInPauseMenu();
-                native.setFrontendActive(false);
+                if (Config.INVENTORY_AVATAR) {
+                    native.clearPedInPauseMenu();
+                    native.setFrontendActive(false);
 
-                if (typeof ped !== 'undefined') {
-                    native.deleteEntity(ped);
-                    ped = undefined;
-                }
+                    if (typeof ped !== 'undefined') {
+                        native.deleteEntity(ped);
+                        ped = undefined;
+                    }
 
-                if (previousHudColor) {
-                    native.replaceHudColourWithRgba(
-                        117,
-                        previousHudColor.r,
-                        previousHudColor.g,
-                        previousHudColor.b,
-                        previousHudColor.a,
-                    );
+                    if (previousHudColor) {
+                        native.replaceHudColourWithRgba(
+                            117,
+                            previousHudColor.r,
+                            previousHudColor.g,
+                            previousHudColor.b,
+                            previousHudColor.a,
+                        );
+                    }
                 }
 
                 alt.emitServer(INVENTORY_EVENTS.TO_SERVER.CLOSE);

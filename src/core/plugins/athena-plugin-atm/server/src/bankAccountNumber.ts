@@ -5,20 +5,20 @@ import { BANK_CONFIG } from './config';
 
 const metaName = 'bankNumber';
 
-// Extends the player interface.
-declare module 'alt-server' {
-    export interface Character extends Partial<charRef.Character> {
-        [metaName]?: null | undefined | number;
-    }
-}
+// Extends the player interface. REMOVED NOT CORRECT ANYMORE
+// declare module 'alt-server' {
+//     export interface Character extends Partial<charRef.Character> {
+//         [metaName]?: null | undefined | number;
+//     }
+// }
 
 class InternalFunctions {
     static async handleSelect(player: alt.Player) {
-        const data = Athena.document.character.get(player);
-        if (typeof data === 'undefined') return;
+        //const data = Athena.document.character.get<AtmCharData>(player);  //Typesafe
+        const data = Athena.document.character.get(player); //Not typesafe but works
 
-        if (data.bankNumber !== undefined && data.bankNumber !== null) {
-            Athena.player.emit.meta(player, metaName, data[metaName]);
+        if (data.bankNu1mber !== undefined && data.bankNumber !== null) {
+            Athena.player.emit.meta(player, metaName, data.bankNumber);
             return;
         }
 

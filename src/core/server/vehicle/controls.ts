@@ -50,6 +50,10 @@ export async function toggleEngine(vehicle: alt.Vehicle): Promise<boolean> {
     }
 
     await updateLastUsed(vehicle);
+    //Corechange: Fixme waitfor
+    // [02:44:03][Error] Uncaught exception: Error: Failed to wait for callback: ()=>vehicle.engineOn === nextState
+    // at eval (eval at <anonymous> (node:embedder_main_1:30:5), <anonymous>:3347:24)
+    // at handler (eval at <anonymous> (node:embedder_main_1:30:5), <anonymous>:3266:13)
     await alt.Utils.waitFor(() => vehicle.engineOn === nextState);
 
     return vehicle.engineOn;

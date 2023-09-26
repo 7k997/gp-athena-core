@@ -121,7 +121,8 @@ const Internal = {
  */
 export function disable() {
     enabled = false;
-    alt.off('playerDeath', Internal.handleDefaultDeath);
+    //Corechange
+    // alt.off('playerDeath', Internal.handleDefaultDeath);
     alt.log(`~y~Default Death System Turned Off`);
 }
 
