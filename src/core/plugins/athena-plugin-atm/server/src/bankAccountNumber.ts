@@ -17,7 +17,7 @@ class InternalFunctions {
         //const data = Athena.document.character.get<AtmCharData>(player);  //Typesafe
         const data = Athena.document.character.get(player); //Not typesafe but works
 
-        if (data.bankNu1mber !== undefined && data.bankNumber !== null) {
+        if (data.bankNumber !== undefined && data.bankNumber !== null) {
             Athena.player.emit.meta(player, metaName, data.bankNumber);
             return;
         }
