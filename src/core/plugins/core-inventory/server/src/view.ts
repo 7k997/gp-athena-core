@@ -245,7 +245,14 @@ const Internal = {
             return;
         }
 
-        const startItem = Athena.systems.inventory.slot.getAt(info.startIndex, startData);
+        let startItem = Athena.systems.inventory.slot.getAt(info.startIndex, startData);
+        startItem = Athena.systems.inventory.swap.invokeInjection(
+            'before-swap',
+            player,
+            startItem,
+            info.startType,
+            info.endType,
+        );
         if (typeof startItem === 'undefined') {
             return;
         }
@@ -263,10 +270,11 @@ const Internal = {
             if (info.startType === 'custom') {
                 openStorages[player.id] = newInventory;
                 InventoryView.storage.resync(player);
+                Athena.systems.inventory.swap.invoke('item-combine', player, endItem, info.startType, info.endType);
                 return;
             }
-
             await Athena.document.character.set(player, info.startType, newInventory);
+            Athena.systems.inventory.swap.invoke('item-combine', player, endItem, info.startType, info.endType);
             return;
         }
 
@@ -281,10 +289,14 @@ const Internal = {
             if (info.startType === 'custom') {
                 openStorages[player.id] = newInventory;
                 InventoryView.storage.resync(player);
+                Athena.systems.inventory.swap.invoke('item-swap', player, startItem, info.startType, info.endType);
+                Athena.systems.inventory.swap.invoke('item-swap', player, endItem, info.startType, info.endType);
                 return;
             }
 
             await Athena.document.character.set(player, info.startType, newInventory);
+            Athena.systems.inventory.swap.invoke('item-swap', player, startItem, info.startType, info.endType);
+            Athena.systems.inventory.swap.invoke('item-swap', player, endItem, info.startType, info.endType);
             return;
         }
 
@@ -295,10 +307,11 @@ const Internal = {
 
         if (info.startType !== info.endType && !Athena.systems.inventory.manager.compare(startItem, endItem)) {
             // Swapping different slots with different data sets.
-            complexSwap = Athena.systems.inventory.manager.swapBetween(fromComplex, toComplex);
+            complexSwap = Athena.systems.inventory.manager.swapBetween(player, fromComplex, toComplex);
         } else {
             // Items match; but different data sets. Move stack sizes.
             complexSwap = Athena.systems.inventory.manager.combineAtComplex(
+                player,
                 { slot: info.startIndex, data: startData, size: info.startType, type: info.startType },
                 { slot: info.endIndex, data: endData, size: info.endType, type: info.endType },
             );
@@ -313,6 +326,7 @@ const Internal = {
                 [info.startType]: complexSwap.from,
                 [info.endType]: complexSwap.to,
             });
+            Athena.systems.inventory.swap.invoke('item-swap', player, startItem, info.startType, info.endType);
             return;
         }
 

@@ -590,9 +590,13 @@ export function combineAt<CustomData = {}>(
     return Athena.systems.inventory.weight.update<CustomData>(copyOfData);
 }
 
-export function combineAtComplex(from: ComplexSwap, to: ComplexSwap): ComplexSwapReturn | undefined {
+export function combineAtComplex(
+    player: alt.Player,
+    from: ComplexSwap,
+    to: ComplexSwap,
+): ComplexSwapReturn | undefined {
     if (Overrides.combineAtComplex) {
-        return Overrides.combineAtComplex(from, to);
+        return Overrides.combineAtComplex(player, from, to);
     }
 
     if (typeof from.size === 'string') {
@@ -645,6 +649,22 @@ export function combineAtComplex(from: ComplexSwap, to: ComplexSwap): ComplexSwa
 
     fromData[fromIndex].quantity -= spaceAvailable;
     toData[toIndex].quantity += spaceAvailable;
+
+    fromData[fromIndex] = Athena.systems.inventory.swap.invokeInjection(
+        'before-swap',
+        player,
+        fromData[fromIndex],
+        from.type,
+        to.type,
+    );
+    toData[toIndex] = Athena.systems.inventory.swap.invokeInjection(
+        'after-swap',
+        player,
+        toData[toIndex],
+        from.type,
+        to.type,
+    );
+    Athena.systems.inventory.swap.invoke('swap', player, toData[toIndex], from.type, to.type);
     return {
         from: Athena.systems.inventory.weight.update(fromData),
         to: Athena.systems.inventory.weight.update(toData),
@@ -708,9 +728,9 @@ export function swap(
  * @param {ComplexSwap} to
  * @return {(ComplexSwapReturn | undefined)}
  */
-export function swapBetween(from: ComplexSwap, to: ComplexSwap): ComplexSwapReturn | undefined {
+export function swapBetween(player: alt.Player, from: ComplexSwap, to: ComplexSwap): ComplexSwapReturn | undefined {
     if (Overrides.swapBetween) {
-        return Overrides.swapBetween(from, to);
+        return Overrides.swapBetween(player, from, to);
     }
 
     if (typeof from.size === 'string') {
@@ -737,6 +757,8 @@ export function swapBetween(from: ComplexSwap, to: ComplexSwap): ComplexSwapRetu
 
     // Clone of the original items, if the item is available.
     let fromItem = deepCloneObject<StoredItem>(fromData[fromIndex]);
+    fromItem = Athena.systems.inventory.swap.invokeInjection('before-swap', player, fromItem, from.type, to.type);
+
     const fromBaseItem = Athena.systems.inventory.factory.getBaseItem(fromItem.dbName, fromItem.version);
     if (to.type === 'toolbar' && fromBaseItem && fromBaseItem.behavior && !fromBaseItem.behavior.isToolbar) {
         return undefined;
@@ -757,6 +779,8 @@ export function swapBetween(from: ComplexSwap, to: ComplexSwap): ComplexSwapRetu
         toItem.slot = from.slot;
         toData.splice(toIndex, 1);
 
+        toItem = Athena.systems.inventory.swap.invokeInjection('after-swap', player, toItem, from.type, to.type);
+
         // Move the 'to' item to the other data set.
         fromData.push(toItem);
     }
@@ -768,8 +792,11 @@ export function swapBetween(from: ComplexSwap, to: ComplexSwap): ComplexSwapRetu
         fromItem.isEquipped = false;
     }
 
+    fromItem = Athena.systems.inventory.swap.invokeInjection('after-swap', player, fromItem, from.type, to.type);
     // Move the 'from' item to the other data set.
     toData.push(fromItem);
+
+    Athena.systems.inventory.swap.invoke('swap', player, fromItem, from.type, to.type);
     return {
         from: Athena.systems.inventory.weight.update(fromData),
         to: Athena.systems.inventory.weight.update(toData),

@@ -1,0 +1,233 @@
+import * as alt from 'alt-server';
+import { StoredItem, StoredItemEx } from '@AthenaShared/interfaces/item';
+import { InventoryType } from './manager';
+
+const anyDbNamePlaceholder = 'any1sd2f3g4h5j6k7l8';
+
+type StoredItemInjections = ((
+    player: alt.Player,
+    item: StoredItem,
+    fromType: InventoryType,
+    toType: InventoryType,
+) => StoredItem)[];
+
+type StoredItemCallbacks = ((
+    player: alt.Player,
+    item: StoredItem,
+    fromType: InventoryType,
+    toType: InventoryType,
+) => void)[];
+
+const InjectionList: { [key: string]: { [dbName: string]: StoredItemInjections } } = {
+    'before-swap': {},
+    'after-swap': {},
+    'before-combine': {},
+    'after-combine': {},
+};
+
+const CallbackList: { [key: string]: { [dbName: string]: StoredItemCallbacks } } = {
+    'item-swap': {},
+    'item-combine': {},
+    'item-swap-to-toolbar': {},
+    'item-swap-to-inventory': {},
+    'item-swap-to-custom': {},
+    'item-swap-from-inventory-to-toolbar': {},
+    'item-swap-from-toolbar-to-inventory': {},
+    'item-swap-from-toolbar-to-custom': {},
+    'item-swap-from-inventory-to-custom': {},
+};
+
+type InjectionEvents = keyof typeof InjectionList;
+type Events = keyof typeof CallbackList;
+
+/**
+ * Invoke a specific event for listening to a specific item type being equipped / unequipped
+ *
+ * @export
+ * @param {Events} event
+ * @param {alt.Player} player
+ * @param {StoredItem} item
+ * @return {*}
+ */
+export function invoke(
+    event: Events,
+    player: alt.Player,
+    item: StoredItem,
+    fromType: InventoryType,
+    toType: InventoryType,
+) {
+    alt.logWarning(`Invoking ${event} from ${fromType} to ${toType}`);
+    //Autoinvoke
+    if (toType === 'toolbar' && event === 'item-swap') {
+        invoke('item-swap-to-toolbar', player, item, fromType, toType);
+        if (fromType === 'inventory') {
+            invoke('item-swap-from-inventory-to-toolbar', player, item, fromType, toType);
+        }
+    }
+
+    if (toType === 'inventory' && event === 'item-swap') {
+        invoke('item-swap-to-inventory', player, item, fromType, toType);
+
+        if (fromType === 'toolbar') {
+            invoke('item-swap-from-toolbar-to-inventory', player, item, fromType, toType);
+        }
+    }
+
+    if (toType === 'custom' && event === 'item-swap') {
+        invoke('item-swap-to-custom', player, item, fromType, toType);
+
+        if (fromType === 'toolbar') {
+            invoke('item-swap-from-toolbar-to-custom', player, item, fromType, toType);
+        }
+    }
+
+    if (!CallbackList[event] || !item) {
+        return;
+    }
+
+    if (CallbackList[event][anyDbNamePlaceholder]) {
+        for (let cb of CallbackList[event][anyDbNamePlaceholder]) {
+            try {
+                alt.logWarning(`Invoking ${event} from ${fromType} to ${toType}, item: ${item.dbName}`);
+                cb(player, item, fromType, toType);
+            } catch (err) {
+                console.warn(`Got swap Invoke Error: ${err}`);
+                continue;
+            }
+        }
+    }
+
+    if (!CallbackList[event][item.dbName] || CallbackList[event][item.dbName].length <= 0) {
+        return;
+    }
+
+    for (let cb of CallbackList[event][item.dbName]) {
+        try {
+            cb(player, item, fromType, toType);
+        } catch (err) {
+            console.warn(`Got swap Invoke Error: ${err}`);
+            continue;
+        }
+    }
+}
+
+export function invokeInjection(
+    event: InjectionEvents,
+    player: alt.Player,
+    item: StoredItem,
+    fromType: InventoryType,
+    toType: InventoryType,
+): StoredItem {
+    alt.logWarning(`Invoking ${event} from ${fromType} to ${toType}`);
+    if (!InjectionList[event] || !item) {
+        return item;
+    }
+
+    if (InjectionList[event][anyDbNamePlaceholder]) {
+        for (let cb of InjectionList[event][anyDbNamePlaceholder]) {
+            try {
+                item = cb(player, item, fromType, toType);
+            } catch (err) {
+                console.warn(`Got swap Injection Error: ${err}`);
+                continue;
+            }
+        }
+    }
+
+    if (!InjectionList[event][item.dbName] || InjectionList[event][item.dbName].length <= 0) {
+        return item;
+    }
+
+    for (let cb of InjectionList[event][item.dbName]) {
+        try {
+            item = cb(player, item, fromType, toType);
+        } catch (err) {
+            console.warn(`Got swap Injection Error: ${err}`);
+            continue;
+        }
+    }
+
+    return item;
+}
+
+/**
+ * Listen for a when a specific item is equipped or unequipped
+ *
+ * @export
+ * @template T
+ * @param {Events} event
+ * @param {string} dbName
+ * @param {(player: alt.Player, item: StoredItemEx<T>) => void} cb
+ * @return {*}
+ */
+export function on<T = {}>(
+    event: Events,
+    dbName: string,
+    cb: (player: alt.Player, item: StoredItemEx<T>, fromType: InventoryType, toType: InventoryType) => void,
+) {
+    if (!CallbackList[event]) {
+        return;
+    }
+
+    if (!CallbackList[event][dbName]) {
+        CallbackList[event][dbName] = [];
+    }
+
+    CallbackList[event][dbName].push(cb);
+}
+
+/**
+ * Listen for a when a random item is equipped or unequipped
+ *
+ * @export
+ * @template T
+ * @param {Events} event
+ * @param {string} dbName
+ * @param {(player: alt.Player, item: StoredItemEx<T>) => void} cb
+ * @return {*}
+ */
+export function onAny<T = {}>(
+    event: Events,
+    cb: (player: alt.Player, item: StoredItemEx<T>, fromType: InventoryType, toType: InventoryType) => void,
+) {
+    if (!CallbackList[event]) {
+        return;
+    }
+
+    if (!CallbackList[event][anyDbNamePlaceholder]) {
+        CallbackList[event][anyDbNamePlaceholder] = [];
+    }
+
+    CallbackList[event][anyDbNamePlaceholder].push(cb);
+}
+
+export function addInjection<T = {}>(
+    event: InjectionEvents,
+    dbName: string,
+    cb: (player: alt.Player, item: StoredItemEx<T>, fromType: InventoryType, toType: InventoryType) => StoredItem,
+) {
+    if (!InjectionList[event]) {
+        return;
+    }
+
+    if (!InjectionList[event][dbName]) {
+        InjectionList[event][dbName] = [];
+    }
+
+    InjectionList[event][dbName].push(cb);
+}
+
+export function addInjectionAny<T = {}>(
+    event: InjectionEvents,
+    cb: (player: alt.Player, item: StoredItemEx<T>, fromType: InventoryType, toType: InventoryType) => StoredItem,
+) {
+    if (!InjectionList[event]) {
+        return;
+    }
+
+    if (!InjectionList[event][anyDbNamePlaceholder]) {
+        InjectionList[event][anyDbNamePlaceholder] = [];
+    }
+
+    InjectionList[event][anyDbNamePlaceholder].push(cb);
+}

@@ -6,11 +6,16 @@ import { InventoryType } from '@AthenaPlugins/core-inventory/shared/interfaces';
 
 export class ItemUtil {
     static getItem<CustomData>(player: alt.Player, slot: number, type: InventoryType): ItemEx<CustomData> {
-        let item: ItemEx<CustomData> =
-            type === 'toolbar'
-                ? Athena.systems.inventory.convert.toItem<CustomData>(Athena.player.toolbar.getAt(player, slot))
-                : Athena.systems.inventory.convert.toItem<CustomData>(Athena.player.inventory.getAt(player, slot));
-        return item;
+        if (type === 'toolbar') {
+            if (Athena.player.toolbar.getAt(player, slot)) {
+                return Athena.systems.inventory.convert.toItem<CustomData>(Athena.player.toolbar.getAt(player, slot));
+            }
+        } else {
+            if (Athena.player.inventory.getAt(player, slot)) {
+                return Athena.systems.inventory.convert.toItem<CustomData>(Athena.player.inventory.getAt(player, slot));
+            }
+        }
+        return null;
     }
 
     static getPlayerData(player: alt.Player): Character {
