@@ -72,8 +72,8 @@ const Internal = {
                 continue;
             }
 
-            if (dataSet[i] instanceof alt.Object) {
-                const object = dataSet[i] as alt.Object;
+            if (dataSet[i] instanceof alt.LocalObject) {
+                const object = dataSet[i] as alt.LocalObject;
                 if (object && native.isEntityAttached(object.scriptID)) {
                     continue;
                 }
@@ -101,7 +101,7 @@ const Internal = {
     updateSelectionList() {
         const players = [...alt.Player.streamedIn];
         const vehicles = [...alt.Vehicle.streamedIn];
-        const objects = [...alt.Object.all];
+        const objects = [...alt.LocalObject.all];
 
         let entityInfo: Array<TargetInfo> = Internal.convert(players, 'player');
         entityInfo = entityInfo.concat(Internal.convert(vehicles, 'vehicle'));
@@ -237,20 +237,21 @@ const Internal = {
                         break;
                     }
 
-                    const object = alt.Object.all.find((x) => x.scriptID === selection.id);
+                    const object = alt.LocalObject.all.find((x) => x.scriptID === selection.id);
                     if (typeof object === 'undefined') {
-                        //Corechange: Its maybe a map object and not alt.Object check if it exists...
+                        //Corechange: Its maybe a map object and not alt.LocalObject check if it exists...
                         const model = native.getEntityModel(selection.id);
                         const rot = native.getEntityRotation(selection.id, 2);
                         if (model) {
-                            //Create dummy alt.Object
-                            const createdObject: alt.Object = {
+                            //Create dummy alt.LocalObject
+                            const createdObject: alt.LocalObject = {
+                                frozen: false,
+                                remoteID: undefined,
                                 model: model,
                                 pos: new alt.Vector3(selection.pos),
                                 rot: new alt.Vector3(rot),
                                 dynamic: true,
                                 visible: false,
-                                count: 0,
                                 alpha: 0,
                                 resetAlpha: undefined,
                                 lodDistance: 0,
@@ -281,8 +282,6 @@ const Internal = {
                                 hasStreamSyncedMeta: undefined,
                                 getStreamSyncedMetaKeys: undefined,
                                 dimension: 0,
-                                getByID: undefined,
-                                getByRemoteID: undefined,
                                 valid: false,
                                 destroy: undefined,
                                 getMetaDataKeys: undefined,

@@ -13,7 +13,7 @@
 
             .menu-wrapper {
                 position: absolute;
-                right: 25px;
+                right: 80px;
                 top: 25px;
             }
 

@@ -318,10 +318,13 @@ export function add<CustomData = {}>(
     item: Omit<StoredItem<CustomData>, 'slot'>,
     data: Array<StoredItem<CustomData>>,
     size: InventoryType | number = 256,
+    reservedSlot?: number,
 ): Array<StoredItem<CustomData>> | undefined {
     if (Overrides.add) {
         return Overrides.add(item, data, size);
     }
+
+    alt.logWarning(`Adding item3`);
 
     if (item.quantity <= 0) {
         alt.logWarning(`ItemManager: Cannot add negative quantity, or zero quantity to an item.`);
@@ -332,6 +335,7 @@ export function add<CustomData = {}>(
         return Athena.systems.inventory.weight.update<CustomData>(data);
     }
 
+    alt.logWarning(`Adding item4`);
     // Lookup the base item based on the dbName of the item.
     const baseItem = Athena.systems.inventory.factory.getBaseItem(item.dbName, item.version);
     if (typeof baseItem === 'undefined') {
@@ -344,7 +348,7 @@ export function add<CustomData = {}>(
     let availableStackIndex = -1;
     if (baseItem.behavior.canStack && actualMaxStack > 1) {
         availableStackIndex = copyOfData.findIndex(
-            (x) => x.dbName === item.dbName && x.version === item.version && x.quantity !== actualMaxStack,
+            (x) => x.dbName === item.dbName && x.version === item.version && x.quantity !== actualMaxStack && !x.id,
         );
     }
 
@@ -352,22 +356,27 @@ export function add<CustomData = {}>(
     // - Adds unstackable items
     // - Adds an item with a max stack of 1
     // - Adds stackable items, and automatically tries to fill item quantity.
-    if (!baseItem.behavior.canStack || actualMaxStack === 1 || availableStackIndex === -1) {
+    // - Corechange, if a ID is set then the item is unstackable.
+    if (!baseItem.behavior.canStack || actualMaxStack === 1 || availableStackIndex === -1 || item.id) {
         // Ensure there is enough room to add items.
+
+        alt.logWarning(`Adding item5`);
         if (copyOfData.length >= parseFloat(String(size))) {
             return undefined;
         }
-
+        alt.logWarning(`Adding item5.2`);
         // Determine open slot for item.
         // If undefined; do not try to add anything else; return undefined as a failure.
-        const openSlot = Athena.systems.inventory.slot.findOpen(size, copyOfData);
+        const openSlot = Athena.systems.inventory.slot.findOpen(size, copyOfData, reservedSlot);
         if (typeof openSlot === 'undefined') {
             return undefined;
         }
+        alt.logWarning(`Adding item5.3`);
 
         let itemClone = deepCloneObject<StoredItem<CustomData>>(item);
         itemClone.slot = openSlot;
 
+        alt.logWarning(`Adding item5.4`);
         // Use quantity to subtract from max stack size or use amount left
         if (baseItem.behavior.canStack) {
             itemClone.quantity = item.quantity < actualMaxStack ? item.quantity : actualMaxStack;
@@ -380,18 +389,22 @@ export function add<CustomData = {}>(
         copyOfData.push(itemClone);
 
         if (item.quantity === 0) {
+            alt.logWarning(`Adding item quantity 0!`);
             return Athena.systems.inventory.weight.update<CustomData>(copyOfData);
         }
 
+        alt.logWarning(`test1`);
         return add(item, copyOfData, size);
     }
 
+    alt.logWarning(`Adding item6`);
     // If the item.quantity is less than the stack size and less than or equal to amount missing. Simply add to it.
     const amountMissing = actualMaxStack - copyOfData[availableStackIndex].quantity;
     if (item.quantity <= amountMissing) {
         copyOfData[availableStackIndex].quantity += item.quantity;
         copyOfData[availableStackIndex] = calculateItemWeight(baseItem, copyOfData[availableStackIndex]);
 
+        alt.logWarning(`Adding item7`);
         return copyOfData;
     }
 
@@ -402,6 +415,7 @@ export function add<CustomData = {}>(
     copyOfData[availableStackIndex] = calculateItemWeight(baseItem, copyOfData[availableStackIndex]);
 
     item.quantity -= amountMissing;
+    alt.logWarning(`test2 ${item.quantity}`);
     return add(item, copyOfData, size);
 }
 
@@ -414,7 +428,7 @@ export function add<CustomData = {}>(
  * @return {(Array<StoredItem> | undefined)}
  */
 export function sub<CustomData = {}>(
-    item: Omit<StoredItem<CustomData>, 'slot' | 'data'>,
+    item: Omit<StoredItem<CustomData>, 'data'>,
     data: Array<StoredItem>,
 ): Array<StoredItem> | undefined {
     if (Overrides.sub) {
@@ -438,7 +452,24 @@ export function sub<CustomData = {}>(
     }
 
     const copyOfData = deepCloneArray<StoredItem>(data);
-    const existingItemIndex = copyOfData.findIndex((x) => x.dbName === item.dbName && x.version === item.version);
+
+    let existingItemIndex = -1;
+    if (item.id) {
+        //Corechange - If Item has an unique ID, we need to find the item by ID
+        existingItemIndex = copyOfData.findIndex(
+            (x) => x.dbName === item.dbName && x.id === item.id && x.version === item.version,
+        );
+    } else {
+        //Corechange - Try to find the item first in the inventory by slot.
+        existingItemIndex = copyOfData.findIndex(
+            (x) => x.dbName === item.dbName && x.slot === item.slot && x.version === item.version,
+        );
+
+        if (existingItemIndex <= -1) {
+            //Corechange - if the item is not in the specified slot then try to find it in another slot.
+            existingItemIndex = copyOfData.findIndex((x) => x.dbName === item.dbName && x.version === item.version);
+        }
+    }
 
     // Pretty much means there are not more items to remove from.
     // Return undefined.
@@ -590,11 +621,11 @@ export function combineAt<CustomData = {}>(
     return Athena.systems.inventory.weight.update<CustomData>(copyOfData);
 }
 
-export function combineAtComplex(
+export async function combineAtComplex(
     player: alt.Player,
     from: ComplexSwap,
     to: ComplexSwap,
-): ComplexSwapReturn | undefined {
+): Promise<ComplexSwapReturn | undefined> {
     if (Overrides.combineAtComplex) {
         return Overrides.combineAtComplex(player, from, to);
     }
@@ -650,21 +681,28 @@ export function combineAtComplex(
     fromData[fromIndex].quantity -= spaceAvailable;
     toData[toIndex].quantity += spaceAvailable;
 
-    fromData[fromIndex] = Athena.systems.inventory.swap.invokeInjection(
-        'before-swap',
-        player,
-        fromData[fromIndex],
-        from.type,
-        to.type,
-    );
-    toData[toIndex] = Athena.systems.inventory.swap.invokeInjection(
+    // fromData[fromIndex] = await Athena.systems.inventory.swap.invokeInjection(
+    //     'before-swap',
+    //     'beforeSwap-2',
+    //     player,
+    //     fromData[fromIndex],
+    //     from.type,
+    //     to.type,
+    // );
+
+    toData[toIndex] = await Athena.systems.inventory.swap.invokeInjection(
         'after-swap',
+        'afterSwap-2',
         player,
         toData[toIndex],
-        from.type,
-        to.type,
+        { startType: from.type, startIndex: fromIndex, endType: to.type, endIndex: toIndex },
     );
-    Athena.systems.inventory.swap.invoke('swap', player, toData[toIndex], from.type, to.type);
+    Athena.systems.inventory.swap.invoke('item-swap', 'swap2', player, toData[toIndex], {
+        startType: from.type,
+        startIndex: fromIndex,
+        endType: to.type,
+        endIndex: toIndex,
+    });
     return {
         from: Athena.systems.inventory.weight.update(fromData),
         to: Athena.systems.inventory.weight.update(toData),
@@ -728,7 +766,11 @@ export function swap(
  * @param {ComplexSwap} to
  * @return {(ComplexSwapReturn | undefined)}
  */
-export function swapBetween(player: alt.Player, from: ComplexSwap, to: ComplexSwap): ComplexSwapReturn | undefined {
+export async function swapBetween(
+    player: alt.Player,
+    from: ComplexSwap,
+    to: ComplexSwap,
+): Promise<ComplexSwapReturn | undefined> {
     if (Overrides.swapBetween) {
         return Overrides.swapBetween(player, from, to);
     }
@@ -757,7 +799,14 @@ export function swapBetween(player: alt.Player, from: ComplexSwap, to: ComplexSw
 
     // Clone of the original items, if the item is available.
     let fromItem = deepCloneObject<StoredItem>(fromData[fromIndex]);
-    fromItem = Athena.systems.inventory.swap.invokeInjection('before-swap', player, fromItem, from.type, to.type);
+    // fromItem = await Athena.systems.inventory.swap.invokeInjection(
+    //     'before-swap',
+    //     'beforeSwap-3',
+    //     player,
+    //     fromItem,
+    //     from.type,
+    //     to.type,
+    // );
 
     const fromBaseItem = Athena.systems.inventory.factory.getBaseItem(fromItem.dbName, fromItem.version);
     if (to.type === 'toolbar' && fromBaseItem && fromBaseItem.behavior && !fromBaseItem.behavior.isToolbar) {
@@ -779,7 +828,12 @@ export function swapBetween(player: alt.Player, from: ComplexSwap, to: ComplexSw
         toItem.slot = from.slot;
         toData.splice(toIndex, 1);
 
-        toItem = Athena.systems.inventory.swap.invokeInjection('after-swap', player, toItem, from.type, to.type);
+        toItem = await Athena.systems.inventory.swap.invokeInjection('after-swap', 'afterSwap-3', player, toItem, {
+            startType: from.type,
+            startIndex: fromIndex,
+            endType: to.type,
+            endIndex: toIndex,
+        });
 
         // Move the 'to' item to the other data set.
         fromData.push(toItem);
@@ -792,11 +846,21 @@ export function swapBetween(player: alt.Player, from: ComplexSwap, to: ComplexSw
         fromItem.isEquipped = false;
     }
 
-    fromItem = Athena.systems.inventory.swap.invokeInjection('after-swap', player, fromItem, from.type, to.type);
+    fromItem = await Athena.systems.inventory.swap.invokeInjection('after-swap', 'afterSwap-4', player, fromItem, {
+        startType: from.type,
+        startIndex: fromIndex,
+        endType: to.type,
+        endIndex: toIndex,
+    });
     // Move the 'from' item to the other data set.
     toData.push(fromItem);
 
-    Athena.systems.inventory.swap.invoke('swap', player, fromItem, from.type, to.type);
+    Athena.systems.inventory.swap.invoke('item-swap', 'swap1', player, fromItem, {
+        startType: from.type,
+        startIndex: fromIndex,
+        endType: to.type,
+        endIndex: toIndex,
+    });
     return {
         from: Athena.systems.inventory.weight.update(fromData),
         to: Athena.systems.inventory.weight.update(toData),

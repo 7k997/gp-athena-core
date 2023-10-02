@@ -26,6 +26,7 @@ const ClientAttachableSystem = {
                 return;
             }
 
+            alt.logWarning(`Creating Attachables for ${entity.id}`);
             ClientAttachableSystem.update(entity, attachables);
         });
     },
@@ -54,10 +55,11 @@ const ClientAttachableSystem = {
         }
 
         if (!value || !Array.isArray(value)) {
+            alt.logWarning(`Destroying Attachables value: ${value} for ${entity.id}`);
             ClientAttachableSystem.destroy(entity);
             return;
         }
-
+        alt.logWarning(`Updating Attachables for value: ${value} for ${entity.id}`);
         ClientAttachableSystem.update(entity, value);
     },
 
@@ -90,6 +92,15 @@ const ClientAttachableSystem = {
      *
      */
     remove(player: alt.Player) {
+
+        //Remove all Attachables for test
+        alt.logWarning(`Destroying Attachables for ${player.id}`);
+
+        alt.LocalObject.all.forEach((object) => {
+            alt.logWarning(`Destroying Attachables for ${player.id}, model: `, object.model, ' id: ', object.id);
+            // object.detach();
+            // object.destroy();
+        });
         // Remove old attachables
         if (cache[player.id]) {
             for (let i = 0; i < cache[player.id].length; i++) {
@@ -99,10 +110,18 @@ const ClientAttachableSystem = {
                     continue;
                 }
 
-                const foundObject = alt.Object.all.find((x) => x.id === attachable.entityID);
+                alt.logWarning(`EntityID: ${attachable.entityID}`);
+                const foundObject = alt.LocalObject.all.find((x) => x.id === attachable.entityID);
                 if (typeof foundObject === 'undefined' || foundObject === null || foundObject.valid === false) {
                     continue;
                 }
+
+                alt.logWarning(
+                    `Destroying Attachable for ${player.id}, foundObject: `,
+                    foundObject.model,
+                    ' id: ',
+                    foundObject.id,
+                );
 
                 foundObject.destroy();
             }
@@ -117,13 +136,14 @@ const ClientAttachableSystem = {
      *
      */
     async update(player: alt.Player, attachables: Array<IAttachable>) {
+        alt.logWarning('Update attachables: ', JSON.stringify(attachables));
         ClientAttachableSystem.remove(player);
 
         // Create new attachables
         cache[player.id] = [];
 
         for (let i = 0; i < attachables.length; i++) {
-            const newObject = new alt.Object(
+            const newObject = new alt.LocalObject(
                 attachables[i].model,
                 new alt.Vector3(attachables[i].pos),
                 new alt.Vector3(attachables[i].rot),

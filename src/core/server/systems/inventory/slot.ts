@@ -9,9 +9,10 @@ import * as config from './config';
  *
  * @param {(InventoryType | number)} slotSize
  * @param {Array<StoredItem>} data
+ * @param {number} [reservedSlot] A slot that is reserved for a specific item -> Do not use this slot.
  * @return {(number | undefined)}
  */
-export function findOpen(slotSize: InventoryType | number, data: Array<StoredItem>): number | undefined {
+export function findOpen(slotSize: InventoryType | number, data: Array<StoredItem>, reservedSlot?: number ): number | undefined {
     if (Overrides.findOpen) {
         return Overrides.findOpen(slotSize, data);
     }
@@ -25,6 +26,9 @@ export function findOpen(slotSize: InventoryType | number, data: Array<StoredIte
     const maxSlot = typeof slotSize === 'number' ? Number(slotSize) : config.get()[String(slotSize)].size;
 
     for (let i = 0; i < maxSlot; i++) {
+        if(reservedSlot && reservedSlot === i) {
+            continue;
+        }
         const index = data.findIndex((x) => x.slot === i);
         if (index >= 0) {
             continue;

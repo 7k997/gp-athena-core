@@ -3,7 +3,7 @@ import * as alt from 'alt-client';
 import { SYSTEM_EVENTS } from '@AthenaShared/enums/system';
 import { IObject } from '@AthenaShared/interfaces/iObject';
 
-export type CreatedObject = IObject & { createdObject?: alt.Object };
+export type CreatedObject = IObject & { createdObject?: alt.LocalObject };
 
 const clientObjects: { [uid: string]: CreatedObject } = {};
 const serverObjects: { [uid: string]: CreatedObject } = {};
@@ -46,7 +46,7 @@ const InternalFunctions = {
             dataRef[uid].createdObject.destroy();
         }
 
-        const createdObject = new alt.Object(
+        const createdObject = new alt.LocalObject(
             model,
             new alt.Vector3(dataRef[uid].pos),
             new alt.Vector3(dataRef[uid].rot),
@@ -89,7 +89,7 @@ const InternalFunctions = {
                 delete serverObjects[objRef.uid];
             }
 
-            const createdObject = new alt.Object(
+            const createdObject = new alt.LocalObject(
                 objRef.model,
                 new alt.Vector3(objRef.pos),
                 new alt.Vector3(objRef.rot),
@@ -139,7 +139,7 @@ export function addObject(newObject: IObject) {
         throw new Error(`Object with ${newObject.uid} already exists! Use a unique identifier.`);
     }
 
-    const createdObject = new alt.Object(
+    const createdObject = new alt.LocalObject(
         newObject.model,
         new alt.Vector3(newObject.pos),
         new alt.Vector3(newObject.rot),

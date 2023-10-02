@@ -278,6 +278,17 @@ export type StoredItemEx<T> = StoredItem<T>;
  */
 export interface StoredItem<CustomData = {}> extends SharedItem<CustomData> {
     /**
+     * The id of this item.
+     *
+     * The id of this item is used to identify an item clearly.
+     * Example: 5 note items with the same dbName. 4 without ID are new note items, they can be stacked. 1 with ID is a already used note item with modifactions in data.
+     * No stackable possible if ID is set!
+     * @type {string}
+     *
+     */
+    id?: string;
+
+    /**
      * The amount of this item the player has.
      *
      * @type {number}

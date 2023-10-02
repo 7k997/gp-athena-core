@@ -190,4 +190,6 @@ Athena.systems.plugins.registerPlugin(PLUGIN_NAME, () => {
     alt.onClient(CharSelectEvents.toServer.select, handleSelect);
     alt.onClient(CharSelectEvents.toServer.delete, handleDelete);
     alt.onClient(CharSelectEvents.toServer.new, handleNew);
+
+    alt.log(`~lg~${PLUGIN_NAME} was Loaded`);
 });

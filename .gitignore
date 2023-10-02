@@ -1,7 +1,5 @@
 node_modules
-altv-server
 *.dll
-*.exe
 update.json
 *.log
 cache/
@@ -63,3 +61,7 @@ resources/webviews/**
 !resources/mods/**/*.dll
 !data/
 !server/data/
+altv-server.exe
+altv-server
+altv-crash-handler.exe
+altv-crash-handler

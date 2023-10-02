@@ -323,6 +323,26 @@ export function getBaseItem<CustomData = {}, CustomBehavior = {}>(
     return deepCloneObject<BaseItem<DefaultItemBehavior & CustomBehavior, CustomData>>(databaseItems[index]);
 }
 
+// export function applyBeforeInjections(functionName: string, item: any): any {
+//     const injections = BeforeInjections[functionName];
+//     if (injections) {
+//         injections.forEach((injectionFn) => {
+//             item = injectionFn(item);
+//         });
+//     }
+//     return item;
+// }
+
+// export function applyAfterInjections(functionName: string, item: any): any {
+//     const injections = BeforeInjections[functionName];
+//     if (injections) {
+//         injections.forEach((injectionFn) => {
+//             item = injectionFn(item);
+//         });
+//     }
+//     return item;
+// }
+
 /**
  * Converts an item from a player inventory, or toolbar to a full item set.
  *
@@ -342,18 +362,48 @@ export function fromStoredItem<CustomData = {}, CustomBehavior = DefaultItemBeha
         return Overrides.fromStoredItem<CustomData, CustomBehavior>(item);
     }
 
+    item = fromStoredItem_BeforeInjection<CustomData, CustomBehavior>('fromStoredItem_BeforeInjection', item);
+
     const baseItem = getBaseItem<CustomData, CustomBehavior>(item.dbName, item.version);
     if (typeof baseItem === 'undefined') {
         return undefined;
     }
 
-    const combinedItem = Object.assign(baseItem, item) as Item<CustomBehavior & DefaultItemBehavior, CustomData>;
+    let combinedItem = Object.assign(baseItem, item) as Item<CustomBehavior & DefaultItemBehavior, CustomData>;
 
     if (typeof baseItem.weight === 'number') {
         combinedItem.totalWeight = baseItem.weight * combinedItem.quantity;
     }
 
+    combinedItem = fromStoredItem_AfterInjection<CustomData, CustomBehavior>('fromStoredItem_AfterInjection', combinedItem);
+
     return combinedItem;
+}
+
+export function fromStoredItem_BeforeInjection<CustomData = {}, CustomBehavior = DefaultItemBehavior>(
+    functionName: string,
+    item: StoredItem<CustomData>,
+): StoredItem<CustomData> {
+    const injections = Injections[functionName];
+    if (injections) {
+        injections.forEach((injectionFn) => {
+            item = injectionFn(functionName, item);
+        });
+    }
+    return item;
+}
+
+export function fromStoredItem_AfterInjection<CustomData = {}, CustomBehavior = DefaultItemBehavior>(
+    functionName: string,
+    item: Item<CustomBehavior & DefaultItemBehavior, CustomData>,
+): Item<CustomBehavior & DefaultItemBehavior, CustomData> {
+    const injections = Injections[functionName];
+    if (injections) {
+        injections.forEach((injectionFn) => {
+            item = injectionFn(functionName, item);
+        });
+    }
+    return item;
 }
 
 /**
@@ -372,7 +422,9 @@ export function toStoredItem<CustomData = {}>(item: Item<DefaultItemBehavior, Cu
         return Overrides.toStoredItem<CustomData>(item);
     }
 
-    const storedItem: StoredItem<CustomData> = {
+    // item = applyBeforeInjections('toStoredItem', item);
+
+    let storedItem: StoredItem<CustomData> = {
         dbName: item.dbName,
         data: item.data,
         quantity: item.quantity,
@@ -386,6 +438,8 @@ export function toStoredItem<CustomData = {}>(item: Item<DefaultItemBehavior, Cu
     if (typeof item.version !== 'undefined') {
         storedItem.version = item.version;
     }
+
+    // storedItem = applyAfterInjections('fromStoredItem', storedItem);
 
     return storedItem;
 }
@@ -402,7 +456,7 @@ export function toStoredItem<CustomData = {}>(item: Item<DefaultItemBehavior, Cu
 export function fromBaseToStored<CustomData = {}>(
     baseItem: BaseItem<DefaultItemBehavior, CustomData>,
     quantity: number,
-) {
+): StoredItem<CustomData> {
     if (Overrides.fromBaseToStored) {
         return Overrides.fromBaseToStored(baseItem, quantity);
     }
@@ -521,7 +575,13 @@ interface FactoryFuncs {
     getBaseItemByFuzzySearch: typeof getBaseItemByFuzzySearch;
 }
 
+interface FactoryInjections {
+    fromStoredItem_BeforeInjection: typeof fromStoredItem_BeforeInjection;
+    fromStoredItem_AfterInjection: typeof fromStoredItem_AfterInjection;
+}
+
 const Overrides: Partial<FactoryFuncs> = {};
+const Injections: { [key: string]: Array<Function> } = {};
 
 export function override(functionName: 'getBaseItemAsync', callback: typeof getBaseItemAsync);
 export function override(functionName: 'upsertAsync', callback: typeof upsertAsync);
@@ -534,6 +594,7 @@ export function override(functionName: 'fromBaseToStored', callback: typeof from
 export function override(functionName: 'getBaseItems', callback: typeof getBaseItems);
 export function override(functionName: 'getBaseItemsAsync', callback: typeof getBaseItemsAsync);
 export function override(functionName: 'getBaseItemByFuzzySearch', callback: typeof getBaseItemByFuzzySearch);
+
 /**
  * Used to override inventory item factory functionality
  *
@@ -544,5 +605,29 @@ export function override(functionName: 'getBaseItemByFuzzySearch', callback: typ
 export function override(functionName: keyof FactoryFuncs, callback: any): void {
     Overrides[functionName] = callback;
 }
+
+export function addInjection(
+    functionName: 'fromStoredItem_BeforeInjection',
+    callback: typeof fromStoredItem_BeforeInjection,
+);
+export function addInjection(
+    functionName: 'fromStoredItem_AfterInjection',
+    callback: typeof fromStoredItem_AfterInjection,
+);
+
+/**
+ * Used to inject functionality into inventory item factory
+ *
+ * @param {keyof FactoryFuncs} functionName
+ * @param {*} callback
+ */
+export function addInjection(functionName: keyof FactoryInjections, callback: any): void {
+    if (!Injections[functionName]) {
+        Injections[functionName] = [];
+    }
+    Injections[functionName].push(callback);
+}
+
+
 
 InternalFunctions.init();

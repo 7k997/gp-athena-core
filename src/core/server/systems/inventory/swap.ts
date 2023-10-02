@@ -1,28 +1,42 @@
 import * as alt from 'alt-server';
 import { StoredItem, StoredItemEx } from '@AthenaShared/interfaces/item';
 import { InventoryType } from './manager';
+import { DualSlotInfo } from '@AthenaPlugins/core-inventory/shared/interfaces';
 
 const anyDbNamePlaceholder = 'any1sd2f3g4h5j6k7l8';
 
-type StoredItemInjections = ((
-    player: alt.Player,
-    item: StoredItem,
-    fromType: InventoryType,
-    toType: InventoryType,
-) => StoredItem)[];
+type StoredItemInjections = ((player: alt.Player, item: StoredItem, info: DualSlotInfo) => Promise<StoredItem>)[];
 
-type StoredItemCallbacks = ((
-    player: alt.Player,
-    item: StoredItem,
-    fromType: InventoryType,
-    toType: InventoryType,
-) => void)[];
+type StoredItemCallbacks = ((player: alt.Player, item: StoredItem, info: DualSlotInfo) => void)[];
 
 const InjectionList: { [key: string]: { [dbName: string]: StoredItemInjections } } = {
-    'before-swap': {},
-    'after-swap': {},
+    // Before Injections:
+    // Use to modify the item before it has been swapped internally.
+    // You can also modify the storages here. TODO: Issue on drag and drop slots maybe already in use.
+
+    //Modify source item, but not the storages.
     'before-combine': {},
+    'before-swap': {},
+    'before-swap-to-inventory': {},
+    'before-swap-from-toolbar-to-inventory': {},
+
+    //TODO unequip from toolbar.
+
+    // After Injections:
+    // Use to modify the item after it has been swapped internally. You can get the target slot from the item.
+    // But you cannot modify any of the storages because it will overritten by the swap, finally.
+
+    //Modify target item, but not the storages.
     'after-combine': {},
+    'after-swap': {},
+    'after-swap-to-inventory': {},
+    'after-swap-from-toolbar-to-inventory': {},
+
+    //You can modify storages after swap completed
+    // 'after-combine': {},
+    // 'after-swap': {},
+    // 'after-swap-to-inventory': {},
+    // 'after-swap-from-toolbar-to-inventory': {},
 };
 
 const CallbackList: { [key: string]: { [dbName: string]: StoredItemCallbacks } } = {
@@ -49,35 +63,27 @@ type Events = keyof typeof CallbackList;
  * @param {StoredItem} item
  * @return {*}
  */
-export function invoke(
-    event: Events,
-    player: alt.Player,
-    item: StoredItem,
-    fromType: InventoryType,
-    toType: InventoryType,
-) {
-    alt.logWarning(`Invoking ${event} from ${fromType} to ${toType}`);
+export function invoke(event: Events, sourceID: string, player: alt.Player, item: StoredItem, info: DualSlotInfo) {
+    // alt.logWarning(`Invoking ${event}|${sourceID} from ${info.startType} to ${info.endType}`);
     //Autoinvoke
-    if (toType === 'toolbar' && event === 'item-swap') {
-        invoke('item-swap-to-toolbar', player, item, fromType, toType);
-        if (fromType === 'inventory') {
-            invoke('item-swap-from-inventory-to-toolbar', player, item, fromType, toType);
-        }
-    }
+    if (event === 'item-swap') {
+        if (info.endType === 'toolbar') {
+            invoke('item-swap-to-toolbar', sourceID, player, item, info);
+            if (info.startType === 'inventory') {
+                invoke('item-swap-from-inventory-to-toolbar', sourceID, player, item, info);
+            }
+        } else if (info.endType === 'inventory') {
+            invoke('item-swap-to-inventory', sourceID, player, item, info);
 
-    if (toType === 'inventory' && event === 'item-swap') {
-        invoke('item-swap-to-inventory', player, item, fromType, toType);
+            if (info.startType === 'toolbar') {
+                invoke('item-swap-from-toolbar-to-inventory', sourceID, player, item, info);
+            }
+        } else if (info.endType === 'custom') {
+            invoke('item-swap-to-custom', sourceID, player, item, info);
 
-        if (fromType === 'toolbar') {
-            invoke('item-swap-from-toolbar-to-inventory', player, item, fromType, toType);
-        }
-    }
-
-    if (toType === 'custom' && event === 'item-swap') {
-        invoke('item-swap-to-custom', player, item, fromType, toType);
-
-        if (fromType === 'toolbar') {
-            invoke('item-swap-from-toolbar-to-custom', player, item, fromType, toType);
+            if (info.startType === 'toolbar') {
+                invoke('item-swap-from-toolbar-to-custom', sourceID, player, item, info);
+            }
         }
     }
 
@@ -88,8 +94,8 @@ export function invoke(
     if (CallbackList[event][anyDbNamePlaceholder]) {
         for (let cb of CallbackList[event][anyDbNamePlaceholder]) {
             try {
-                alt.logWarning(`Invoking ${event} from ${fromType} to ${toType}, item: ${item.dbName}`);
-                cb(player, item, fromType, toType);
+                alt.logWarning(`Invoking ${event} from ${info.startType} to ${info.endType}, item: ${item.dbName}`);
+                cb(player, item, info);
             } catch (err) {
                 console.warn(`Got swap Invoke Error: ${err}`);
                 continue;
@@ -103,7 +109,7 @@ export function invoke(
 
     for (let cb of CallbackList[event][item.dbName]) {
         try {
-            cb(player, item, fromType, toType);
+            cb(player, item, info);
         } catch (err) {
             console.warn(`Got swap Invoke Error: ${err}`);
             continue;
@@ -111,14 +117,31 @@ export function invoke(
     }
 }
 
-export function invokeInjection(
+export async function invokeInjection(
     event: InjectionEvents,
+    sourceID: string,
     player: alt.Player,
     item: StoredItem,
-    fromType: InventoryType,
-    toType: InventoryType,
-): StoredItem {
-    alt.logWarning(`Invoking ${event} from ${fromType} to ${toType}`);
+    info: DualSlotInfo,
+): Promise<StoredItem> {
+    alt.logWarning(`Invoking ${event}|${sourceID} from ${info.startType} to ${info.endType}`);
+    //Autoinvoke
+
+    if (event === 'before-swap') {
+        if (info.endType === 'inventory') {
+            item = await invokeInjection('before-swap-to-inventory', sourceID, player, item, info);
+            if (info.startType === 'toolbar') {
+                item = await invokeInjection('before-swap-from-toolbar-to-inventory', sourceID, player, item, info);
+            }
+        }
+    } else if (event === 'after-swap') {
+        if (info.endType === 'inventory') {
+            item = await invokeInjection('after-swap-to-inventory', sourceID, player, item, info);
+            if (info.startType === 'toolbar') {
+                item = await invokeInjection('after-swap-from-toolbar-to-inventory', sourceID, player, item, info);
+            }
+        }
+    }
     if (!InjectionList[event] || !item) {
         return item;
     }
@@ -126,7 +149,7 @@ export function invokeInjection(
     if (InjectionList[event][anyDbNamePlaceholder]) {
         for (let cb of InjectionList[event][anyDbNamePlaceholder]) {
             try {
-                item = cb(player, item, fromType, toType);
+                item = await cb(player, item, info);
             } catch (err) {
                 console.warn(`Got swap Injection Error: ${err}`);
                 continue;
@@ -140,7 +163,7 @@ export function invokeInjection(
 
     for (let cb of InjectionList[event][item.dbName]) {
         try {
-            item = cb(player, item, fromType, toType);
+            item = await cb(player, item, info);
         } catch (err) {
             console.warn(`Got swap Injection Error: ${err}`);
             continue;
@@ -163,7 +186,7 @@ export function invokeInjection(
 export function on<T = {}>(
     event: Events,
     dbName: string,
-    cb: (player: alt.Player, item: StoredItemEx<T>, fromType: InventoryType, toType: InventoryType) => void,
+    cb: (player: alt.Player, item: StoredItemEx<T>, info: DualSlotInfo) => void,
 ) {
     if (!CallbackList[event]) {
         return;
@@ -188,7 +211,7 @@ export function on<T = {}>(
  */
 export function onAny<T = {}>(
     event: Events,
-    cb: (player: alt.Player, item: StoredItemEx<T>, fromType: InventoryType, toType: InventoryType) => void,
+    cb: (player: alt.Player, item: StoredItemEx<T>, info: DualSlotInfo) => void,
 ) {
     if (!CallbackList[event]) {
         return;
@@ -201,10 +224,18 @@ export function onAny<T = {}>(
     CallbackList[event][anyDbNamePlaceholder].push(cb);
 }
 
+/**
+ * Injection used to modify a defined item before or after it is swapped.
+ *
+ * @param event
+ * @param dbName
+ * @param cb
+ * @returns
+ */
 export function addInjection<T = {}>(
     event: InjectionEvents,
     dbName: string,
-    cb: (player: alt.Player, item: StoredItemEx<T>, fromType: InventoryType, toType: InventoryType) => StoredItem,
+    cb: (player: alt.Player, item: StoredItemEx<T>, info: DualSlotInfo) => Promise<StoredItem>,
 ) {
     if (!InjectionList[event]) {
         return;
@@ -217,9 +248,17 @@ export function addInjection<T = {}>(
     InjectionList[event][dbName].push(cb);
 }
 
+/**
+ * InjectionAny used to modify any item before or after it is swapped.
+ *
+ * @param event
+ * @param dbName
+ * @param cb
+ * @returns
+ */
 export function addInjectionAny<T = {}>(
     event: InjectionEvents,
-    cb: (player: alt.Player, item: StoredItemEx<T>, fromType: InventoryType, toType: InventoryType) => StoredItem,
+    cb: (player: alt.Player, item: StoredItemEx<T>, info: DualSlotInfo) => Promise<StoredItem>,
 ) {
     if (!InjectionList[event]) {
         return;

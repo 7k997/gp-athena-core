@@ -249,7 +249,7 @@ declare module "src/core/client/streamers/object" {
     import * as alt from 'alt-client';
     import { IObject } from "src/core/shared/interfaces/iObject";
     export type CreatedObject = IObject & {
-        createdObject?: alt.Object;
+        createdObject?: alt.LocalObject;
     };
     export function addObject(newObject: IObject): void;
     export function removeObject(uid: string): void;
@@ -939,7 +939,7 @@ declare module "src/core/client/streamers/item" {
     import * as alt from 'alt-client';
     import { ItemDrop } from "src/core/shared/interfaces/item";
     export type CreatedDrop = ItemDrop & {
-        createdObject?: alt.Object;
+        createdObject?: alt.LocalObject;
     };
     export function getClosest(): Array<ItemDrop>;
     export function setDefaultDropModel(model: string): void;

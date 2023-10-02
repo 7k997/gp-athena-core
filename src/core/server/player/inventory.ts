@@ -4,6 +4,20 @@ import * as Athena from '@AthenaServer/api';
 
 import { StoredItem } from '@AthenaShared/interfaces/item';
 import { deepCloneArray, deepCloneObject } from '@AthenaShared/utility/deepCopy';
+import { sha256Random } from '@AthenaServer/utility/hash';
+
+/**
+ * Corechange - add item with unique identifier
+ */
+
+export async function addUnique(
+    player: alt.Player,
+    item: Omit<StoredItem, 'slot'>,
+    reservedSlot?: number,
+): Promise<boolean> {
+    item.id = sha256Random(JSON.stringify(item));
+    return Athena.player.inventory.add(player, item, reservedSlot);
+}
 
 /**
  * Add a new stored item to a user, must specify a quantity of greater than zero.
@@ -21,7 +35,7 @@ import { deepCloneArray, deepCloneObject } from '@AthenaShared/utility/deepCopy'
  * @param {Omit<StoredItem, 'slot'>} item
  * @return {Promise<boolean>}
  */
-export async function add(player: alt.Player, item: Omit<StoredItem, 'slot'>): Promise<boolean> {
+export async function add(player: alt.Player, item: Omit<StoredItem, 'slot'>, reservedSlot?: number): Promise<boolean> {
     if (Overrides.add) {
         return Overrides.add(player, item);
     }
@@ -41,7 +55,8 @@ export async function add(player: alt.Player, item: Omit<StoredItem, 'slot'>): P
     }
 
     item.data = Object.assign(baseItem.data, item.data);
-    const newInventoryData = Athena.systems.inventory.manager.add(item, data.inventory, 'inventory');
+    const newInventoryData = Athena.systems.inventory.manager.add(item, data.inventory, 'inventory', reservedSlot);
+
     if (typeof newInventoryData === 'undefined') {
         return false;
     }
@@ -67,7 +82,7 @@ export async function add(player: alt.Player, item: Omit<StoredItem, 'slot'>): P
  * @param {Omit<StoredItem, 'slot'>} item
  * @return {Promise<boolean>}
  */
-export async function sub(player: alt.Player, item: Omit<StoredItem, 'slot' | 'data'>): Promise<boolean> {
+export async function sub(player: alt.Player, item: Omit<StoredItem, 'data'>): Promise<boolean> {
     if (Overrides.sub) {
         return Overrides.sub(player, item);
     }

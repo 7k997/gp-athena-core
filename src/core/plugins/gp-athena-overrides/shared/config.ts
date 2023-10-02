@@ -16,4 +16,7 @@ export const Config = {
     TOOLBAR_COOLDOWN_DELAY_TIME_AFTER_USE: 1000, //The cooldown after using a toolbar item. Prevents spamming. Normally 1000.
     DISABLE_TOOLBAR_COOLDOWN_DRAWING: true, //Disable the toolbar cooldown drawing.
     INVENTORY_AVATAR: false, //Disable the inventory avatar. If True also the char will be freezed if u open the inventory.
+
+    //TO Activate a set of example codes. Only for testing purposes.
+    EXAMPLES_ENABLED: true, //Enable the example context menu.
 };

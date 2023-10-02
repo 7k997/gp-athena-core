@@ -261,6 +261,135 @@ export function getAt<CustomData = {}>(player: alt.Player, slot: number): Stored
     return deepCloneObject<StoredItem<CustomData>>(item);
 }
 
+interface CustomData {
+    hash: string; // Example: assuming 'hash' is a property in CustomData
+    // Other properties can be added here
+}
+
+/**
+ * Finds the index of the item in the toolbar array based on specific properties.
+ *
+ * @template CustomData - The type of data associated with the item.
+ * @param {StoredItem<CustomData>[]} toolbar - The toolbar to search within.
+ * @param {Partial<StoredItem<CustomData>>} searchCriteria - The criteria to search for.
+ * @return {number} The index of the found item, or -1 if not found.
+ */
+export function findSlot<CustomData = {}>(
+    player: alt.Player,
+    searchCriteria: Partial<StoredItem<Partial<CustomData>>>,
+): number {
+    if (Overrides.findSlot) {
+        return Overrides.findSlot<CustomData>(player, searchCriteria);
+    }
+
+    const data = document.character.get(player);
+    if (typeof data === 'undefined' || typeof data.toolbar === 'undefined') {
+        return -1;
+    }
+
+    for (let i = 0; i < data.toolbar.length; i++) {
+        const item = deepCloneObject<StoredItem<CustomData>>(data.toolbar[i]);
+
+        let isMatch = false; // Set isMatch to false by default
+
+        // Check properties in data
+        if (searchCriteria.data) {
+            for (const dataProp in searchCriteria.data) {
+                if (searchCriteria.data[dataProp] !== item.data[dataProp]) {
+                    alt.logWarning(`1 Failed on ${dataProp}`);
+                    isMatch = false;
+                    break;
+                } else {
+                    alt.logWarning(
+                        `1 Passed on ${dataProp}: ${searchCriteria.data[dataProp]} === ${item.data[dataProp]}`,
+                    );
+                    isMatch = true; // Set isMatch to true if a match is found
+                }
+            }
+        }
+
+        // Check other properties
+        for (const prop in searchCriteria) {
+            if (prop !== 'data') {
+                if (searchCriteria[prop] !== item[prop]) {
+                    alt.logWarning(`2 Failed on ${prop}`);
+                    isMatch = false;
+                    break;
+                } else {
+                    alt.logWarning(`2 Passed on ${prop}`);
+                    isMatch = true; // Set isMatch to true if a match is found
+                }
+            }
+        }
+
+        if (isMatch) {
+            return item.slot;
+        }
+    }
+
+    return -1;
+}
+
+/**
+ * Finds the indices of the items in the toolbar array based on specific properties.
+ *
+ * @template CustomData - The type of data associated with the item.
+ * @param {alt.Player} player - The player whose toolbar to search within.
+ * @param {Partial<StoredItem<Partial<CustomData>>>} searchCriteria - The criteria to search for.
+ * @return {number[]} Array of indices of the found items, or an empty array if not found.
+ */
+export function findSlots<CustomData = {}>(
+    player: alt.Player,
+    searchCriteria: Partial<StoredItem<Partial<CustomData>>>,
+): number[] {
+    if (Overrides.findSlots) {
+        return Overrides.findSlots<CustomData>(player, searchCriteria);
+    }
+
+    const data = document.character.get(player);
+    if (typeof data === 'undefined' || typeof data.toolbar === 'undefined') {
+        return [];
+    }
+
+    const matchingSlots: number[] = [];
+
+    for (let i = 0; i < data.toolbar.length; i++) {
+        const item = deepCloneObject<StoredItem<CustomData>>(data.toolbar[i]);
+
+        let isMatch = false; // Set isMatch to false by default
+
+        // Check properties in data
+        if (searchCriteria.data) {
+            for (const dataProp in searchCriteria.data) {
+                if (searchCriteria.data[dataProp] !== item.data[dataProp]) {
+                    isMatch = false;
+                    break;
+                } else {
+                    isMatch = true; // Set isMatch to true if a match is found
+                }
+            }
+        }
+
+        // Check other properties
+        for (const prop in searchCriteria) {
+            if (prop !== 'data') {
+                if (searchCriteria[prop] !== item[prop]) {
+                    isMatch = false;
+                    break;
+                } else {
+                    isMatch = true; // Set isMatch to true if a match is found
+                }
+            }
+        }
+
+        if (isMatch) {
+            matchingSlots.push(item.slot);
+        }
+    }
+
+    return matchingSlots;
+}
+
 interface ToolbarFunctions {
     add: typeof add;
     has: typeof has;
@@ -269,6 +398,8 @@ interface ToolbarFunctions {
     remove: typeof remove;
     modifyItemData: typeof modifyItemData;
     getItemData: typeof getItemData;
+    findSlot: typeof findSlot;
+    findSlots: typeof findSlots;
 }
 
 const Overrides: Partial<ToolbarFunctions> = {};
@@ -280,6 +411,9 @@ export function override(functionName: 'remove', callback: typeof remove);
 export function override(functionName: 'sub', callback: typeof sub);
 export function override(functionName: 'modifyItemData', callback: typeof modifyItemData);
 export function override(functionName: 'getItemData', callback: typeof getItemData);
+export function override(functionName: 'findSlot', callback: typeof findSlot);
+export function override(functionName: 'findSlots', callback: typeof findSlots);
+
 /**
  * Used to override any toolbar functions
  *

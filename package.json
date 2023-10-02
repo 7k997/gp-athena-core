@@ -12,7 +12,7 @@
         "dev": "node ./scripts/runtime/index.js --start --dev",
         "cdn": "node ./scripts/runtime/index.js --start --cdn",
         "[-] Updating, Installing, Cleanup": "",
-        "update": "npx altv-pkg d release",
+        "update": "npx altv-pkg d rc",
         "check": "tsc -p ./tsconfig.json | node ./scripts/fileChecker/index.js",
         "fix": "node ./scripts/doctor/index.js",
         "[-] Vue WebView Deployment": "",
@@ -20,12 +20,16 @@
         "[-] Utility": "",
         "docs": "npx typedoc --options ./src/core/typedoc.json && node ./scripts/documentation/index.js",
         "fix-natives": "node ./scripts/natives-upgrade/index.js",
-        "test": ""
+        "test": "",
+        "gpitemsgenerate": "node ./scripts/gpitemsgenerate/index.js",
+        "gpitemsgenerateObject": "node ./scripts/gpitemsgenerate/indexObjects.js",
+        "gpitemsgenerateClothes": "node ./scripts/gpitemsgenerate/indexClothes.js",
+        "openAIGenerator": "node ./scripts/gpitemsgenerate/openAIGenerator.js"
     },
     "devDependencies": {
-        "@altv/types-client": "^2.6.3",
+        "@altv/types-client": "^3.0.0",
         "@altv/types-natives": "^1.5.3",
-        "@altv/types-server": "^2.7.3",
+        "@altv/types-server": "^3.0.5",
         "@altv/types-shared": "^1.4.8",
         "@altv/types-webview": "^1.0.5",
         "@altv/types-worker": "1.0.7",
