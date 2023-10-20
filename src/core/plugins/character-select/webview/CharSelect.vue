@@ -50,8 +50,8 @@
 import { onMounted, ref } from 'vue';
 import Icon from '@ViewComponents/Icon.vue';
 import CharDelete from './components/CharDelete.vue';
-import WebViewEvents from '@utility/webViewEvents';
-import { CharSelectEvents } from '../shared/events';
+import WebViewEvents from '@utility/webViewEvents.js';
+import { CharSelectEvents } from '../shared/events.js';
 
 let isSelecting = ref(false);
 let isDeleting = ref(false);

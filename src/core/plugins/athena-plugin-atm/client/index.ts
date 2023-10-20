@@ -1,8 +1,8 @@
 import * as alt from 'alt-client';
-import * as AthenaClient from '@AthenaClient/api';
-import ViewModel from '@AthenaClient/models/viewModel';
-import { ATM_INTERACTIONS } from '../shared/events';
-import { LOCALE_ATM_VIEW } from '../shared/locales';
+import * as AthenaClient from '@AthenaClient/api/index.js';
+import ViewModel from '@AthenaClient/models/viewModel.js';
+import { ATM_INTERACTIONS } from '../shared/events.js';
+import { LOCALE_ATM_VIEW } from '../shared/locales.js';
 
 const PAGE_NAME = 'Atm';
 

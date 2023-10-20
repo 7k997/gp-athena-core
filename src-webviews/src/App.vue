@@ -37,18 +37,18 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { CORE_IMPORTS } from './pages/components';
-import { PLUGIN_IMPORTS } from './plugins/imports';
-import { WebViewEventNames } from '../../src/core/shared/enums/webViewEvents';
+import { CORE_IMPORTS } from './pages/components.js';
+import { PLUGIN_IMPORTS } from './plugins/imports.js';
+import { WebViewEventNames } from '../../src/core/shared/enums/webViewEvents.js';
 import VueDevMenu from './components/VueDevMenu.vue';
-import { SYSTEM_EVENTS } from '@AthenaShared/enums/system';
-import { Character } from '@AthenaShared/interfaces/character';
-import * as state from '@utility/state';
+import { SYSTEM_EVENTS } from '@AthenaShared/enums/system.js';
+import { Character } from '@AthenaShared/interfaces/character.js';
+import * as state from '@utility/state.js';
 
 // Interfaces
-import IPageData from './interfaces/IPageData';
-import WebViewEvents from '@utility/webViewEvents';
-import { Account } from '@AthenaShared/interfaces/iAccount';
+import IPageData from './interfaces/IPageData.js';
+import WebViewEvents from '@utility/webViewEvents.js';
+import { Account } from '@AthenaShared/interfaces/iAccount.js';
 
 const ALL_THE_COMPONENTS = {
     ...CORE_IMPORTS,

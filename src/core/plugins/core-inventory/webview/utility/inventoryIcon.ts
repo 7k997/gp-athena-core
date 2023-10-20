@@ -1,6 +1,6 @@
-import { ClothingComponent, DefaultItemBehavior, Item } from '@AthenaShared/interfaces/item';
-import { clothingItemToIconName } from '@AthenaShared/utility/clothing';
-import ResolvePath from '../../../../../../src-webviews/src/utility/pathResolver';
+import { ClothingComponent, DefaultItemBehavior, Item } from '@AthenaShared/interfaces/item.js';
+import { clothingItemToIconName } from '@AthenaShared/utility/clothing.js';
+import ResolvePath from '../../../../../../src-webviews/src/utility/pathResolver.js';
 
 type ClothingInfo = { sex: number; components: Array<ClothingComponent> };
 

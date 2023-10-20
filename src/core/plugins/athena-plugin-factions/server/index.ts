@@ -1,9 +1,9 @@
 import * as alt from 'alt-server';
-import * as Athena from '@AthenaServer/api';
-import { FactionActions } from './src/actions';
-import { FactionCommands } from './src/commands';
-import { FactionFuncs } from './src/funcs';
-import { FactionHandler } from './src/handler';
+import * as Athena from '@AthenaServer/api/index.js';
+import { FactionActions } from './src/actions.js';
+import { FactionCommands } from './src/commands.js';
+import { FactionFuncs } from './src/funcs.js';
+import { FactionHandler } from './src/handler.js';
 
 const PLUGIN_NAME = 'Athena Factions';
 

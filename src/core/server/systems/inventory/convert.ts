@@ -1,5 +1,5 @@
 import * as Athena from '@AthenaServer/api/index.js';
-import { BaseItemEx, ItemEx, StoredItemEx } from '@AthenaShared/interfaces/item.js';
+import { BaseItemEx, ItemDrop, ItemEx, StoredItemEx } from '@AthenaShared/interfaces/item.js';
 
 /**
  * Converts a stored item into a full item.
@@ -48,5 +48,20 @@ export function toBaseItem<CustomData = {}>(storedItem: StoredItemEx<CustomData>
  * @return {*}
  */
 export function toStoredItem<CustomData = {}>(baseItem: BaseItemEx<CustomData>, quantity: number) {
-    return Athena.systems.inventory.factory.fromBaseToStored(baseItem, quantity);
+    return Athena.systems.inventory.factory.fromBaseToStored<CustomData>(baseItem, quantity);
+}
+
+/**
+ * Convert a Droped Item to a stored item
+ *
+ * Does not perform any inventory changes.
+ *
+ * @export
+ * @template CustomData
+ * @param {BaseItemEx<CustomData>} baseItem
+ * @param {number} quantity
+ * @return {*}
+ */
+export function toStoredItemFromDroped<CustomData = {}>(dropedItem: ItemDrop) {
+    return Athena.systems.inventory.factory.fromDropedToStored<CustomData>(dropedItem);
 }

@@ -145,8 +145,8 @@
 import { defineComponent, defineAsyncComponent } from 'vue';
 import { CustomContextAction, CustomSubMenu, Item } from '@AthenaShared/interfaces/item';
 import { makeDraggable } from '@ViewUtility/drag';
-import WebViewEvents from '@ViewUtility/webViewEvents';
-import { INVENTORY_EVENTS } from '../../shared/events';
+import WebViewEvents from '@ViewUtility/webViewEvents.js';
+import { INVENTORY_EVENTS } from '../../shared/events.js';
 import { getImagePath } from '../utility/inventoryIcon';
 import { INVENTORY_CONFIG } from '../../shared/config';
 import { debounceReady } from '../utility/debounce';

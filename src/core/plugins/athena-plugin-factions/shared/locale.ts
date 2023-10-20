@@ -1,4 +1,4 @@
-import { RankPermissionNames } from './interfaces';
+import { RankPermissionNames } from './interfaces.js';
 
 export const FactionLocale = {
     [RankPermissionNames.addMembers + 'Desc']: 'Recruit new members.',

@@ -42,8 +42,8 @@
 
 <script lang="ts">
 import { defineComponent, defineAsyncComponent } from 'vue';
-import { FactionRank } from '../../../shared/interfaces';
-import { AllRankPermissions } from '../../../shared/defaultData';
+import { FactionRank } from '../../../shared/interfaces.js';
+import { AllRankPermissions } from '../../../shared/defaultData.js';
 
 const ComponentName = 'ManageRank';
 export default defineComponent({

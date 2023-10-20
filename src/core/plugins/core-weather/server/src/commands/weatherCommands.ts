@@ -1,9 +1,9 @@
 import * as alt from 'alt-server';
-import * as Athena from '@AthenaServer/api';
-import { LOCALE_KEYS } from '@AthenaShared/locale/languages/keys';
-import { LocaleController } from '@AthenaShared/locale/locale';
-import { WORLD_WEATHER } from '@AthenaPlugins/core-weather/shared/weather';
-import { World } from '../world';
+import * as Athena from '@AthenaServer/api/index.js';
+import { LOCALE_KEYS } from '@AthenaShared/locale/languages/keys.js';
+import { LocaleController } from '@AthenaShared/locale/locale.js';
+import { WORLD_WEATHER } from '@AthenaPlugins/core-weather/shared/weather.js';
+import { World } from '../world.js';
 
 export class WeatherCommands {
     static init() {

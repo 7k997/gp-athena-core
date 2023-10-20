@@ -1,7 +1,7 @@
-import { playAnimation } from '@AthenaClient/systems/animations';
-import { handleDisablingAttacks } from '@AthenaClient/utility/disableControls';
-import { VEHICLE_EVENTS } from '@AthenaShared/enums/vehicle';
-import { ANIMATION_FLAGS } from '@AthenaShared/flags/animationFlags';
+import { playAnimation } from '@AthenaClient/systems/animations.js';
+import { handleDisablingAttacks } from '@AthenaClient/utility/disableControls.js';
+import { VEHICLE_EVENTS } from '@AthenaShared/enums/vehicle.js';
+import { ANIMATION_FLAGS } from '@AthenaShared/flags/animationFlags.js';
 import * as alt from 'alt-client';
 import * as native from 'natives';
 

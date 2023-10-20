@@ -101,7 +101,7 @@
 
 <script lang="ts">
 import { defineComponent, defineAsyncComponent } from 'vue';
-import { LOCALE_CLOTHING } from '../../shared/locales';
+import { LOCALE_CLOTHING } from '../../shared/locales.js';
 
 const ComponentName = 'Option';
 export default defineComponent({

@@ -38,10 +38,10 @@
 
 <script lang="ts">
 import { defineComponent, defineAsyncComponent } from 'vue';
-import { Vector3 } from '../../../../shared/interfaces/vector';
-import { Faction } from '../../shared/interfaces';
-import { FactionPageInjections } from '../injections';
-import { FactionParser } from '../utility/factionParser';
+import { Faction } from '../../shared/interfaces.js';
+import { FactionPageInjections } from '../injections.js';
+import { FactionParser } from '../utility/factionParser.js';
+import { Vector3 } from '@AthenaPlugins/gp-athena-utils/shared/interfaces/vector.js';
 
 const ComponentName = 'Settings';
 export default defineComponent({

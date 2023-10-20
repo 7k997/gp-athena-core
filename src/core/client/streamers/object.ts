@@ -2,8 +2,9 @@ import * as alt from 'alt-client';
 
 import { SYSTEM_EVENTS } from '@AthenaShared/enums/system.js';
 import { IObject } from '@AthenaShared/interfaces/iObject.js';
+import { Config } from '@AthenaPlugins/gp-athena-overrides/shared/config.js';
 
-export type CreatedObject = IObject & { createdObject?: alt.LocalObject };
+export type CreatedObject = IObject & { createdObject?: alt.Object };
 
 const clientObjects: { [uid: string]: CreatedObject } = {};
 const serverObjects: { [uid: string]: CreatedObject } = {};
@@ -52,6 +53,8 @@ const InternalFunctions = {
             new alt.Vector3(dataRef[uid].rot),
             true,
             false,
+            false,
+            Config.DEFAULT_STREAMING_DISTANCE
         );
 
         if (dataRef[uid].noCollision) {
@@ -93,6 +96,8 @@ const InternalFunctions = {
                 new alt.Vector3(objRef.rot),
                 true,
                 false,
+                false,
+                Config.DEFAULT_STREAMING_DISTANCE
             );
 
             if (objRef.noCollision) {
@@ -141,6 +146,8 @@ export function addObject(newObject: IObject) {
         new alt.Vector3(newObject.rot),
         true,
         false,
+        false,
+        Config.DEFAULT_STREAMING_DISTANCE
     );
 
     if (newObject.noCollision) {

@@ -41,7 +41,7 @@
 
 <script lang="ts">
 import { defineComponent, defineAsyncComponent } from 'vue';
-import { Faction } from '../../../shared/interfaces';
+import { Faction } from '../../../shared/interfaces.js';
 
 const ComponentName = 'AddRank';
 export default defineComponent({

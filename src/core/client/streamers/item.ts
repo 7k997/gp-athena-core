@@ -3,6 +3,8 @@ import * as AthenaClient from '@AthenaClient/api/index.js';
 import { ItemDrop } from '@AthenaShared/interfaces/item.js';
 import { onTicksStart } from '@AthenaClient/events/onTicksStart.js';
 import { ITEM_SYNCED_META } from '@AthenaShared/enums/syncedMeta.js';
+import { Config } from '@AthenaPlugins/gp-athena-overrides/shared/config.js';
+
 
 export type CreatedDrop = ItemDrop & { createdObject?: alt.Entity };
 
@@ -48,7 +50,7 @@ const InternalFunctions = {
         let startDistance = 10;
         for (let i = 0; i < items.length; i++) {
             if (!maxDistance) {
-                maxDistance = 25;
+                maxDistance = Config.DEFAULT_STREAMING_DISTANCE;
             }
 
             const dist = AthenaClient.utility.vector.distance2d(alt.Player.local.pos, items[i].pos);
@@ -95,6 +97,30 @@ function onEntityCreate(entity: alt.Entity) {
     items.push({ ...info, createdObject: entity });
 }
 
+function onStreamSyncedMetaChange(entity: alt.Entity, key: string, newValue: any, oldValue: any) {
+    if (!(entity instanceof alt.Entity)) {
+        return;
+    }
+
+    if (key !== ITEM_SYNCED_META.ITEM_DROP_INFO) {
+        return;
+    }
+
+    const info = newValue as ItemDrop;
+    if (!info) {
+        return;
+    }
+
+    const index = items.findIndex((x) => x._id === info._id);
+    if (index >= 1) {
+        return;
+    }
+
+    if (index >= 0) {
+        items[index] = { ...info, createdObject: entity };
+    }
+}
+
 function onEntityRemoved(entity: alt.Entity) {
     if (!(entity instanceof alt.Entity)) {
         return;
@@ -122,6 +148,7 @@ function onEntityRemoved(entity: alt.Entity) {
 alt.on('gameEntityCreate', onEntityCreate);
 alt.on('gameEntityDestroy', onEntityRemoved);
 alt.on('baseObjectRemove', onEntityRemoved);
+alt.on('streamSyncedMetaChange', onStreamSyncedMetaChange);
 
 /**
  * Return an array of items that are closest to the player.

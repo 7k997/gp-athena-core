@@ -1,5 +1,5 @@
 import * as alt from 'alt-shared';
-import { VehicleInfo } from '@AthenaShared/interfaces/vehicleInfo';
+import { VehicleInfo } from '@AthenaShared/interfaces/vehicleInfo.js';
 
 export interface IDealership {
     /**

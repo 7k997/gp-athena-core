@@ -1,9 +1,9 @@
 import * as alt from 'alt-server';
-import * as Athena from '@AthenaServer/api';
-import { VehicleInfo } from '@AthenaShared/interfaces/vehicleInfo';
-import { DEALERSHIP_EVENTS } from '../../shared/events';
-import { IDealership } from '../../shared/interfaces';
-import { DEALERSHIP_LOCALE } from '../../shared/locale';
+import * as Athena from '@AthenaServer/api/index.js';
+import { VehicleInfo } from '@AthenaShared/interfaces/vehicleInfo.js';
+import { DEALERSHIP_EVENTS } from '../../shared/events.js';
+import { IDealership } from '../../shared/interfaces.js';
+import { DEALERSHIP_LOCALE } from '../../shared/locale.js';
 
 const dealerships: Array<IDealership> = [];
 let inDealership: { [key: string]: string } = {};

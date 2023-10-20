@@ -6,7 +6,7 @@ import * as streamers from '@AthenaClient/streamers/index.js';
 import * as systems from '@AthenaClient/systems/index.js';
 import * as utility from '@AthenaClient/utility/index.js';
 import * as webview from '@AthenaClient/webview/index.js';
-export * as webviewCinema from '@AthenaClient/webviewCinema/index.js';
+import * as webviewCinema from '@AthenaClient/webviewCinema/index.js';
 import * as world from '@AthenaClient/world/index.js';
 
-export { camera, menu, rmlui, screen, streamers, systems, utility, webview, world };
+export { camera, menu, rmlui, screen, streamers, systems, utility, webview, webviewCinema, world };

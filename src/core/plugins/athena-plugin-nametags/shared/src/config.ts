@@ -1,4 +1,4 @@
-import { INametagConfig } from '../interfaces';
+import { INametagConfig } from '../interfaces.js';
 
 // Hover over these in VSCode to see what they do.
 const nametagConfig: INametagConfig = {

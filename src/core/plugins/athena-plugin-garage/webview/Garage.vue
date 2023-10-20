@@ -53,13 +53,13 @@
 </template>
 
 <script lang="ts">
-import WebViewEvents from '@ViewUtility/webViewEvents';
-import { OwnedVehicle } from '@AthenaShared/interfaces/vehicleOwned';
-import { GARAGE_INTERACTIONS } from '../shared/events';
+import WebViewEvents from '@ViewUtility/webViewEvents.js';
+import { OwnedVehicle } from '@AthenaShared/interfaces/vehicleOwned.js';
+import { GARAGE_INTERACTIONS } from '../shared/events.js';
 import { defineComponent, defineAsyncComponent } from 'vue';
-import DefaultLocale from './utility/defaultLocale';
-import TestData from './utility/testData';
-import ResolvePath from '@utility/pathResolver';
+import DefaultLocale from './utility/defaultLocale.js';
+import TestData from './utility/testData.js';
+import ResolvePath from '@utility/pathResolver.js';
 
 export const ComponentName = 'Garage';
 export default defineComponent({

@@ -1,14 +1,14 @@
 import * as alt from 'alt-server';
-import * as Athena from '@AthenaServer/api';
-import { VEHICLE_CLASS } from '@AthenaShared/enums/vehicleTypeFlags';
-import { VehicleData } from '@AthenaShared/information/vehicles';
-import { isFlagEnabled } from '@AthenaShared/utility/flags';
-import { VEHICLE_STATE } from '../../shared/vehicle';
-import { distance2d } from '@AthenaShared/utility/vector';
-import { LOCALE_FUEL } from '../../shared/locales';
-import { FuelCommands } from './commands';
-import { FUEL_CONFIG } from './config';
-import { ATHENA_EVENTS_VEHICLE } from '../../shared/events';
+import * as Athena from '@AthenaServer/api/index.js';
+import { VEHICLE_CLASS } from '@AthenaShared/enums/vehicleTypeFlags.js';
+import { VehicleData } from '@AthenaShared/information/vehicles.js';
+import { isFlagEnabled } from '@AthenaShared/utility/flags.js';
+import { VEHICLE_STATE } from '../../shared/vehicle.js';
+import { distance2d } from '@AthenaShared/utility/vector.js';
+import { LOCALE_FUEL } from '../../shared/locales.js';
+import { FuelCommands } from './commands.js';
+import { FUEL_CONFIG } from './config.js';
+import { ATHENA_EVENTS_VEHICLE } from '../../shared/events.js';
 
 export class FuelSystem {
     /**

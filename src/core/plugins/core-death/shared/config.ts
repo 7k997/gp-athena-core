@@ -1,4 +1,4 @@
-import { KEY_BINDS } from '@AthenaShared/enums/keyBinds';
+import { KEY_BINDS } from '@AthenaShared/enums/keyBinds.js';
 
 export const DEATH_CONFIG = {
     // Use default Key from KEY_BINDS. (E)

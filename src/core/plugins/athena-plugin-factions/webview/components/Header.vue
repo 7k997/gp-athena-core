@@ -9,7 +9,7 @@
 import { defineComponent } from 'vue';
 import Button from '@components/Button.vue';
 import Icon from '@components/Icon.vue';
-import { Faction } from '../../shared/interfaces';
+import { Faction } from '../../shared/interfaces.js';
 
 const ComponentName = 'Header';
 export default defineComponent({

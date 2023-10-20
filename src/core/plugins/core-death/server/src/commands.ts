@@ -1,7 +1,7 @@
 import * as alt from 'alt-server';
-import * as Athena from '@AthenaServer/api';
-import { LOCALE_KEYS } from '@AthenaShared/locale/languages/keys';
-import { LocaleController } from '@AthenaShared/locale/locale';
+import * as Athena from '@AthenaServer/api/index.js';
+import { LOCALE_KEYS } from '@AthenaShared/locale/languages/keys.js';
+import { LocaleController } from '@AthenaShared/locale/locale.js';
 
 export class DeathCommands {
     static init() {

@@ -92,7 +92,7 @@
 
 <script lang="ts">
 import { defineComponent, defineAsyncComponent } from 'vue';
-import WebViewEvents from '@ViewUtility/webViewEvents';
+import WebViewEvents from '@ViewUtility/webViewEvents.js';
 
 // Very Important! The name of the component must match the file name.
 // Don't forget to do this. This is a note so you don't forget.

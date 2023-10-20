@@ -1,11 +1,11 @@
 import * as alt from 'alt-server';
-import * as Athena from '@AthenaServer/api';
-import { addAPI } from '@AthenaServer/systems/plugins';
-import { getClosestPlayers } from './utility/closest';
-import { InventoryUtil } from './utility/inventory';
-import { emitAll } from './utility/emitHelper';
-import { PlayerExtension } from './overrides/player';
-import { MenuUtil } from './utility/menuUtil';
+import * as Athena from '@AthenaServer/api/index.js';
+import { addAPI } from '@AthenaServer/systems/plugins.js';
+import { getClosestPlayers } from './utility/closest.js';
+import { InventoryUtil } from './utility/inventory.js';
+import { emitAll } from './utility/emitHelper.js';
+import { PlayerExtension } from './overrides/player.js';
+import { MenuUtil } from './utility/menuUtil.js';
 
 const PLUGIN_NAME = 'gpAthenaUtils';
 

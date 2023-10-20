@@ -45,11 +45,11 @@
 
 <script lang="ts">
 import { defineComponent, defineAsyncComponent } from 'vue';
-import { Vector3 } from '../../gp-athena-utils/shared/interfaces/vector';
-import { Faction } from '../../athena-plugin-factions/shared/interfaces';
-import { FactionParser } from '../../athena-plugin-factions/webview/utility/factionParser';
-import { F_PAYCHECK_VIEW_EVENTS } from '../shared/events';
-import { FactionRank } from '../shared/extensions';
+import { Vector3 } from '@AthenaPlugins/gp-athena-utils/shared/interfaces/vector.js';
+import { Faction } from '../../athena-plugin-factions/shared/interfaces.js';
+import { FactionParser } from '../../athena-plugin-factions/webview/utility/factionParser.js';
+import { F_PAYCHECK_VIEW_EVENTS } from '../shared/events.js';
+import { FactionRank } from '../shared/extensions.js';
 
 const ComponentName = 'Paychecks';
 export default defineComponent({

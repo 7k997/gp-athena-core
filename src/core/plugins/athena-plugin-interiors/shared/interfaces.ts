@@ -1,7 +1,7 @@
-import { IObject } from '@AthenaShared/interfaces/iObject';
-import { INTERIOR_SYSTEM } from './flags';
+import { IObject } from '@AthenaShared/interfaces/iObject.js';
+import { INTERIOR_SYSTEM } from './flags.js';
 import { Vector3 } from 'alt-shared';
-import { IEntitySet } from '@AthenaPlugins/gp-athena-utils/shared/interfaces/iEntitySet';
+import { IEntitySet } from '@AthenaPlugins/gp-athena-utils/shared/interfaces/iEntitySet.js';
 
 export interface Interior {
     /**

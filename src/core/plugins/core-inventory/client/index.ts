@@ -2,7 +2,6 @@ import * as alt from 'alt-client';
 import * as native from 'natives';
 
 import * as AthenaClient from '@AthenaClient/api/index.js';
-
 import { Item } from '@AthenaShared/interfaces/item.js';
 import { INVENTORY_EVENTS } from '../shared/events.js';
 import { INVENTORY_CONFIG } from '../shared/config.js';

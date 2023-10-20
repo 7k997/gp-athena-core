@@ -141,7 +141,7 @@
 <script lang="ts">
 import { defineComponent, defineAsyncComponent } from 'vue';
 
-import { CHARACTER_CREATOR_WEBVIEW_EVENTS } from '../../shared/events';
+import { CHARACTER_CREATOR_WEBVIEW_EVENTS } from '../../shared/events.js';
 
 const ComponentName = 'Info';
 export default defineComponent({

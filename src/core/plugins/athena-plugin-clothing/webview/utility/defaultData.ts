@@ -1,4 +1,4 @@
-import { CLOTHING_STORE_PAGE } from '../../shared/enums';
+import { CLOTHING_STORE_PAGE } from '../../shared/enums.js';
 
 export const DEFAULT_CLOTHING_STORE = {
     uid: 'clothing-store-0',

@@ -1,6 +1,6 @@
 import { App, createApp } from 'vue';
 import ActualApp from './App.vue';
-import { VUE_PLUGIN_IMPORTS } from './plugins/vue-plugin-imports';
+import { VUE_PLUGIN_IMPORTS } from './plugins/vue-plugin-imports.js';
 
 const MOUNT_DIV_ID = '#app';
 let app: App<Element>;

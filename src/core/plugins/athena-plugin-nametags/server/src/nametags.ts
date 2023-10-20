@@ -1,7 +1,7 @@
 import * as alt from 'alt-server';
-import NametagConfig from './config';
-import { NAMETAG_EVENTS } from '../../shared/enums';
-import * as PlayerEvents from '@AthenaServer/player/events';
+import NametagConfig from './config.js';
+import { NAMETAG_EVENTS } from '../../shared/enums.js';
+import * as PlayerEvents from '@AthenaServer/player/events.js';
 import { Player } from 'alt-client';
 
 /**

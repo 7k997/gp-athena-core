@@ -113,6 +113,7 @@ export async function open(label: string, options: Array<IWheelOptionExt>, setMo
         return;
     }
 
+    alt.logWarning('Opening Wheel Menu with options: ' + JSON.stringify(options));
     _label = label;
     _options = options;
 

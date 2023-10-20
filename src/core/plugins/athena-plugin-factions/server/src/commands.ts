@@ -1,9 +1,9 @@
 import * as alt from 'alt-server';
-import * as Athena from '@AthenaServer/api';
-import { FACTION_EVENTS } from '../../shared/factionEvents';
-import { FactionFuncs } from './funcs';
-import { FactionHandler } from './handler';
-import { FactionPlayerFuncs } from './playerFuncs';
+import * as Athena from '@AthenaServer/api/index.js';
+import { FACTION_EVENTS } from '../../shared/factionEvents.js';
+import { FactionFuncs } from './funcs.js';
+import { FactionHandler } from './handler.js';
+import { FactionPlayerFuncs } from './playerFuncs.js';
 
 const lastInvite: { [character: string]: string } = {};
 

@@ -1,1 +1,1 @@
-import './menus/interior';
+import './menus/interior.js';

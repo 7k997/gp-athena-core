@@ -1,9 +1,9 @@
 import * as alt from 'alt-server';
-import * as Athena from '@AthenaServer/api';
+import * as Athena from '@AthenaServer/api/index.js';
 
-import { SYSTEM_EVENTS } from '@AthenaShared/enums/system';
-import { VITALS_CONFIG } from '../../shared/src/config';
-import { VITAL_NAMES } from '../../shared/enums';
+import { SYSTEM_EVENTS } from '@AthenaShared/enums/system.js';
+import { VITALS_CONFIG } from '../../shared/src/config.js';
+import { VITAL_NAMES } from '../../shared/enums.js';
 
 const syncTimes: { [player_id: string]: number } = {};
 

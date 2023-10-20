@@ -1,8 +1,8 @@
 import * as alt from 'alt-server';
-import * as Athena from '@AthenaServer/api';
+import * as Athena from '@AthenaServer/api/index.js';
 
-import { BankAccountNumber } from './src/bankAccountNumber';
-import { AtmFunctions } from './src/view';
+import { BankAccountNumber } from './src/bankAccountNumber.js';
+import { AtmFunctions } from './src/view.js';
 
 const PLUGIN_NAME = 'Athena ATM';
 

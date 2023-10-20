@@ -97,14 +97,19 @@ export function playSoundInDimension(dimension: number, soundInfo: Omit<CustomSo
  * @return {void}
  *
  */
-export function playSoundInArea(soundInfo: Required<Omit<CustomSoundInfo, 'target' | 'volume'>>) {
+export function playSoundInArea(soundInfo: Required<Omit<CustomSoundInfo, 'target' | 'volume'>>, maxDistance?: number) {
     if (Overrides.playSoundInArea) {
         return Overrides.playSoundInArea(soundInfo);
     }
 
     const players = [...alt.Player.all].filter((t) => {
         const dist = distance2d(t.pos, soundInfo.pos);
-        if (dist > MAX_AUDIO_AREA_DISTANCE) {
+
+        if (maxDistance) {
+            if (dist > maxDistance) {
+                return false;
+            }
+        } else if (dist > MAX_AUDIO_AREA_DISTANCE) {
             return false;
         }
 

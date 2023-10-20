@@ -9,7 +9,7 @@
 </template>
 
 <script lang="ts" setup>
-import WebViewEvents from '@utility/webViewEvents';
+import WebViewEvents from '@utility/webViewEvents.js';
 
 function hover() {
     WebViewEvents.playSoundFrontend('HIGHLIGHT', 'HUD_FRONTEND_DEFAULT_SOUNDSET');

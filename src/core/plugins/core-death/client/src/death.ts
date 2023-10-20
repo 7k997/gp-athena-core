@@ -1,13 +1,13 @@
 import * as alt from 'alt-client';
 import * as native from 'natives';
-import * as AthenaClient from '@AthenaClient/api';
-import { DEATH_CONFIG } from '../../shared/config';
-import { DEATH_EVENTS } from '../../shared/events';
-import { SCREEN_EFFECTS } from '../../../../shared/enums/screenEffects';
-import { isAnyMenuOpen } from '@AthenaClient/webview';
-import { drawText2D } from '@AthenaClient/screen/text';
-import { LOCALE_DEATH } from '@AthenaPlugins/core-death/shared/locales';
-import { overwriteDefaultKeybind } from '@AthenaShared/enums/keyBinds';
+import * as AthenaClient from '@AthenaClient/api/index.js';
+import { DEATH_CONFIG } from '../../shared/config.js';
+import { DEATH_EVENTS } from '../../shared/events.js';
+import { SCREEN_EFFECTS } from '../../../../shared/enums/screenEffects.js';
+import { isAnyMenuOpen } from '@AthenaClient/webview/index.js';
+import { drawText2D } from '@AthenaClient/screen/text.js';
+import { LOCALE_DEATH } from '@AthenaPlugins/core-death/shared/locales.js';
+import { overwriteDefaultKeybind } from '@AthenaShared/enums/keyBinds.js';
 
 let interval: number;
 let timeInTheFuture: number;
@@ -50,7 +50,7 @@ export class Death {
             }
 
             // Switch out player now
-            AthenaClient.camera.switch.switchToMultiSecondpart(2000);
+            AthenaClient.camera.switchCamera.switchToMultiSecondpart(2000);
 
             // Wait just a bit for the switch to start
             await alt.Utils.wait(1000);

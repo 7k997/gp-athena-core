@@ -1,11 +1,11 @@
 import * as alt from 'alt-server';
-import * as Athena from '@AthenaServer/api';
-import { CurrencyTypes } from '../../../../shared/enums/currency';
-import { FactionFuncs } from '../../../athena-plugin-factions/server/src/funcs';
-import { FactionHandler } from '../../../athena-plugin-factions/server/src/handler';
-import { FactionPlayerFuncs } from '../../../athena-plugin-factions/server/src/playerFuncs';
-import { F_PAYCHECK_EVENTS } from '../../shared/events';
-import { FactionCharacter, FactionRank } from '../../shared/extensions';
+import * as Athena from '@AthenaServer/api/index.js';
+import { CurrencyTypes } from '../../../../shared/enums/currency.js';
+import { FactionFuncs } from '../../../athena-plugin-factions/server/src/funcs.js';
+import { FactionHandler } from '../../../athena-plugin-factions/server/src/handler.js';
+import { FactionPlayerFuncs } from '../../../athena-plugin-factions/server/src/playerFuncs.js';
+import { F_PAYCHECK_EVENTS } from '../../shared/events.js';
+import { FactionCharacter, FactionRank } from '../../shared/extensions.js';
 
 const DEFAULT_HIGH_VALUE = Number.MAX_SAFE_INTEGER;
 

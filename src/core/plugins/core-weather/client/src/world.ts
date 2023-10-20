@@ -1,8 +1,8 @@
 import * as alt from 'alt-client';
 import * as native from 'natives';
-import { WEATHER_EVENTS } from '@AthenaPlugins/core-weather/shared/events';
-import { WORLD_WEATHER } from '@AthenaPlugins/core-weather/shared/weather';
-import { Config } from '@AthenaPlugins/gp-athena-overrides/shared/config';
+import { WEATHER_EVENTS } from '@AthenaPlugins/core-weather/shared/events.js';
+import { WORLD_WEATHER } from '@AthenaPlugins/core-weather/shared/weather.js';
+import { Config } from '@AthenaPlugins/gp-athena-overrides/shared/config.js';
 
 let isTransitioning = false;
 let isFrozen = false;

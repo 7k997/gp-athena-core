@@ -1,7 +1,7 @@
-import { VEHICLE_CLASS } from '@AthenaShared/enums/vehicleTypeFlags';
-import { VehicleData } from '@AthenaShared/information/vehicles';
-import { IDealership } from '../../shared/interfaces';
-import { DealershipView } from './view';
+import { VEHICLE_CLASS } from '@AthenaShared/enums/vehicleTypeFlags.js';
+import { VehicleData } from '@AthenaShared/information/vehicles.js';
+import { IDealership } from '../../shared/interfaces.js';
+import { DealershipView } from './view.js';
 
 const dealerships: Array<IDealership> = [
     {

@@ -1,5 +1,5 @@
-import { CLOTHING_IDS, ORIENTATION, PROP_IDS } from './enums';
-import { IClothingConfig } from './interfaces';
+import { CLOTHING_IDS, ORIENTATION, PROP_IDS } from './enums.js';
+import { IClothingConfig } from './interfaces.js';
 
 export const CLOTHING_CONFIG: IClothingConfig = {
     /**

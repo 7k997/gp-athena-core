@@ -1,7 +1,7 @@
-import { WEATHER_CONFIG } from '@AthenaPlugins/core-weather/shared/config';
-import { WORLD_WEATHER } from '@AthenaPlugins/core-weather/shared/weather';
+import { WEATHER_CONFIG } from '@AthenaPlugins/core-weather/shared/config.js';
+import { WORLD_WEATHER } from '@AthenaPlugins/core-weather/shared/weather.js';
 import * as alt from 'alt-server';
-import { WEATHER_EVENTS } from '@AthenaPlugins/core-weather/shared/events';
+import { WEATHER_EVENTS } from '@AthenaPlugins/core-weather/shared/events.js';
 
 let weatherRotation = [
     'EXTRASUNNY',

@@ -26,10 +26,10 @@
 
 <script lang="ts">
 import { defineComponent, defineAsyncComponent } from 'vue';
-import { VehicleInfo } from '@AthenaShared/interfaces/vehicleInfo';
-import { DEALERSHIP_WEBVIEW_EVENTS } from '../shared/events';
-import { VehicleData } from '@AthenaShared/information/vehicles';
-import { VEHICLE_CLASS } from '@AthenaShared/enums/vehicleTypeFlags';
+import { VehicleInfo } from '@AthenaShared/interfaces/vehicleInfo.js';
+import { DEALERSHIP_WEBVIEW_EVENTS } from '../shared/events.js';
+import { VehicleData } from '@AthenaShared/information/vehicles.js';
+import { VEHICLE_CLASS } from '@AthenaShared/enums/vehicleTypeFlags.js';
 
 export const ComponentName = 'Dealership';
 export default defineComponent({

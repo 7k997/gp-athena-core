@@ -101,12 +101,12 @@
 
 <script lang="ts">
 import { defineComponent, defineAsyncComponent } from 'vue';
-import { Faction, FactionCharacter, FactionRank, RankPermissionNames } from '../../shared/interfaces';
-import { FactionLocale } from '../../shared/locale';
-import { FactionParser } from '../utility/factionParser';
-import { FACTION_EVENTS } from '../../shared/factionEvents';
-import { FACTION_PFUNC } from '../../shared/funcNames';
-import { FactionPageInjections } from '../injections';
+import { Faction, FactionCharacter, FactionRank, RankPermissionNames } from '../../shared/interfaces.js';
+import { FactionLocale } from '../../shared/locale.js';
+import { FactionParser } from '../utility/factionParser.js';
+import { FACTION_EVENTS } from '../../shared/factionEvents.js';
+import { FACTION_PFUNC } from '../../shared/funcNames.js';
+import { FactionPageInjections } from '../injections.js';
 
 const ComponentName = 'Members';
 export default defineComponent({

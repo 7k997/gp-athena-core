@@ -51,6 +51,12 @@ export function respawned(player: alt.Player, position: alt.IVector3): void {
     }
 
     Athena.document.character.set(player, 'isDead', false);
+    Athena.document.character.set(player, 'interiorUID', null);
+    Athena.document.character.set(player, 'portalUID', null);
+    Athena.document.character.set(player, 'portalEntraceIndex', null);
+    Athena.document.character.set(player, 'portalExitIndex', null);
+    player.dimension = 0;
+
     emit.meta(player, 'isDead', false);
     PlayerEvents.trigger('respawned', player, position);
 }

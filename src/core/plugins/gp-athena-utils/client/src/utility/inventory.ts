@@ -1,5 +1,5 @@
-import { onInventoryUpdate } from '@AthenaClient/events/onInventoryUpdate';
-import { Item } from '@AthenaShared/interfaces/item';
+import { onInventoryUpdate } from '@AthenaClient/events/onInventoryUpdate.js';
+import { Item } from '@AthenaShared/interfaces/item.js';
 
 let inventory: Array<Item> = [];
 let toolbar: Array<Item> = [];

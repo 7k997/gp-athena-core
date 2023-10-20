@@ -8,6 +8,9 @@ export const Config = {
     DISABLE_DEFAULT_TIME_SYNC: false, //Disable the default time sync.
     DISABLE_HOSPITAL_BLIPS: false, //Disable the hospital blips.
     WEATHER_SYNC_INTERVAL: 1000 * 60 * 1, //1 minutes, DO NOT SET IT BELOW 1 MINUTE.
+    DISABLE_OBJECT_DROP_EXPIRATION: true, //Disable the object drop expiration.
+
+    DEFAULT_STREAMING_DISTANCE: 500, //Default streaming distance for objects. (Athena Core Default is 100 or lower)
 
     //TODO: Configuration for Corechanges. These are quickly added and only working with some changes in core. These changes should
     //be moved into this plugin and not be in core.

@@ -1,8 +1,8 @@
 import * as alt from 'alt-server';
-import * as AthenaClient from '@AthenaClient/api';
-import * as PlayerEvents from '@AthenaServer/player/events';
-import NametagConfig from './config';
-import { NAMETAG_EVENTS } from '../enums';
+import * as AthenaClient from '@AthenaClient/api/index.js';
+import * as PlayerEvents from '@AthenaServer/player/events.js';
+import NametagConfig from './config.js';
+import { NAMETAG_EVENTS } from '../enums.js';
 
 /**
  * Send the configuration to the player.

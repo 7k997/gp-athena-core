@@ -1,16 +1,16 @@
 import * as alt from 'alt-client';
 import * as native from 'natives';
-import * as AthenaClient from '@AthenaClient/api';
-import { HUD_COMPONENT } from '@AthenaShared/enums/hudComponents';
-import { SYSTEM_EVENTS } from '@AthenaShared/enums/system';
-import { PLAYER_SYNCED_META } from '@AthenaShared/enums/playerSynced';
-import ViewModel from '@AthenaClient/models/viewModel';
-import { VehicleData } from '../../../shared/information/vehicles';
-import { isVehicleType, VEHICLE_TYPE } from '../../../shared/enums/vehicleTypeFlags';
-import { SHARED_CONFIG } from '@AthenaShared/configurations/shared';
-import { KEY_BINDS } from '@AthenaShared/enums/keyBinds';
-import IHudComponent from '../shared/interfaces/iHudComponent';
-import IClientInteraction from '../shared/interfaces/iClientInteraction';
+import * as AthenaClient from '@AthenaClient/api/index.js';
+import { HUD_COMPONENT } from '@AthenaShared/enums/hudComponents.js';
+import { SYSTEM_EVENTS } from '@AthenaShared/enums/system.js';
+import { PLAYER_SYNCED_META } from '@AthenaShared/enums/playerSynced.js';
+import ViewModel from '@AthenaClient/models/viewModel.js';
+import { VehicleData } from '../../../shared/information/vehicles.js';
+import { isVehicleType, VEHICLE_TYPE } from '../../../shared/enums/vehicleTypeFlags.js';
+import { SHARED_CONFIG } from '@AthenaShared/configurations/shared.js';
+import { KEY_BINDS } from '@AthenaShared/enums/keyBinds.js';
+import IHudComponent from '../shared/interfaces/iHudComponent.js';
+import IClientInteraction from '../shared/interfaces/iClientInteraction.js';
 
 const PAGE_NAME = 'Hud';
 const RegisteredComponents: { [key: string]: IHudComponent } = {};

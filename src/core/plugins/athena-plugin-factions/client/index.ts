@@ -1,3 +1,3 @@
-import { FactionView } from './views/factionView';
+import { FactionView } from './views/factionView.js';
 
 FactionView.init();

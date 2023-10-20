@@ -7,6 +7,14 @@ import { MARKER_TYPE } from '@AthenaShared/enums/markerTypes.js';
 import { SYSTEM_EVENTS } from '@AthenaShared/enums/system.js';
 import { Interaction } from '@AthenaShared/interfaces/interaction.js';
 import { KEY_BINDS } from '@AthenaShared/enums/keyBinds.js';
+import {
+    ClosestTarget,
+    MapObjectTarget,
+} from '@AthenaPlugins/gp-athena-overrides/client/src/replacements/mapObjectTarget.js';
+import { IWheelOptionExt } from '@AthenaShared/interfaces/wheelMenu.js';
+import { CreatedDrop } from '@AthenaClient/streamers/item.js';
+
+//Corechange: TODO remove entity selector over vehicles and maybe more
 
 export type ValidEntityTypes = 'object' | 'pos' | 'npc' | 'player' | 'vehicle' | 'interaction';
 export type TargetInfo = {
@@ -30,7 +38,7 @@ let showMarker = true;
 let color: alt.RGBA = new alt.RGBA(255, 255, 255, 200);
 let size = new alt.Vector3(0.1, 0.05, 0.1);
 let latestInteraction: Interaction;
-let autoMode = true;
+let autoMode = false;
 
 const Internal = {
     init() {
@@ -68,8 +76,8 @@ const Internal = {
                 continue;
             }
 
-            if (dataSet[i] instanceof alt.LocalObject) {
-                const object = dataSet[i] as alt.LocalObject;
+            if (dataSet[i] instanceof alt.Object) {
+                const object = dataSet[i] as alt.Object;
                 if (object && native.isEntityAttached(object.scriptID)) {
                     continue;
                 }
@@ -80,6 +88,17 @@ const Internal = {
             const dist = AthenaClient.utility.vector.distance2d(alt.Player.local.pos, dataSet[i].pos);
             entityInfo.push({ id: dataSet[i].scriptID, dist, type, pos: dataSet[i].pos, height, entity: dataSet[i] });
         }
+
+        return entityInfo;
+    },
+    convertMapObject(mapObject: ClosestTarget, type: ValidEntityTypes): Array<TargetInfo> {
+        let entityInfo: Array<TargetInfo> = [];
+
+        const model = native.getEntityModel(mapObject.scriptID);
+        const [_, min, max] = native.getModelDimensions(model);
+        const height = Math.abs(min.z) + Math.abs(max.z);
+        const dist = AthenaClient.utility.vector.distance2d(alt.Player.local.pos, mapObject.pos);
+        entityInfo.push({ id: mapObject.scriptID, dist, type, pos: mapObject.pos, height, entity: null });
 
         return entityInfo;
     },
@@ -106,9 +125,22 @@ const Internal = {
 
         let entityInfo: Array<TargetInfo> = Internal.convert(players, 'player');
         entityInfo = entityInfo.concat(Internal.convert(vehicles, 'vehicle'));
+        entityInfo = entityInfo.concat(Internal.convert(objects, 'object'));
 
-        const objectInfo = entityInfo.concat(Internal.convert(objects, 'object'));
-        entityInfo = objectInfo;
+        //corechange: Raycast for default map objects
+        const closestObject = MapObjectTarget.get();
+        if (closestObject) {
+            const targetInfo = Internal.convertMapObject(closestObject, 'object');
+
+            //Check if object is already in list
+            for (const target of targetInfo) {
+                const isObjectInList = entityInfo.some((item) => item.id === target.id);
+
+                if (!isObjectInList) {
+                    entityInfo.push(target);
+                }
+            }
+        }
 
         if (latestInteraction) {
             const dist = AthenaClient.utility.vector.distance2d(alt.Player.local.pos, latestInteraction.position);
@@ -167,6 +199,8 @@ const Internal = {
             selectionIndex = 0;
         }
 
+        //TODO: Corechange Last selection was not set in core athena
+        lastSelection = selections[selectionIndex];
         AthenaClient.systems.sound.frontend('SKIP', 'HUD_FRONTEND_DEFAULT_SOUNDSET');
     },
     invokeSelection() {
@@ -189,6 +223,7 @@ const Internal = {
 
         // Here we will construct a dynamic wheel menu based on the amount of options we have.
         const wheelOptions: Array<IWheelOptionExt> = [];
+        const scriptIDsAdded: Map<number, boolean> = new Map();
 
         for (const selection of selected) {
             if (typeof selection === 'undefined') {
@@ -220,46 +255,48 @@ const Internal = {
                         },
                     });
                     break;
-                }
-
-                const droppedItem = AthenaClient.streamers.item.getDropped(object.remoteID);
-                if (typeof droppedItem !== 'undefined') {
+                case 'vehicle':
+                    const targetVehicle = alt.Vehicle.all.find((x) => x.scriptID === selection.id);
+                    if (!targetVehicle || !targetVehicle.valid) {
+                        break;
+                    }
+                    const model = native.getDisplayNameFromVehicleModel(targetVehicle.model);
+                    wheelOptions.push({
+                        name: model,
+                        icon: 'icon-directions_car',
+                        data: [targetVehicle],
+                        callback: (_targetVehicle: alt.Vehicle) => {
+                            AthenaClient.menu.vehicle.open(_targetVehicle);
+                        },
+                    });
+                    break;
+                case 'object':
                     if (alt.Player.local.vehicle) {
                         break;
                     }
 
-                    const object = alt.LocalObject.all.find((x) => x.scriptID === selection.id);
+                    alt.logWarning('ScriptID 0: ' + selection.id);
+                    alt.logWarning('alt.Objects.ScriptIDs: ' + alt.Object.all.map((x) => x.scriptID));
+                    const object = alt.Object.all.find((x) => x.scriptID === selection.id);
+
                     if (typeof object === 'undefined') {
+                        alt.logWarning('No object found, so its maybe a map object');
                         //Corechange: Its maybe a map object and not alt.LocalObject check if it exists...
                         const model = native.getEntityModel(selection.id);
                         const rot = native.getEntityRotation(selection.id, 2);
                         if (model) {
                             //Create dummy alt.LocalObject
-                            const createdObject: alt.LocalObject = {
+                            const createdObject: alt.Object = {
                                 frozen: false,
                                 remoteID: undefined,
                                 model: model,
                                 pos: new alt.Vector3(selection.pos),
                                 rot: new alt.Vector3(rot),
-                                dynamic: true,
                                 visible: false,
                                 alpha: 0,
-                                resetAlpha: undefined,
                                 lodDistance: 0,
-                                hasGravity: false,
                                 isRemote: false,
-                                isStreamedIn: false,
-                                useStreaming: false,
-                                streamingDistance: 0,
-                                detach: undefined,
-                                isCollisionEnabled: false,
-                                toggleCollision: undefined,
-                                placeOnGroundProperly: undefined,
-                                positionFrozen: false,
-                                activatePhysics: undefined,
                                 textureVariation: 0,
-                                isWorldObject: false,
-                                waitForSpawn: undefined,
                                 id: 0,
                                 scriptID: selection.id,
                                 isSpawned: false,
@@ -277,7 +314,6 @@ const Internal = {
                                 destroy: undefined,
                                 getMetaDataKeys: undefined,
                                 refCount: 0,
-                                attachToEntity: undefined,
                                 netOwner: undefined,
                                 getSyncedMetaKeys: undefined,
                                 type: undefined,
@@ -307,8 +343,14 @@ const Internal = {
                     }
 
                     //Corechange: gp-athena-overrides
-                    const droppedItem = AthenaClient.streamers.item.getDropped(object.scriptID);
+                    //Corechange: prevent duplicate entries for dropped items and objects, because there are always both.
+                    const droppedItem = AthenaClient.streamers.item.getDropped(object.remoteID);
+                    alt.logWarning('try to get dropped item: ' + JSON.stringify(droppedItem));
                     if (typeof droppedItem !== 'undefined') {
+                        alt.logWarning(
+                            'ScriptID 1: ' + object.scriptID + ' ScriptID 2: ' + droppedItem?.createdObject.scriptID,
+                        );
+                        scriptIDsAdded.set(droppedItem.createdObject.scriptID, true);
                         wheelOptions.push({
                             name: droppedItem.name,
                             icon: 'icon-lightbulb',
@@ -320,17 +362,20 @@ const Internal = {
                         break;
                     }
 
-                    const objectInstance = AthenaClient.streamers.object.getFromScriptId(selection.id);
-                    if (typeof objectInstance !== 'undefined') {
-                        wheelOptions.push({
-                            name: 'Object',
-                            icon: 'icon-lightbulb',
-                            data: [objectInstance],
-                            callback: (_objectInstance: AthenaClient.CreatedObject) => {
-                                AthenaClient.menu.object.open(_objectInstance);
-                            },
-                        });
-                        break;
+                    if (!scriptIDsAdded.has(selection.id)) {
+                        alt.logWarning('ScriptID 3: ' + selection.id);
+                        const objectInstance = AthenaClient.streamers.object.getFromScriptId(selection.id);
+                        if (typeof objectInstance !== 'undefined') {
+                            wheelOptions.push({
+                                name: 'Object',
+                                icon: 'icon-lightbulb',
+                                data: [objectInstance],
+                                callback: (_objectInstance: AthenaClient.CreatedObject) => {
+                                    AthenaClient.menu.object.open(_objectInstance);
+                                },
+                            });
+                            break;
+                        }
                     }
 
                     break;
@@ -369,6 +414,7 @@ const Internal = {
             if (option.emitClient) {
                 const data = option.data ? option.data : [];
                 alt.emit(option.emitClient, ...data);
+                return;
             }
 
             return;

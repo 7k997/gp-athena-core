@@ -1,6 +1,6 @@
 import * as alt from 'alt-server';
-import * as Athena from '@AthenaServer/api';
-import { FactionPaycheckSystem } from './src/system';
+import * as Athena from '@AthenaServer/api/index.js';
+import { FactionPaycheckSystem } from './src/system.js';
 
 const PLUGIN_NAME = 'Athena Factions - Paychecks';
 

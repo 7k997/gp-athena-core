@@ -53,7 +53,7 @@
 <script lang="ts">
 import { defineComponent, defineAsyncComponent } from 'vue';
 
-import { DEALERSHIP_LOCALE } from '../../shared/locale';
+import { DEALERSHIP_LOCALE } from '../../shared/locale.js';
 
 export default defineComponent({
     name: 'Preview',

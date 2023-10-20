@@ -26,7 +26,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { WebViewEventNames } from '../../../src/core/shared/enums/webViewEvents';
+import { WebViewEventNames } from '../../../src/core/shared/enums/webViewEvents.js';
 import Icon from './Icon.vue';
 
 const ComponentName = 'Toolbar';

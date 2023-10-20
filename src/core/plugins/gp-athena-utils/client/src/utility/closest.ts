@@ -1,4 +1,4 @@
-import { getClosestOfType } from '@AthenaShared/utility/vector';
+import { getClosestOfType } from '@AthenaShared/utility/vector.js';
 import * as alt from 'alt-client';
 import { IVector3 } from 'alt-shared';
 

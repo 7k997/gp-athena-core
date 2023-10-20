@@ -74,10 +74,10 @@
 </template>
 
 <script lang="ts">
-import WebViewEvents from '@ViewUtility/webViewEvents';
+import WebViewEvents from '@ViewUtility/webViewEvents.js';
 import { defineComponent, defineAsyncComponent } from 'vue';
 import TestData from './utility/testData';
-import { View_Events_Input_Menu } from '../shared/events';
+import { View_Events_Input_Menu } from '../shared/events.js';
 
 export const ComponentName = View_Events_Input_Menu.InputBoxPageName;
 export default defineComponent({

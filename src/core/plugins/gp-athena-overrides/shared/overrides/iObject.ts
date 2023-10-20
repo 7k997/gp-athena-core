@@ -1,6 +1,6 @@
 import * as alt from 'alt-shared';
 
-declare module '@AthenaShared/interfaces/iObject' {
+declare module '@AthenaShared/interfaces/iObject.js' {
     export interface IObject {
         /**
          * A unique identifier for this object.

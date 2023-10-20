@@ -1,10 +1,14 @@
 import * as alt from 'alt-server';
-import * as Athena from '@AthenaServer/api';
-import { INTERIOR_SYSTEM } from '../../shared/flags';
-import { Interior } from '../../shared/interfaces';
-import { isFlagEnabled } from '../../../../shared/utility/flags';
-import { InteriorSystem } from './system';
-import { InputMenu, InputOptionType, InputResult } from '@AthenaPlugins/gp-athena-utils/shared/interfaces/inputMenus';
+import * as Athena from '@AthenaServer/api/index.js';
+import { INTERIOR_SYSTEM } from '../../shared/flags.js';
+import { Interior } from '../../shared/interfaces.js';
+import { isFlagEnabled } from '../../../../shared/utility/flags.js';
+import { InteriorSystem } from './system.js';
+import {
+    InputMenu,
+    InputOptionType,
+    InputResult,
+} from '@AthenaPlugins/gp-athena-utils/shared/interfaces/inputMenus.js';
 
 Athena.systems.messenger.commands.register(
     'addhouse',

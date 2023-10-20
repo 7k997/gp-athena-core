@@ -20,8 +20,8 @@
 
 <script lang="ts">
 import { defineComponent, defineAsyncComponent } from 'vue';
-import WebViewEvents from '@ViewUtility/webViewEvents';
-import { INVENTORY_EVENTS } from '@AthenaPlugins/core-inventory/shared/events';
+import WebViewEvents from '@ViewUtility/webViewEvents.js';
+import { INVENTORY_EVENTS } from '@AthenaPlugins/core-invento../shared/events.js';
 
 type PlayerList = Array<{ id: number; name: string }>;
 

@@ -1,8 +1,8 @@
 import * as alt from 'alt-server';
-import * as Athena from '@AthenaServer/api';
-import { Configuration } from './src/configuration';
-import { VehiclesSpawn } from './src/vehiclesSpawn';
-import { Examples } from './examples';
+import * as Athena from '@AthenaServer/api/index.js';
+import { Configuration } from './src/configuration.js';
+import { VehiclesSpawn } from './src/vehiclesSpawn.js';
+import { Examples } from './examples/index.js';
 
 const PLUGIN_NAME = 'gpAthenaOverrides';
 

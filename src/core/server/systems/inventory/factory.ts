@@ -2,7 +2,7 @@ import * as alt from 'alt-server';
 import Database from '@stuyk/ezmongodb';
 import * as Athena from '@AthenaServer/api/index.js';
 
-import { BaseItem, StoredItem, Item, DefaultItemBehavior } from '@AthenaShared/interfaces/item.js';
+import { BaseItem, StoredItem, Item, DefaultItemBehavior, ItemDrop } from '@AthenaShared/interfaces/item.js';
 import { deepCloneObject } from '@AthenaShared/utility/deepCopy.js';
 import { sha256 } from '@AthenaServer/utility/hash.js';
 
@@ -375,7 +375,10 @@ export function fromStoredItem<CustomData = {}, CustomBehavior = DefaultItemBeha
         combinedItem.totalWeight = baseItem.weight * combinedItem.quantity;
     }
 
-    combinedItem = fromStoredItem_AfterInjection<CustomData, CustomBehavior>('fromStoredItem_AfterInjection', combinedItem);
+    combinedItem = fromStoredItem_AfterInjection<CustomData, CustomBehavior>(
+        'fromStoredItem_AfterInjection',
+        combinedItem,
+    );
 
     return combinedItem;
 }
@@ -477,6 +480,18 @@ export function fromBaseToStored<CustomData = {}>(
     }
 
     return storedItem;
+}
+
+/**
+ * Converts a droped item into a stored item for reference.
+ *
+ *
+ * @template CustomData
+ * @param {ItemDrop} ItemDrop
+ * @return {void}
+ */
+export function fromDropedToStored<CustomData = {}>(dropedItem: ItemDrop): StoredItem<CustomData> {
+    return deepCloneObject<StoredItem<CustomData>>(dropedItem);
 }
 
 /**

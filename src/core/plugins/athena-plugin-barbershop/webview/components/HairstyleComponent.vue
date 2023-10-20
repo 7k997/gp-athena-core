@@ -18,9 +18,9 @@
 
 <script lang="ts">
 import { defineComponent, defineAsyncComponent } from 'vue';
-import ResolvePath from '@utility/pathResolver';
-import { maleHair } from '../../shared/maleHair';
-import { femaleHair } from '../../shared/femaleHair';
+import ResolvePath from '@utility/pathResolver.js';
+import { maleHair } from '../../shared/maleHair.js';
+import { femaleHair } from '../../shared/femaleHair.js';
 
 const ComponentName = 'HairstyleComponent';
 export default defineComponent({

@@ -19,7 +19,6 @@ export async function addUnique(
     return Athena.player.inventory.add(player, item, reservedSlot);
 }
 
-
 /**
  * Add a new stored item to a user, must specify a quantity of greater than zero.
  *

@@ -10,6 +10,7 @@ import { onTicksStart } from '@AthenaClient/events/onTicksStart.js';
 
 const Internal = {
     init() {
+        alt.logWarning("VehicleController: This system is deprecated. Use 'systems/vehicles' instead.");
         alt.onServer(VEHICLE_EVENTS.SET_SEATBELT, VehicleController.enableSeatBelt);
         alt.onServer(VEHICLE_EVENTS.SET_INTO, VehicleController.setIntoVehicle);
         alt.onServer(SYSTEM_EVENTS.VEHICLE_ENGINE, VehicleController.toggleEngine);
@@ -98,10 +99,18 @@ export const VehicleController = {
      * @static
      *
      */
-    enterVehicle() {
+    enterVehicle(vehicle: alt.Vehicle, seat: number) {
+        //FIXME: disable seat shuffle, wrongly intepreted
         native.setPedConfigFlag(alt.Player.local.scriptID, PED_CONFIG_FLAG.DISABLE_SEAT_SHUFFLE, true);
+        native.setPedConfigFlag(alt.Player.local.scriptID, 366, false); //AllowAutoShuffleToDriversSeat
         native.setPedConfigFlag(alt.Player.local.scriptID, PED_CONFIG_FLAG.DISABLE_STARTING_VEHICLE_ENGINE, true);
         native.setPedConfigFlag(alt.Player.local.scriptID, PED_CONFIG_FLAG.DISABLE_STOPPING_VEHICLE_ENGINE, true);
+        native.setPedConfigFlag(alt.Player.local.scriptID, PED_CONFIG_FLAG.PUT_ON_MOTORCYCLE_HELMET, false);
+        native.setPedConfigFlag(alt.Player.local.scriptID, 390, true); //DisableAutoEquipHelmetsInBikes
+
+        alt.setTimeout(() => {
+            native.setPedIntoVehicle(alt.Player.local.scriptID, vehicle.scriptID, seat - 2);
+        }, 1500);
     },
 
     /**

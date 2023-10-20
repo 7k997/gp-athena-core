@@ -1,15 +1,15 @@
 import * as alt from 'alt-client';
 import * as native from 'natives';
-import * as AthenaClient from '@AthenaClient/api';
-import ViewModel from '../../../client/models/viewModel';
+import * as AthenaClient from '@AthenaClient/api/index.js';
+import ViewModel from '../../../client/models/viewModel.js';
 // Removed - working with player ped not with PedCharacter
-// import { PedCharacter } from '../../../client/utility/characterPed';
-import { SYSTEM_EVENTS } from '../../../shared/enums/system';
-import { Appearance } from '../../../shared/interfaces/appearance';
-import { ClothingComponent, Item, ItemEx } from '../../../shared/interfaces/item';
-import { CLOTHING_CONFIG } from '../shared/config';
-import { CLOTHING_INTERACTIONS } from '../shared/events';
-import { CLOTHING_DLC_INFO, IClothingStore, IClothingStorePage } from '../shared/interfaces';
+// import { PedCharacter } from '../../../client/utility/characterPed.js';
+import { SYSTEM_EVENTS } from '../../../shared/enums/system.js';
+import { Appearance } from '../../../shared/interfaces/appearance.js';
+import { ClothingComponent, Item, ItemEx } from '../../../shared/interfaces/item.js';
+import { CLOTHING_CONFIG } from '../shared/config.js';
+import { CLOTHING_INTERACTIONS } from '../shared/events.js';
+import { CLOTHING_DLC_INFO, IClothingStore, IClothingStorePage } from '../shared/interfaces.js';
 
 const FreemodeFemale01 = 2627665880;
 const FreeModeMale01 = 1885233650;

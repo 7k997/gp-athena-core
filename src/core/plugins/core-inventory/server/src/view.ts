@@ -125,6 +125,7 @@ const Internal = {
         await Athena.systems.inventory.drops.add(
             clonedItem,
             new alt.Vector3(player.pos.x, player.pos.y, player.pos.z - 1),
+            player.dimension,
             player,
         );
     },

@@ -1,8 +1,8 @@
 import * as alt from 'alt-client';
-import { CameraTarget } from './src/replacements/cameraTarget';
-import { Configurations } from './src/configurations';
-import { EntitySelectorOverride } from './src/overrides/entitySelectorOverride';
-import { MapObjectTarget } from './src/replacements/mapObjectTarget';
+import { CameraTarget } from './src/replacements/cameraTarget.js';
+import { Configurations } from './src/configurations.js';
+import { EntitySelectorOverride } from './src/overrides/entitySelectorOverride.js';
+import { MapObjectTarget } from './src/replacements/mapObjectTarget.js';
 
 Configurations.init();
 // EntitySelectorOverride.init(); //not needed right now, DO NOT USE

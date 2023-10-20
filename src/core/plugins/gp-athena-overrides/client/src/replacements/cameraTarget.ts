@@ -1,10 +1,10 @@
 import * as native from 'natives';
 import * as alt from 'alt-client';
-import * as AthenaClient from '@AthenaClient/api';
-import { KEY_BINDS } from '@AthenaShared/enums/keyBinds';
-import { drawText3D } from '@AthenaClient/screen/text';
-import { SYSTEM_EVENTS } from '@AthenaShared/enums/system';
-import Raycast from '@AthenaPlugins/gp-athena-utils/client/src/utility/raycast';
+import * as AthenaClient from '@AthenaClient/api/index.js';
+import { KEY_BINDS } from '@AthenaShared/enums/keyBinds.js';
+import { drawText3D } from '@AthenaClient/screen/text.js';
+import { SYSTEM_EVENTS } from '@AthenaShared/enums/system.js';
+import Raycast from '@AthenaPlugins/gp-athena-utils/client/src/utility/raycast.js';
 
 interface ClosestTarget {
     scriptID: number;

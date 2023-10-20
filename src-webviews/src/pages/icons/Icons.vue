@@ -35,7 +35,7 @@ Helpful for seeing what default components look like.
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import Icons from '../../exampleData/Icons';
+import Icons from '../../exampleData/Icons.js';
 import Input from '@components/Input.vue';
 import Button from '@components/Button.vue';
 import Icon from '@components/Icon.vue';

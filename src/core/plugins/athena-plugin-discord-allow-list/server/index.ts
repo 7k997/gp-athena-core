@@ -1,8 +1,8 @@
 import * as alt from 'alt-server';
-import * as Athena from '@AthenaServer/api';
-import { AllowListConfig } from './config';
+import * as Athena from '@AthenaServer/api/index.js';
+import { AllowListConfig } from './config.js';
 import axios from 'axios';
-import { DiscordUser } from './interfaces';
+import { DiscordUser } from './interfaces.js';
 
 const PLUGIN_NAME = 'discord-allow-list';
 const AXIOS_REQUEST = 'https://discord.com/api/guilds/$GUILD_ID/members/$MEMBER_ID';
@@ -119,5 +119,3 @@ declare global {
         [PLUGIN_NAME]: typeof API;
     }
 }
-
-

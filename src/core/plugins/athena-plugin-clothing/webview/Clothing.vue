@@ -68,13 +68,13 @@
 </template>
 
 <script lang="ts">
-import WebViewEvents from '@ViewUtility/webViewEvents';
-import { CLOTHING_INTERACTIONS } from '../shared/events';
+import WebViewEvents from '@ViewUtility/webViewEvents.js';
+import { CLOTHING_INTERACTIONS } from '../shared/events.js';
 import { defineComponent, defineAsyncComponent } from 'vue';
-import { EXAMPLE_CLOTHING_DATA } from './utility/exampleData';
-import { DEFAULT_CLOTHING_STORE } from './utility/defaultData';
-import { LOCALE_CLOTHING } from '../shared/locales';
-import { IClothingStorePage } from '../shared/interfaces';
+import { EXAMPLE_CLOTHING_DATA } from './utility/exampleData.js';
+import { DEFAULT_CLOTHING_STORE } from './utility/defaultData.js';
+import { LOCALE_CLOTHING } from '../shared/locales.js';
+import { IClothingStorePage } from '../shared/interfaces.js';
 
 const ComponentName = 'Clothing';
 export default defineComponent({

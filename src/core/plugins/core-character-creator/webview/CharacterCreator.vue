@@ -47,7 +47,7 @@ import OverlaysList from './utility/overlaysList';
 import { MaleHairOverlays, FemaleHairOverlays } from './utility/hairOverlays';
 import { MalePresets, FemalePresets } from './utility/presets';
 import { CHARACTER_CREATOR_LOCALE } from '../shared/locale';
-import { CHARACTER_CREATOR_WEBVIEW_EVENTS } from '../shared/events';
+import { CHARACTER_CREATOR_WEBVIEW_EVENTS } from '../shared/events.js';
 
 const ComponentName = 'CharacterCreator';
 export default defineComponent({

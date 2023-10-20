@@ -1,10 +1,10 @@
 import * as alt from 'alt-client';
 import * as native from 'natives';
-import * as AthenaClient from '@AthenaClient/api';
-import ViewModel from '@AthenaClient/models/viewModel';
-import { VehicleInfo } from '@AthenaShared/interfaces/vehicleInfo';
-import { DEALERSHIP_EVENTS, DEALERSHIP_WEBVIEW_EVENTS } from '../../shared/events';
-import { IDealership } from '../../shared/interfaces';
+import * as AthenaClient from '@AthenaClient/api/index.js';
+import ViewModel from '@AthenaClient/models/viewModel.js';
+import { VehicleInfo } from '@AthenaShared/interfaces/vehicleInfo.js';
+import { DEALERSHIP_EVENTS, DEALERSHIP_WEBVIEW_EVENTS } from '../../shared/events.js';
+import { IDealership } from '../../shared/interfaces.js';
 
 let isUpdating = false;
 let vehicles: Array<VehicleInfo>;

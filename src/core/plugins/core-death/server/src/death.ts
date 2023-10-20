@@ -1,9 +1,9 @@
 import * as alt from 'alt-server';
 import { IVector3 } from 'alt-shared';
-import * as Athena from '@AthenaServer/api';
-import { distance2d } from '@AthenaShared/utility/vector';
-import { DEATH_EVENTS } from '../../shared/events';
-import { DEATH_CONFIG } from './config';
+import * as Athena from '@AthenaServer/api/index.js';
+import { distance2d } from '@AthenaShared/utility/vector.js';
+import { DEATH_EVENTS } from '../../shared/events.js';
+import { DEATH_CONFIG } from './config.js';
 
 const TimeOfDeath: { [_id: string]: number } = {};
 

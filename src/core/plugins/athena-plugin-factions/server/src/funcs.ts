@@ -1,13 +1,12 @@
 import Database from '@stuyk/ezmongodb';
 import * as alt from 'alt-server';
-import { Collections } from '@AthenaServer/database/collections';
-import { Character } from '../../../../shared/interfaces/character';
-import { FactionHandler } from './handler';
-import { Faction, FactionCharacter, FactionRank, RankPermissions } from '../../shared/interfaces';
-import { FACTION_EVENTS } from '../../shared/factionEvents';
-import * as Athena from '@AthenaServer/api';
-import { storage } from '@AthenaServer/systems';
-import { OwnedVehicle } from '@AthenaShared/interfaces/vehicleOwned';
+import { Collections } from '@AthenaServer/database/collections.js';
+import { Character } from '../../../../shared/interfaces/character.js';
+import { FactionHandler } from './handler.js';
+import { Faction, FactionCharacter, FactionRank, RankPermissions } from '../../shared/interfaces.js';
+import { FACTION_EVENTS } from '../../shared/factionEvents.js';
+import * as Athena from '@AthenaServer/api/index.js';
+import { OwnedVehicle } from '@AthenaShared/interfaces/vehicleOwned.js';
 
 let hasInitialized = false;
 
@@ -644,7 +643,7 @@ export class FactionFuncs {
         }
 
         const storageId = await Athena.systems.storage.create([]);
-        if (!storage) {
+        if (!storageId) {
             return false;
         }
 

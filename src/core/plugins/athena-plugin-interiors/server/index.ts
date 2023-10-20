@@ -1,7 +1,7 @@
 import * as alt from 'alt-server';
-import * as Athena from '@AthenaServer/api';
-import { createDefaultInteriors } from './src/interiors';
-import { InteriorSystem } from './src/system';
+import * as Athena from '@AthenaServer/api/index.js';
+import { createDefaultInteriors } from './src/interiors.js';
+import { InteriorSystem } from './src/system.js';
 
 const PLUGIN_NAME = 'Athena Interiors';
 

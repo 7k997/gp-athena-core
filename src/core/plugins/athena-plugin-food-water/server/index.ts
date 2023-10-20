@@ -1,10 +1,10 @@
 import * as alt from 'alt-server';
-import * as Athena from '@AthenaServer/api';
+import * as Athena from '@AthenaServer/api/index.js';
 
-import { VitalsSystem } from './src/system';
+import { VitalsSystem } from './src/system.js';
 
-import './src/commands';
-import { VitalsEffects } from './src/effects';
+import './src/commands.js';
+import { VitalsEffects } from './src/effects.js';
 
 const PLUGIN_NAME = 'Vitals Plugin';
 

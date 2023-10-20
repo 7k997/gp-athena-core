@@ -1,7 +1,7 @@
 import * as alt from 'alt-server';
-import * as Athena from '@AthenaServer/api';
-import { DefaultDealerships } from './src/defaults';
-import { DealershipView } from './src/view';
+import * as Athena from '@AthenaServer/api/index.js';
+import { DefaultDealerships } from './src/defaults.js';
+import { DealershipView } from './src/view.js';
 
 const PLUGIN_NAME = 'Athena Dealership';
 

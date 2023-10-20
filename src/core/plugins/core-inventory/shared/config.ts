@@ -1,4 +1,4 @@
-import { KEY_BINDS } from '@AthenaShared/enums/keyBinds';
+import { KEY_BINDS } from '@AthenaShared/enums/keyBinds.js';
 
 const THE_LETTER_I = KEY_BINDS.INVENTORY;
 

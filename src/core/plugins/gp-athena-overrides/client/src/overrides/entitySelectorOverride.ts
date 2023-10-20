@@ -1,8 +1,9 @@
-import * as AthenaClient from '@AthenaClient/api';
-import { ObjectMenuInjection } from '@AthenaClient/menus/object';
-import { CreatedDrop } from '@AthenaClient/streamers/item';
-import { SYSTEM_EVENTS } from '@AthenaShared/enums/system';
-import { IWheelOptionExt } from '@AthenaShared/interfaces/wheelMenu';
+import * as AthenaClient from '@AthenaClient/api/index.js';
+import { ObjectMenuInjection } from '@AthenaClient/menus/object.js';
+import { CreatedDrop } from '@AthenaClient/streamers/item.js';
+import { Config } from '@AthenaPlugins/gp-athena-overrides/shared/config.js';
+import { SYSTEM_EVENTS } from '@AthenaShared/enums/system.js';
+import { IWheelOptionExt } from '@AthenaShared/interfaces/wheelMenu.js';
 import * as alt from 'alt-client';
 import * as native from 'natives';
 
@@ -12,6 +13,8 @@ export class EntitySelectorOverride {
     static init() {
         AthenaClient.menu.object.override('open', EntitySelectorOverride.open);
         AthenaClient.menu.object.override('addInjection', EntitySelectorOverride.addInjection);
+
+        AthenaClient.streamers.item.setDefaultMaxDistance(Config.DEFAULT_STREAMING_DISTANCE);
     }
 
     /**
@@ -68,7 +71,7 @@ export class EntitySelectorOverride {
             try {
                 options = callback(object, options);
             } catch (err) {
-                console.warn(`Got Object Menu Injection Error: ${err}`);
+                console.warn(`Got Entity Menu Injection Error: ${err}`);
                 continue;
             }
         }

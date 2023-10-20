@@ -1,9 +1,9 @@
 import * as alt from 'alt-server';
-import { Faction } from '../../shared/interfaces';
-import { FACTION_CONFIG } from './config';
-import { FactionHandler } from './handler';
-import { FactionPlayerFuncs } from './playerFuncs';
-import * as Athena from '@AthenaServer/api';
+import { Faction } from '../../shared/interfaces.js';
+import { FACTION_CONFIG } from './config.js';
+import { FactionHandler } from './handler.js';
+import { FactionPlayerFuncs } from './playerFuncs.js';
+import * as Athena from '@AthenaServer/api/index.js';
 
 const playerActions: { [key: string]: (player: alt.Player, ...args: any[]) => void } = {};
 const tickActions: {

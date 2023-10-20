@@ -3,6 +3,7 @@ import * as alt from 'alt-server';
 import SockJS from 'sockjs-client';
 import { IStream, IStreamMessage } from '../../shared/interfaces/iStream.js';
 import { DEFAULT_CONFIG } from '../athena/main.js';
+import { Config } from '@AthenaPlugins/gp-athena-overrides/shared/config.js';
 
 const Routes = {
     pong: pong,
@@ -145,7 +146,7 @@ async function pong(id: number, data: string) {
 export async function registerCallback<T>(
     key: string,
     callback: (player: alt.Player, streamedData: Array<T>) => void,
-    range: number = 100,
+    range: number = Config.DEFAULT_STREAMING_DISTANCE,
 ) {
     if (!callbacks) {
         callbacks = {};

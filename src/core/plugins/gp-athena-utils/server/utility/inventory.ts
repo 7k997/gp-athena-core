@@ -1,9 +1,9 @@
-import { BaseItemEx, Item, StoredItem } from '@AthenaShared/interfaces/item';
+import { BaseItemEx, Item, StoredItem } from '@AthenaShared/interfaces/item.js';
 import * as alt from 'alt-server';
-import * as Athena from '@AthenaServer/api';
-import { InventoryType } from '@AthenaPlugins/core-inventory/shared/interfaces';
-import { ItemUtil } from './itemUtil';
-import { deepCloneObject } from '@AthenaShared/utility/deepCopy';
+import * as Athena from '@AthenaServer/api/index.js';
+import { InventoryType } from '@AthenaPlugins/core-inventory/shared/interfaces.js';
+import { ItemUtil } from './itemUtil.js';
+import { deepCloneObject } from '@AthenaShared/utility/deepCopy.js';
 
 /**
  *
@@ -172,6 +172,7 @@ export class InventoryUtil {
         await Athena.systems.inventory.drops.add(
             clonedItem,
             new alt.Vector3(player.pos.x, player.pos.y, player.pos.z - 1),
+            player.dimension,
             player,
         );
     }

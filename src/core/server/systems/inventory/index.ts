@@ -1,4 +1,6 @@
 export * as clothing from './clothing.js';
+export * as swap from './swap.js';
+export * as drop from './drop.js';
 export * as config from './config.js';
 export * as convert from './convert.js';
 export * as crafting from './crafting.js';

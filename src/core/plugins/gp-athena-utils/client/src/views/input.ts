@@ -1,7 +1,7 @@
-import * as AthenaClient from '@AthenaClient/api';
-import ViewModel from '@AthenaClient/models/viewModel';
-import { View_Events_Input_Menu } from '@AthenaPlugins/gp-athena-utils/shared/events';
-import { InputMenu, InputResult } from '@AthenaPlugins/gp-athena-utils/shared/interfaces/inputMenus';
+import * as AthenaClient from '@AthenaClient/api/index.js';
+import ViewModel from '@AthenaClient/models/viewModel.js';
+import { View_Events_Input_Menu } from '@AthenaPlugins/gp-athena-utils/shared/events.js';
+import { InputMenu, InputResult } from '@AthenaPlugins/gp-athena-utils/shared/interfaces/inputMenus.js';
 import * as alt from 'alt-client';
 
 //TODO: Old v4.x style. Needs to be updated to v5.x style.

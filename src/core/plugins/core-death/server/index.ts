@@ -1,7 +1,7 @@
 import * as alt from 'alt-server';
-import * as Athena from '@AthenaServer/api';
-import { DeathCommands } from './src/commands';
-import { DeathSystem } from './src/death';
+import * as Athena from '@AthenaServer/api/index.js';
+import { DeathCommands } from './src/commands.js';
+import { DeathSystem } from './src/death.js';
 
 const PLUGIN_NAME = 'Athena Death System';
 

@@ -29,8 +29,8 @@
 
 <script lang="ts">
 import { defineComponent, defineAsyncComponent } from 'vue';
-import { Faction, FactionRank } from '../../../shared/interfaces';
-import { FactionParser } from '../../utility/factionParser';
+import { Faction, FactionRank } from '../../../shared/interfaces.js';
+import { FactionParser } from '../../utility/factionParser.js';
 
 // Look at the current ranks
 // Inside of each rank see if `rank.vehicles` has the vehicle identifier

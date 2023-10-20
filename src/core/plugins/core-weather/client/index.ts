@@ -1,5 +1,5 @@
 import * as alt from 'alt-client';
-import { World } from './src/world';
+import { World } from './src/world.js';
 
 World.init();
 

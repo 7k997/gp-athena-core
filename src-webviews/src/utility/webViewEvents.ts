@@ -1,4 +1,4 @@
-import { WebViewEventNames } from '../../../src/core/shared/enums/webViewEvents';
+import { WebViewEventNames } from '../../../src/core/shared/enums/webViewEvents.js';
 
 const OnEvents: { [key: string]: (...args: any[]) => void } = {};
 
@@ -19,7 +19,7 @@ class InternalFunctions {
     }
 
     /**
-     * Handles emits from WebViewController.emit
+     * Handles emits from  AthenaClient.webview.emit
      *
      * @static
      * @param {string} eventName
@@ -112,7 +112,7 @@ export default class WebViewEvents {
 
     /**
      * Register an `on` event that gets called when...
-     * an event is emitted through WebViewController.
+     * an event is emitted through  AthenaClient.webview.
      *
      * @static
      * @param {string} eventName

@@ -1,17 +1,7 @@
-import * as charRef from '../../../../shared/interfaces/character';
+import * as charRef from '../../../../shared/interfaces/character.js';
 
 // Extends the player interface.
 declare module 'alt-server' {
-    export interface Player {
-        /**
-         * The minimum 'z' below the interior that the player can go before
-         * they have their dimension reset.
-         * @type {number}
-         * @memberof Player
-         */
-        interiorMinimumZ?: number;
-    }
-
     export interface Character extends Partial<charRef.Character> {
         /**
          * The ipl string that this player belongs to atm.

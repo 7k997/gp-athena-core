@@ -37,10 +37,10 @@
 
 <script lang="ts">
 import { defineComponent, defineAsyncComponent } from 'vue';
-import { Vector3 } from '../../../../../shared/interfaces/vector';
-import { FACTION_EVENTS } from '../../../shared/factionEvents';
-import { FACTION_PFUNC } from '../../../shared/funcNames';
-import { Faction } from '../../../shared/interfaces';
+import { FACTION_EVENTS } from '../../../shared/factionEvents.js';
+import { FACTION_PFUNC } from '../../../shared/funcNames.js';
+import { Faction } from '../../../shared/interfaces.js';
+import { Vector3 } from '@AthenaPlugins/gp-athena-utils/shared/interfaces/vector.js';
 
 const ComponentName = 'HeadQuarters';
 export default defineComponent({

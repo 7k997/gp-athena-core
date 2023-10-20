@@ -148,7 +148,7 @@ class StreamerServer {
                 continue;
             }
 
-            const streamDistance = StreamRange[key] ? StreamRange[key] : 100;
+            const streamDistance = StreamRange[key] ? StreamRange[key] : 200;
             const validData = StreamData[key].filter((streamData: IStreamUpdate) => {
                 if (typeof streamData.dimension !== 'undefined') {
                     if (streamData.dimension !== data.dimension) {

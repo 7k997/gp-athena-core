@@ -26,10 +26,13 @@ export function append(itemDrop: ItemDrop): string {
     }
 
     const object = new alt.Object(itemDrop.model ? itemDrop.model : defaultModel, itemDrop.pos, alt.Vector3.zero);
+
+    //TODO: Collision handling
     object.frozen = true;
     object.collision = false;
     object.setStreamSyncedMeta(ITEM_SYNCED_META.ITEM_DROP_INFO, deepCloneObject(itemDrop));
     drops[String(itemDrop._id)] = object;
+
     return String(itemDrop._id);
 }
 
@@ -52,6 +55,15 @@ export function remove(id: string): boolean {
         drops[id].destroy();
     } catch (err) {}
 
+    return true;
+}
+
+/**
+ * Corechange
+ * Updates an item drop in-world.
+ */
+export function update(itemDrop: ItemDrop): boolean {
+    drops[String(itemDrop._id)].setStreamSyncedMeta(ITEM_SYNCED_META.ITEM_DROP_INFO, deepCloneObject(itemDrop));
     return true;
 }
 

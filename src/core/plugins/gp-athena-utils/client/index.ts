@@ -1,8 +1,8 @@
 import * as alt from 'alt-client';
-import { getClosestPlayer, getClosestVehicle } from './src/utility/closest';
-import { addAPI } from '@AthenaClient/systems/plugins';
-import { loadModel } from './src/utility/model';
-import { InventoryUtil } from './src/utility/inventory';
+import { getClosestPlayer, getClosestVehicle } from './src/utility/closest.js';
+import { addAPI } from '@AthenaClient/systems/plugins.js';
+import { loadModel } from './src/utility/model.js';
+import { InventoryUtil } from './src/utility/inventory.js';
 
 declare global {
     export interface ClientPluginAPI {

@@ -1,4 +1,4 @@
-import { Faction, FactionCharacter, FactionRank, RankPermissions } from '../../shared/interfaces';
+import { Faction, FactionCharacter, FactionRank, RankPermissions } from '../../shared/interfaces.js';
 
 export class FactionParser {
     /**

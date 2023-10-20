@@ -14,7 +14,7 @@
 
 <script lang="ts">
 import { defineComponent, defineAsyncComponent } from 'vue';
-import ResolvePath from '@utility/pathResolver';
+import ResolvePath from '@utility/pathResolver.js';
 
 const ComponentName = 'Fuel';
 export default defineComponent({

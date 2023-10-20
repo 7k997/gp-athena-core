@@ -1,5 +1,5 @@
-import * as AthenaClient from '@AthenaClient/api';
-import { Config } from '@AthenaPlugins/gp-athena-overrides/shared/config';
+import * as AthenaClient from '@AthenaClient/api/index.js';
+import { Config } from '@AthenaPlugins/gp-athena-overrides/shared/config.js';
 
 export class Configurations {
     static init() {
@@ -10,5 +10,7 @@ export class Configurations {
         if (Config.ENTITY_SELECTOR_AUTOMODE) {
             AthenaClient.systems.entitySelector.setToAutoMode();
         }
+
+        AthenaClient.streamers.item.setDefaultMaxDistance(Config.DEFAULT_STREAMING_DISTANCE);
     }
 }

@@ -1,5 +1,5 @@
-import * as Athena from '@AthenaServer/api';
-import { Config } from '@AthenaPlugins/gp-athena-overrides/shared/config';
+import * as Athena from '@AthenaServer/api/index.js';
+import { Config } from '@AthenaPlugins/gp-athena-overrides/shared/config.js';
 
 export class Configuration {
     static init() {

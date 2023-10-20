@@ -1,8 +1,8 @@
 import * as alt from 'alt-server';
-import * as Athena from '@AthenaServer/api';
-import { ItemEx } from '@AthenaShared/interfaces/item';
-import { Character } from '@AthenaShared/interfaces/character';
-import { InventoryType } from '@AthenaPlugins/core-inventory/shared/interfaces';
+import * as Athena from '@AthenaServer/api/index.js';
+import { ItemEx } from '@AthenaShared/interfaces/item.js';
+import { Character } from '@AthenaShared/interfaces/character.js';
+import { InventoryType } from '@AthenaPlugins/core-inventory/shared/interfaces.js';
 
 export class ItemUtil {
     static getItem<CustomData>(player: alt.Player, slot: number, type: InventoryType): ItemEx<CustomData> {

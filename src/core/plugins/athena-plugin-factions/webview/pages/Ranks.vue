@@ -106,11 +106,11 @@
 <script lang="ts">
 import { defineComponent, defineAsyncComponent } from 'vue';
 
-import { Faction, FactionRank, RankPermissions } from '../../shared/interfaces';
-import { FactionParser } from '../utility/factionParser';
-import { FACTION_EVENTS } from '../../shared/factionEvents';
-import { FACTION_PFUNC } from '../../shared/funcNames';
-import { FactionPageInjections } from '../injections';
+import { Faction, FactionRank, RankPermissions } from '../../shared/interfaces.js';
+import { FactionParser } from '../utility/factionParser.js';
+import { FACTION_EVENTS } from '../../shared/factionEvents.js';
+import { FACTION_PFUNC } from '../../shared/funcNames.js';
+import { FactionPageInjections } from '../injections.js';
 
 const ComponentName = 'Ranks';
 export default defineComponent({

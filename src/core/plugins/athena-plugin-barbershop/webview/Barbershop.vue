@@ -65,18 +65,18 @@
 
 <script lang="ts">
 import { defineComponent, defineAsyncComponent, nextTick } from 'vue';
-import { maleHair } from '../shared/maleHair';
-import { femaleHair } from '../shared/femaleHair';
-import { BarbershopEvents } from '../shared/events';
-import { BarbershopData } from '../shared/interfaces';
-import { BARBER_SHOP_LOCALE } from '../shared/locales';
+import { maleHair } from '../shared/maleHair.js';
+import { femaleHair } from '../shared/femaleHair.js';
+import { BarbershopEvents } from '../shared/events.js';
+import { BarbershopData } from '../shared/interfaces.js';
+import { BARBER_SHOP_LOCALE } from '../shared/locales.js';
 import ColorComponentVue from './components/ColorComponent.vue';
 import HairstyleComponentVue from './components/HairstyleComponent.vue';
 import EyeComponentVue from './components/EyeComponent.vue';
 import BeardComponentVue from './components/BeardComponent.vue';
 
-import ResolvePath from '@utility/pathResolver';
-import WebViewEvents from '@ViewUtility/webViewEvents';
+import ResolvePath from '@utility/pathResolver.js';
+import WebViewEvents from '@ViewUtility/webViewEvents.js';
 export const ComponentName = 'Barbershop';
 export default defineComponent({
     name: ComponentName,

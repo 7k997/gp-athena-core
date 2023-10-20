@@ -1,6 +1,6 @@
 import * as alt from 'alt-server';
-import { StoredItem, StoredItemEx } from '@AthenaShared/interfaces/item';
-import { InventoryType } from './manager';
+import { StoredItem, StoredItemEx } from '@AthenaShared/interfaces/item.js';
+import { InventoryType } from './manager.js';
 
 const anyDbNamePlaceholder = 'any1sd2f3g4h5j6k7l8';
 

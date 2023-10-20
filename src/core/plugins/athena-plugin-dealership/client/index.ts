@@ -1,3 +1,3 @@
-import { DealershipClientView } from './src/view';
+import { DealershipClientView } from './src/view.js';
 
 DealershipClientView.init();

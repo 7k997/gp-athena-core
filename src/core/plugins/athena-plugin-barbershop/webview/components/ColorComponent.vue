@@ -12,8 +12,8 @@
 </template>
 
 <script lang="ts">
-import { makeupColors } from '../../../../shared/information/makeupColors';
-import { hairColors } from '../../../../shared/information/hairColors';
+import { makeupColors } from '../../../../shared/information/makeupColors.js';
+import { hairColors } from '../../../../shared/information/hairColors.js';
 import { defineComponent, nextTick } from 'vue';
 
 const ComponentName = 'ColorComponent';

@@ -1,7 +1,7 @@
-import { FactionActions } from './actions';
-import { FactionFuncs } from './funcs';
-import { FactionHandler } from './handler';
-import { FactionPlayerFuncs } from './playerFuncs';
+import { FactionActions } from './actions.js';
+import { FactionFuncs } from './funcs.js';
+import { FactionHandler } from './handler.js';
+import { FactionPlayerFuncs } from './playerFuncs.js';
 
 export const factionFuncs = {
     actions: FactionActions,

@@ -34,11 +34,11 @@
 
 <script lang="ts">
 import { defineComponent, defineAsyncComponent } from 'vue';
-import { Vector3 } from '../../../../gp-athena-utils/shared/interfaces/vector';
-import { Faction } from '../../../shared/interfaces';
-import { distance } from '../../../../gp-athena-utils/shared/utility/vector';
-import { FACTION_EVENTS } from '../../../shared/factionEvents';
-import { FACTION_PFUNC } from '../../../shared/funcNames';
+import { Faction } from '../../../shared/interfaces.js';
+import { FACTION_EVENTS } from '../../../shared/factionEvents.js';
+import { FACTION_PFUNC } from '../../../shared/funcNames.js';
+import { Vector3 } from '@AthenaPlugins/gp-athena-utils/shared/interfaces/vector.js';
+import { distance } from '@AthenaPlugins/gp-athena-utils/shared/utility/vector.js';
 
 const ComponentName = 'Parking';
 export default defineComponent({

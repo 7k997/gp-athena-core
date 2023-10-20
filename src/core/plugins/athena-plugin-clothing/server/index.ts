@@ -1,6 +1,6 @@
 import * as alt from 'alt-server';
-import * as Athena from '@AthenaServer/api';
-import { ClothingFunctions } from './src/view';
+import * as Athena from '@AthenaServer/api/index.js';
+import { ClothingFunctions } from './src/view.js';
 
 const PLUGIN_NAME = 'Athena Clothing';
 

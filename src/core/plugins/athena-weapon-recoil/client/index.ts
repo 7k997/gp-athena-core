@@ -1,6 +1,6 @@
 import * as alt from 'alt-client';
 import * as native from 'natives';
-import { config } from '../shared/config';
+import { config } from '../shared/config.js';
 
 alt.on('connectionComplete', () => {
     if (config.shooting_stat.enabled) alt.setStat('shooting_ability', config.shooting_stat.value);

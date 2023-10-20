@@ -29,10 +29,10 @@
 <script lang="ts">
 import { defineComponent, defineAsyncComponent } from 'vue';
 
-import { ExampleFactionData } from './utility/exampleFactionData';
-import { Faction } from '../shared/interfaces';
-import { FACTION_EVENTS } from '../shared/factionEvents';
-import { Vector3 } from '../../gp-athena-utils/shared/interfaces/vector';
+import { ExampleFactionData } from './utility/exampleFactionData.js';
+import { Faction } from '../shared/interfaces.js';
+import { FACTION_EVENTS } from '../shared/factionEvents.js';
+import { Vector3 } from '@AthenaPlugins/gp-athena-utils/shared/interfaces/vector.js';
 
 export const ComponentName = 'Factions';
 export default defineComponent({

@@ -1,13 +1,13 @@
 import * as alt from 'alt-client';
-import * as AthenaClient from '@AthenaClient/api';
-import { PLAYER_SYNCED_META } from '../../../../shared/enums/playerSynced';
-import { Interior } from '../../shared/interfaces';
-import { INTERIOR_INTERACTIONS } from '../../shared/enums';
-import { LOCALE_INTERIOR_VIEW } from '../../shared/locales';
-import { IWheelOptionExt } from '../../../../shared/interfaces/wheelMenu';
-import { PushVehicle } from '@AthenaPlugins/gp-athena-utils/client/src/systems/push';
-import { InputOptionType, InputResult } from '@AthenaPlugins/gp-athena-utils/shared/interfaces/inputMenus';
-import { InputView } from '@AthenaPlugins/gp-athena-utils/client/src/views/input';
+import * as AthenaClient from '@AthenaClient/api/index.js';
+import { PLAYER_SYNCED_META } from '../../../../shared/enums/playerSynced.js';
+import { Interior } from '../../shared/interfaces.js';
+import { INTERIOR_INTERACTIONS } from '../../shared/enums.js';
+import { LOCALE_INTERIOR_VIEW } from '../../shared/locales.js';
+import { IWheelOptionExt } from '../../../../shared/interfaces/wheelMenu.js';
+import { PushVehicle } from '@AthenaPlugins/gp-athena-utils/client/src/systems/push.js';
+import { InputOptionType, InputResult } from '@AthenaPlugins/gp-athena-utils/shared/interfaces/inputMenus.js';
+import { InputView } from '@AthenaPlugins/gp-athena-utils/client/src/views/input.js';
 
 function initialCheck(): boolean {
     if (alt.Player.local.vehicle) {

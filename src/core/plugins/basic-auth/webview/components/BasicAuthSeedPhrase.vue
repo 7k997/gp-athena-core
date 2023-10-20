@@ -14,8 +14,8 @@
 </template>
 
 <script lang="ts" setup>
-import { AuthEvents } from '@AthenaPlugins/basic-auth/shared/events';
-import WebViewEvents from '@utility/webViewEvents';
+import { AuthEvents } from '@AthenaPlugins/basic-au../shared/events.js';
+import WebViewEvents from '@utility/webViewEvents.js';
 import { ref, computed, onMounted } from 'vue';
 
 const props = defineProps<{ seedphrase: string }>();

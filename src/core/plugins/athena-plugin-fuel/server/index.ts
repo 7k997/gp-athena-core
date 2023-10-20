@@ -1,6 +1,6 @@
 import * as alt from 'alt-server';
-import * as Athena from '@AthenaServer/api';
-import { FuelSystem } from './src/fuel';
+import * as Athena from '@AthenaServer/api/index.js';
+import { FuelSystem } from './src/fuel.js';
 
 const PLUGIN_NAME = 'Athena Fuel';
 

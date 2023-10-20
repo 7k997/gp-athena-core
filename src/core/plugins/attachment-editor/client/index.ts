@@ -3,6 +3,7 @@ import * as native from 'natives';
 import * as AthenaClient from '@AthenaClient/api/index.js';
 import { Bones } from './bones.js';
 import { Events } from '../shared/events.js';
+import { Config } from '@AthenaPlugins/gp-athena-overrides/shared/config.js';
 
 let object: alt.LocalObject;
 
@@ -26,7 +27,16 @@ async function attachObject(model: string, pos: alt.IVector3, rot: alt.IVector3)
     await alt.Utils.waitFor(() => typeof object === 'undefined');
 
     currentModel = model;
-    object = new alt.LocalObject(currentModel, new alt.Vector3(pos), new alt.Vector3(rot), true, false);
+    object = new alt.LocalObject(
+        currentModel,
+        new alt.Vector3(pos),
+        new alt.Vector3(rot),
+        true,
+        false,
+        false,
+        Config.DEFAULT_STREAMING_DISTANCE,
+    );
+
     object.attachToEntity(
         alt.Player.local,
         currentBone,

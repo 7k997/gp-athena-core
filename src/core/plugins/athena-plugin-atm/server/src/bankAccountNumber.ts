@@ -1,7 +1,7 @@
 import * as alt from 'alt-server';
-import * as charRef from '../../../../shared/interfaces/character';
-import * as Athena from '@AthenaServer/api';
-import { BANK_CONFIG } from './config';
+import * as charRef from '../../../../shared/interfaces/character.js';
+import * as Athena from '@AthenaServer/api/index.js';
+import { BANK_CONFIG } from './config.js';
 
 const metaName = 'bankNumber';
 

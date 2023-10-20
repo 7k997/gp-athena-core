@@ -1,7 +1,7 @@
-import { Player } from 'alt-server';
-import * as Athena from '@AthenaServer/api';
-import * as charRef from '@AthenaShared/interfaces/character';
-import { deepCloneObject } from '@AthenaShared/utility/deepCopy';
+import * as alt from 'alt-server';
+import * as Athena from '@AthenaServer/api/index.js';
+import * as charRef from '@AthenaShared/interfaces/character.js';
+import { deepCloneObject } from '@AthenaShared/utility/deepCopy.js';
 
 /**
  * @deprecated replace data
@@ -25,7 +25,7 @@ declare module 'alt-server' {
     }
 }
 
-Object.defineProperty(Player.prototype, 'data', {
+Object.defineProperty(alt.Player.prototype, 'data', {
     get: function (): charRef.Character {
         let data = Athena.document.character.get(this) as charRef.Character;
         return data;
@@ -37,7 +37,7 @@ export class PlayerExtension {
         Athena.player.events.on('selected-character', PlayerExtension.initPlayer);
     }
 
-    static initPlayer(player: Player) {
+    static initPlayer(player: alt.Player) {
         const character = Athena.document.character.get(player);
         player.character = deepCloneObject(character);
     }

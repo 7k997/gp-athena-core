@@ -1,12 +1,12 @@
 import * as alt from 'alt-server';
-import * as Athena from '@AthenaServer/api';
+import * as Athena from '@AthenaServer/api/index.js';
 
-import atms from '@AthenaShared/information/atms';
-import { CurrencyTypes } from '@AthenaShared/enums/currency';
-import { LocaleController } from '@AthenaShared/locale/locale';
-import { LOCALE_KEYS } from '@AthenaShared/locale/languages/keys';
-import { Character } from '@AthenaShared/interfaces/character';
-import { ATM_INTERACTIONS } from '../../shared/events';
+import atms from '@AthenaShared/information/atms.js';
+import { CurrencyTypes } from '@AthenaShared/enums/currency.js';
+import { LocaleController } from '@AthenaShared/locale/locale.js';
+import { LOCALE_KEYS } from '@AthenaShared/locale/languages/keys.js';
+import { Character } from '@AthenaShared/interfaces/character.js';
+import { ATM_INTERACTIONS } from '../../shared/events.js';
 import Database from '@stuyk/ezmongodb';
 
 const INTERACTION_RANGE = 1.5;

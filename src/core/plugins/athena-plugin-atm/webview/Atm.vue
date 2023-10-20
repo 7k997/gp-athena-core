@@ -48,7 +48,7 @@
 
 <script lang="ts">
 import { defineComponent, defineAsyncComponent } from 'vue';
-import DefaultLocale from './utility/defaultLocale';
+import DefaultLocale from './utility/defaultLocale.js';
 
 export const ComponentName = 'Atm';
 export default defineComponent({

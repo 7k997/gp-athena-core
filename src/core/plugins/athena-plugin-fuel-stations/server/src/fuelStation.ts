@@ -1,15 +1,15 @@
 import * as alt from 'alt-server';
-import * as Athena from '@AthenaServer/api';
-import { VIEW_EVENTS_FUEL_TRIGGER } from '../../shared/events';
-import { LOCALE_FUEL_STATIONS } from '../../shared/locales';
-import { Vehicle_Behavior } from '../../shared/vehicle';
-import { CurrencyTypes } from '@AthenaShared/enums/currency';
-import { JobTrigger } from '@AthenaShared/interfaces/jobTrigger';
-import { isFlagEnabled } from '@AthenaShared/utility/flags';
-import { distance2d } from '@AthenaShared/utility/vector';
-import { deepCloneObject } from '@AthenaShared/utility/deepCopy';
-import { FUEL_CONFIG } from './config';
-import stations from './stations';
+import * as Athena from '@AthenaServer/api/index.js';
+import { VIEW_EVENTS_FUEL_TRIGGER } from '../../shared/events.js';
+import { LOCALE_FUEL_STATIONS } from '../../shared/locales.js';
+import { Vehicle_Behavior } from '../../shared/vehicle.js';
+import { CurrencyTypes } from '@AthenaShared/enums/currency.js';
+import { JobTrigger } from '@AthenaShared/interfaces/jobTrigger.js';
+import { isFlagEnabled } from '@AthenaShared/utility/flags.js';
+import { distance2d } from '@AthenaShared/utility/vector.js';
+import { deepCloneObject } from '@AthenaShared/utility/deepCopy.js';
+import { FUEL_CONFIG } from './config.js';
+import stations from './stations.js';
 
 const maximumFuel = 100;
 const fuelInfo: { [playerID: string]: FuelStatus } = {};

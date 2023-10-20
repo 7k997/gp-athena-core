@@ -48,8 +48,8 @@
 
 <script lang="ts">
 import { defineComponent, defineAsyncComponent } from 'vue';
-import { Faction } from '../../../shared/interfaces';
-import ResolvePath from '@utility/pathResolver';
+import { Faction } from '../../../shared/interfaces.js';
+import ResolvePath from '@utility/pathResolver.js';
 
 const ComponentName = 'AddVehicle';
 export default defineComponent({

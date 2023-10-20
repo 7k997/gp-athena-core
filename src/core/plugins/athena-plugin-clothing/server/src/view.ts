@@ -1,16 +1,16 @@
 import * as alt from 'alt-server';
-import * as Athena from '@AthenaServer/api';
-import { Interaction } from '../../../../shared/interfaces/interaction';
-import { ClothingComponent, Item, ItemEx } from '../../../../shared/interfaces/item';
-import { deepCloneObject } from '../../../../shared/utility/deepCopy';
-import { CLOTHING_CONFIG } from '../../shared/config';
-import { CLOTHING_STORE_PAGE, DLC_CLOTH_HASH } from '../../shared/enums';
-import { CLOTHING_INTERACTIONS } from '../../shared/events';
-import { CLOTHING_DLC_INFO, IClothingStore, IClothingStorePage } from '../../shared/interfaces';
-import clothingStores from './stores';
-import { PolygonShape } from '@AthenaServer/extensions/extColshape';
-import { sha256 } from '@AthenaServer/utility/hash';
-import { Blip } from '@AthenaShared/interfaces/blip';
+import * as Athena from '@AthenaServer/api/index.js';
+import { Interaction } from '../../../../shared/interfaces/interaction.js';
+import { ClothingComponent, Item, ItemEx } from '../../../../shared/interfaces/item.js';
+import { deepCloneObject } from '../../../../shared/utility/deepCopy.js';
+import { CLOTHING_CONFIG } from '../../shared/config.js';
+import { CLOTHING_STORE_PAGE, DLC_CLOTH_HASH } from '../../shared/enums.js';
+import { CLOTHING_INTERACTIONS } from '../../shared/events.js';
+import { CLOTHING_DLC_INFO, IClothingStore, IClothingStorePage } from '../../shared/interfaces.js';
+import clothingStores from './stores.js';
+import { PolygonShape } from '@AthenaServer/extensions/extColshape.js';
+import { sha256 } from '@AthenaServer/utility/hash.js';
+import { Blip } from '@AthenaShared/interfaces/blip.js';
 
 // Do not change order
 const icons = [

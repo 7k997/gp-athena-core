@@ -1,10 +1,10 @@
 import * as alt from 'alt-client';
 import * as native from 'natives';
-import * as AthenaClient from '@AthenaClient/api';
-import { PLAYER_SYNCED_META } from '@AthenaShared/enums/playerSynced';
-import { distance2d } from '@AthenaShared/utility/vector';
-import { NAMETAG_EVENTS } from '../shared/enums';
-import { INametagConfig } from '../shared/interfaces';
+import * as AthenaClient from '@AthenaClient/api/index.js';
+import { PLAYER_SYNCED_META } from '@AthenaShared/enums/playerSynced.js';
+import { distance2d } from '@AthenaShared/utility/vector.js';
+import { NAMETAG_EVENTS } from '../shared/enums.js';
+import { INametagConfig } from '../shared/interfaces.js';
 
 let showNametags = true;
 let config: INametagConfig;

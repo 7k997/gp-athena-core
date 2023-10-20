@@ -1,5 +1,5 @@
 import * as alt from 'alt-shared';
-import { Vehicle_Behavior } from '../vehicle';
+import { Vehicle_Behavior } from '../vehicle.js';
 
 export default interface IVehicle {
     /**

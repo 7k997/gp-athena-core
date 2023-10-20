@@ -3,12 +3,39 @@ import Database from '@stuyk/ezmongodb';
 import * as Athena from '@AthenaServer/api/index.js';
 import { ItemDrop, StoredItem } from '@AthenaShared/interfaces/item.js';
 import { deepCloneObject } from '@AthenaShared/utility/deepCopy.js';
+import { Config } from '@AthenaPlugins/gp-athena-overrides/shared/config.js';
 
 type UnpushedItemDrop = Omit<ItemDrop, '_id'>;
 
 const DEFAULT_EXPIRATION = 60000 * 5; // 5 Minutes
 const drops: Array<ItemDrop> = [];
 const markAsTaken: { [key: string]: boolean } = {};
+
+export type ItemDropInit = (itemDrop: ItemDrop) => Promise<ItemDrop>;
+export type ItemDropAppendInjection = (itemDrop: StoredItem) => Promise<StoredItem>;
+export type ItemDropRemoveInjection = (itemDrop: ItemDrop) => Promise<boolean>;
+export type ItemDropUpdateInjection = (itemDrop: ItemDrop) => Promise<ItemDrop>;
+
+const InitInjections: Array<ItemDropInit> = [];
+const AppendInjections: Array<ItemDropAppendInjection> = [];
+const RemoveInjections: Array<ItemDropRemoveInjection> = [];
+const UpdateInjections: Array<ItemDropUpdateInjection> = [];
+
+export function addInitInjection(callback: ItemDropInit) {
+    InitInjections.push(callback);
+}
+
+export function addAppendInjection(callback: ItemDropAppendInjection) {
+    AppendInjections.push(callback);
+}
+
+export function addRemoveInjection(callback: ItemDropRemoveInjection) {
+    RemoveInjections.push(callback);
+}
+
+export function addUpdateInjection(callback: ItemDropUpdateInjection) {
+    UpdateInjections.push(callback);
+}
 
 /**
  * Initialize all item drops stored in the database.
@@ -20,6 +47,16 @@ async function init() {
     const results = await Database.fetchAllData<ItemDrop>(Athena.database.collections.Drops);
     for (let i = 0; i < results.length; i++) {
         results[i]._id = String(results[i]._id);
+
+        for (const callback of InitInjections) {
+            try {
+                results[i] = await callback(results[i]);
+            } catch (err) {
+                console.warn(`Got Itemdrop Init Injection Error: ${err}`);
+                continue;
+            }
+        }
+
         drops.push(results[i]);
         Athena.controllers.itemDrops.append(results[i]);
         markAsTaken[String(results[i]._id)] = false;
@@ -44,6 +81,45 @@ async function addToDatabase(storedItem: UnpushedItemDrop): Promise<ItemDrop> {
 }
 
 /**
+ * Updates a item drop in the database.
+ *
+ * @param {StoredItem} storedItem
+ * @return {Promise<ItemDrop>}
+ */
+async function updateToDatabase(itemDrop: ItemDrop, item: UnpushedItemDrop): Promise<boolean> {
+    const updated = await Database.updatePartialData(
+        itemDrop._id.toString(),
+        { data: item.data },
+        Athena.database.collections.Drops,
+    );
+    if (!updated) return false;
+
+    const refeshedItemDrop = await Database.fetchData<ItemDrop>(
+        '_id',
+        itemDrop._id.toString(),
+        Athena.database.collections.Drops,
+    );
+    if (!refeshedItemDrop) return false;
+
+    markAsTaken[String(itemDrop._id)] = false;
+
+    // Find the index of the item drop in the array
+    const index = drops.findIndex((x) => x._id === itemDrop._id);
+
+    if (index !== -1) {
+        // Update the object in the array with the new item drop data
+        const existingId = drops[index]._id;
+        drops[index] = { ...drops[index], ...refeshedItemDrop };
+        drops[index]._id = existingId;
+
+        Athena.controllers.itemDrops.update(refeshedItemDrop);
+        return true;
+    } else {
+        return false; // Item drop not found in the array
+    }
+}
+
+/**
  * Simply tries to remove an entry from the database.
  *
  * @param {string} id
@@ -59,9 +135,14 @@ async function removeFromDatabase(id: string) {
  * @param {alt.IVector3} pos A position in the world.
  * @return {Promise<string>}
  */
-export async function add(item: StoredItem, pos: alt.IVector3, player: alt.Player = undefined): Promise<string> {
+export async function add(
+    item: StoredItem,
+    pos: alt.IVector3,
+    dimension: number,
+    player: alt.Player = undefined,
+): Promise<string> {
     if (Overrides.add) {
-        return await Overrides.add(item, pos, player);
+        return await Overrides.add(item, pos, dimension, player);
     }
 
     const baseItem = Athena.systems.inventory.factory.getBaseItem(item.dbName);
@@ -78,12 +159,22 @@ export async function add(item: StoredItem, pos: alt.IVector3, player: alt.Playe
 
     item.isEquipped = false;
 
+    for (const callback of AppendInjections) {
+        try {
+            item = await callback(item);
+        } catch (err) {
+            console.warn(`Got Itemdrop Append Injection Error: ${err}`);
+            continue;
+        }
+    }
+
     const document = await addToDatabase({
         ...item,
         name: baseItem.name,
         pos,
         expiration,
         model: baseItem.model,
+        dimension: dimension,
     });
 
     Athena.controllers.itemDrops.append(document);
@@ -94,6 +185,25 @@ export async function add(item: StoredItem, pos: alt.IVector3, player: alt.Playe
     }
 
     return document._id as string;
+}
+
+/**
+ * Update a dropped item.
+ *
+ * @param {StoredItem} item
+ * @param {alt.IVector3} pos A position in the world.
+ * @return {Promise<string>}
+ */
+export async function update(itemDrop: ItemDrop, item: UnpushedItemDrop): Promise<boolean> {
+    for (const callback of UpdateInjections) {
+        try {
+            itemDrop = await callback(itemDrop);
+        } catch (err) {
+            console.warn(`Got Itemdrop Append Injection Error: ${err}`);
+            continue;
+        }
+    }
+    return updateToDatabase(itemDrop, item);
 }
 
 /**
@@ -120,10 +230,11 @@ export async function sub(id: string): Promise<StoredItem | undefined> {
         return Overrides.sub(id);
     }
 
+    alt.logWarning('Sub item drop!!!!: ' + id);
     let itemClone: StoredItem = undefined;
 
     for (let i = drops.length - 1; i >= 0; i--) {
-        if (Date.now() > drops[i].expiration && drops[i]._id !== id) {
+        if (!Config.DISABLE_OBJECT_DROP_EXPIRATION && Date.now() > drops[i].expiration && drops[i]._id !== id) {
             delete markAsTaken[id];
             drops.splice(i, 1);
             continue;
@@ -132,6 +243,17 @@ export async function sub(id: string): Promise<StoredItem | undefined> {
         if (drops[i]._id !== id) {
             continue;
         }
+
+        let remove = true;
+        for (const callback of RemoveInjections) {
+            try {
+                remove = await callback(drops[i]);
+            } catch (err) {
+                console.warn(`Got Itemdrop Remove Injection Error: ${err}`);
+                continue;
+            }
+        }
+        if (!remove) return null;
 
         delete markAsTaken[id];
 

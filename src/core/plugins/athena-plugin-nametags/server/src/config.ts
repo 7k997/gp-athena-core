@@ -1,4 +1,4 @@
-import { INametagConfig } from '../../shared/interfaces';
+import { INametagConfig } from '../../shared/interfaces.js';
 
 // Hover over these in VSCode to see what they do.
 export default {

@@ -1,10 +1,9 @@
 import * as alt from 'alt-server';
-import * as Athena from '@AthenaServer/api';
-
+import * as Athena from '@AthenaServer/api/index.js';
 
 export class GarageSystem {
     static init() {
-        Athena.events.vehicle.on("vehicle-destroyed", GarageSystem.handleDestroy);
+        Athena.events.vehicle.on('vehicle-destroyed', GarageSystem.handleDestroy);
     }
 
     static async handleDestroy(vehicle: alt.Vehicle) {

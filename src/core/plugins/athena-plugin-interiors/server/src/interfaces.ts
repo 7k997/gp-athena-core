@@ -1,5 +1,5 @@
 import * as alt from 'alt-server';
-import { Interior } from '../../shared/interfaces';
+import { Interior } from '../../shared/interfaces.js';
 
 export interface InteriorInternal extends Interior {
     /**

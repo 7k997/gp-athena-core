@@ -1,27 +1,27 @@
 import * as alt from 'alt-server';
-import * as Athena from '@AthenaServer/api';
+import * as Athena from '@AthenaServer/api/index.js';
 
 // Yes; there needs to be this many imports to get this working.
-import './player';
-import './cmds';
+import './player.js';
+import './cmds.js';
 
-import { Interior } from '../../shared/interfaces';
+import { Interior } from '../../shared/interfaces.js';
 import Database from '@stuyk/ezmongodb';
-import { InteriorInternal } from './interfaces';
-import { isFlagEnabled } from '../../../../shared/utility/flags';
-import { INTERIOR_SYSTEM } from '../../shared/flags';
-import { SYSTEM_EVENTS } from '../../../../shared/enums/system';
-import { deepCloneObject } from '../../../../shared/utility/deepCopy';
-import { CurrencyTypes } from '../../../../shared/enums/currency';
-import { Character } from '../../../../shared/interfaces/character';
-import { INTERIOR_COLLECTIONS, INTERIOR_INTERACTIONS, INTERIOR_RULES } from '../../shared/enums';
-import { IObject } from '../../../../shared/interfaces/iObject';
-import { LOCALE_INTERIOR_VIEW } from '../../shared/locales';
-import { IResponse } from '@AthenaPlugins/gp-athena-utils/shared/interfaces/iResponse';
-import SystemRules from './rules';
-import { distance } from '@AthenaShared/utility/vector';
-import { InventoryView } from '@AthenaPlugins/core-inventory/server/src/view';
-import { sha256Random } from '@AthenaServer/utility/hash';
+import { InteriorInternal } from './interfaces.js';
+import { isFlagEnabled } from '../../../../shared/utility/flags.js';
+import { INTERIOR_SYSTEM } from '../../shared/flags.js';
+import { SYSTEM_EVENTS } from '../../../../shared/enums/system.js';
+import { deepCloneObject } from '../../../../shared/utility/deepCopy.js';
+import { CurrencyTypes } from '../../../../shared/enums/currency.js';
+import { Character } from '../../../../shared/interfaces/character.js';
+import { INTERIOR_COLLECTIONS, INTERIOR_INTERACTIONS, INTERIOR_RULES } from '../../shared/enums.js';
+import { IObject } from '../../../../shared/interfaces/iObject.js';
+import { LOCALE_INTERIOR_VIEW } from '../../shared/locales.js';
+import { IResponse } from '@AthenaPlugins/gp-athena-utils/shared/interfaces/iResponse.js';
+import SystemRules from './rules.js';
+import { distance } from '@AthenaShared/utility/vector.js';
+import { InventoryView } from '@AthenaPlugins/core-inventory/server/src/view.js';
+import { sha256Random } from '@AthenaServer/utility/hash.js';
 
 /**
  * Interiors should work in the following way.

@@ -15,7 +15,7 @@ export default defineComponent({
         },
         size: {
             type: Number,
-            required: true,
+            required: false,
         },
         noSelect: {
             type: Boolean,

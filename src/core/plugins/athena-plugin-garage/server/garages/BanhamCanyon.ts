@@ -1,6 +1,6 @@
-import { VEHICLE_TYPE } from '@AthenaShared/enums/vehicleTypeFlags';
-import { GarageFunctions } from '../src/view';
-import IGarage from '@AthenaPlugins/athena-plugin-garage/shared/interfaces/iGarage';
+import { VEHICLE_TYPE } from '@AthenaShared/enums/vehicleTypeFlags.js';
+import { GarageFunctions } from '../src/view.js';
+import IGarage from '@AthenaPlugins/athena-plugin-garage/shared/interfaces/iGarage.js';
 
 const garage: IGarage = {
     position: { x: -2954.107666015625, y: 470.46356201171875, z: 14.9 },

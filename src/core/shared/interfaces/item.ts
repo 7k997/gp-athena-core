@@ -15,6 +15,10 @@ export type ItemDrop = {
     expiration: number;
     model?: string;
     name: string;
+    hash?: number;
+    dimension: number;
+    nocollision?: boolean;
+    nofreeze?: boolean;
 } & StoredItem;
 
 /**
