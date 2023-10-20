@@ -47,21 +47,6 @@ yarn.lock
 resources/core/**
 resources/webviews/**
 
-#typedefs.d.ts
+typedefs.d.ts
 
-# For gp-cards plugin, add user photos for backup to git
-!resources/webviews/
-!resources/webviews/photos/
-!resources/webviews/photos/**
-
-#SaltyChat
-!/resources/mods/addon_saltychat/*.dll
-
-#Mods
-!resources/mods/**/*.dll
-!data/
-!server/data/
-altv-server.exe
-altv-server
-altv-crash-handler.exe
-altv-crash-handler
+.server-crashes-cache/

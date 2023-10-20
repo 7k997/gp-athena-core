@@ -1,5 +1,5 @@
 import * as alt from 'alt-server';
-import { StoredItem, StoredItemEx } from '@AthenaShared/interfaces/item';
+import { StoredItem, StoredItemEx } from '@AthenaShared/interfaces/item.js';
 
 const anyDbName = 'any1sd2f3g4h5j6k7l8';
 

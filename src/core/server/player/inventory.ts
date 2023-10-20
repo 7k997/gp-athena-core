@@ -1,10 +1,10 @@
 import * as alt from 'alt-server';
-import * as document from '@AthenaServer/document';
-import * as Athena from '@AthenaServer/api';
+import * as document from '@AthenaServer/document/index.js';
+import * as Athena from '@AthenaServer/api/index.js';
 
-import { StoredItem } from '@AthenaShared/interfaces/item';
-import { deepCloneArray, deepCloneObject } from '@AthenaShared/utility/deepCopy';
-import { sha256Random } from '@AthenaServer/utility/hash';
+import { StoredItem } from '@AthenaShared/interfaces/item.js';
+import { deepCloneArray, deepCloneObject } from '@AthenaShared/utility/deepCopy.js';
+import { sha256Random } from '@AthenaServer/utility/hash.js';
 
 /**
  * Corechange - add item with unique identifier
@@ -18,6 +18,7 @@ export async function addUnique(
     item.id = sha256Random(JSON.stringify(item));
     return Athena.player.inventory.add(player, item, reservedSlot);
 }
+
 
 /**
  * Add a new stored item to a user, must specify a quantity of greater than zero.

@@ -1,8 +1,8 @@
 import * as alt from 'alt-client';
 import * as native from 'natives';
-import * as AthenaClient from '@AthenaClient/api';
-import { Bones } from './bones';
-import { Events } from '../shared/events';
+import * as AthenaClient from '@AthenaClient/api/index.js';
+import { Bones } from './bones.js';
+import { Events } from '../shared/events.js';
 
 let object: alt.LocalObject;
 

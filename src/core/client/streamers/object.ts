@@ -1,7 +1,7 @@
 import * as alt from 'alt-client';
 
-import { SYSTEM_EVENTS } from '@AthenaShared/enums/system';
-import { IObject } from '@AthenaShared/interfaces/iObject';
+import { SYSTEM_EVENTS } from '@AthenaShared/enums/system.js';
+import { IObject } from '@AthenaShared/interfaces/iObject.js';
 
 export type CreatedObject = IObject & { createdObject?: alt.LocalObject };
 
@@ -58,8 +58,6 @@ const InternalFunctions = {
             createdObject.toggleCollision(false, false);
         }
 
-        //Corechange
-        //CreatedObject.setPositionFrozen(true);
         createdObject.positionFrozen = true;
         dataRef[uid].createdObject = createdObject;
     },
@@ -101,8 +99,6 @@ const InternalFunctions = {
                 createdObject.toggleCollision(false, false);
             }
 
-            //Corechange
-            //createdObject.setPositionFrozen(true);
             createdObject.positionFrozen = true;
 
             serverObjects[objRef.uid] = {
@@ -151,8 +147,6 @@ export function addObject(newObject: IObject) {
         createdObject.toggleCollision(false, false);
     }
 
-    //Corechange
-    // createdObject.setPositionFrozen(true);
     createdObject.positionFrozen = true;
     clientObjects[newObject.uid] = {
         ...newObject,
@@ -218,7 +212,6 @@ export function getFromScriptId(scriptId: number): CreatedObject | undefined {
 }
 
 alt.on('disconnect', InternalFunctions.stop);
-alt.onServer(SYSTEM_EVENTS.POPULATE_OBJECTS, InternalFunctions.populate);
 alt.onServer(SYSTEM_EVENTS.MOVE_OBJECT, InternalFunctions.moveObject);
 alt.onServer(SYSTEM_EVENTS.APPEND_OBJECT, addObject);
 alt.onServer(SYSTEM_EVENTS.REMOVE_OBJECT, removeObject);

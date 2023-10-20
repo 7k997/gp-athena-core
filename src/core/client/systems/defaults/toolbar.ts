@@ -1,11 +1,12 @@
 import * as alt from 'alt-client';
 import * as native from 'natives';
-import * as AthenaClient from '@AthenaClient/api';
+import * as AthenaClient from '@AthenaClient/api/index.js';
 
-import { SYSTEM_EVENTS } from '@AthenaShared/enums/system';
-import { Item } from '@AthenaShared/interfaces/item';
-import { KEY_BINDS } from '@AthenaShared/enums/keyBinds';
-import { Config } from '@AthenaPlugins/gp-athena-overrides/shared/config';
+import { SYSTEM_EVENTS } from '@AthenaShared/enums/system.js';
+import { Item } from '@AthenaShared/interfaces/item.js';
+import { KEY_BINDS } from '@AthenaShared/enums/keyBinds.js';
+import { Config } from '@AthenaPlugins/gp-athena-overrides/shared/config.js';
+
 
 const DELAY_TIME_BEFORE_USE = Config.TOOLBAR_COOLDOWN_DELAY_TIME_BEFORE_USE;
 const DELAY_TIME_AFTER_USE = Config.TOOLBAR_COOLDOWN_DELAY_TIME_AFTER_USE;

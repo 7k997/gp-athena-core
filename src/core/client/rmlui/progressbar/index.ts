@@ -1,7 +1,7 @@
 import * as alt from 'alt-client';
-import * as AthenaClient from '@AthenaClient/api';
-import { ProgressBar as ProgressBarType } from '@AthenaShared/interfaces/progressBar';
-import { rgbaToHexAlpha } from '@AthenaShared/utility/color';
+import * as AthenaClient from '@AthenaClient/api/index.js';
+import { ProgressBar as ProgressBarType } from '@AthenaShared/interfaces/progressBar.js';
+import { rgbaToHexAlpha } from '@AthenaShared/utility/color.js';
 
 const DEFAULT_DIMENSIONS = {
     width: 200,
