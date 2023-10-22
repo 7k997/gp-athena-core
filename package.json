@@ -12,7 +12,7 @@
         "dev": "node ./scripts/runtime/index.js --start --dev",
         "cdn": "node ./scripts/runtime/index.js --start --cdn",
         "[-] Updating, Installing, Cleanup": "",
-        "update": "npx altv-pkg d rc",
+        "update": "npx altv-pkg d release",
         "check": "tsc -p ./tsconfig.json | node ./scripts/fileChecker/index.js",
         "fix": "node ./scripts/doctor/index.js",
         "[-] Vue WebView Deployment": "",
