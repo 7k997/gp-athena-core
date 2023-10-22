@@ -38,7 +38,7 @@ let showMarker = true;
 let color: alt.RGBA = new alt.RGBA(255, 255, 255, 200);
 let size = new alt.Vector3(0.1, 0.05, 0.1);
 let latestInteraction: Interaction;
-let autoMode = false;
+let autoMode = true;
 
 const Internal = {
     init() {

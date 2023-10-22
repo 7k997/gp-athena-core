@@ -32,7 +32,6 @@ export function append(itemDrop: ItemDrop): string {
     object.collision = false;
     object.setStreamSyncedMeta(ITEM_SYNCED_META.ITEM_DROP_INFO, deepCloneObject(itemDrop));
     drops[String(itemDrop._id)] = object;
-
     return String(itemDrop._id);
 }
 

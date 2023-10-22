@@ -26,6 +26,8 @@ const serverBinary = !isLinux ? 'altv-server.exe' : './altv-server';
 const passedArguments = process.argv.slice(2).map((arg) => arg.replace('--', ''));
 const fileNameHashes = {};
 
+let configName = 'prod';
+
 if (NO_SPECIAL_CHARACTERS.test(process.cwd())) {
     console.warn(`Hey! A folder in your Athena path has special characters in it.`);
     console.warn(`Please rename your folder, or folders to a name that doesn't have special characters in it.`);
@@ -37,11 +39,6 @@ if (NO_SPECIAL_CHARACTERS.test(process.cwd())) {
  * This is the alt:V Server Process
  * @type {ChildProcess} */
 let lastServerProcess;
-
-/**
- * This is the Streamer Server Process
- * @type {ChildProcess} */
-let lastStreamerProcess;
 
 /**
  * This is the WebView Dev Server Process
@@ -104,21 +101,9 @@ async function runFile(processName, ...args) {
     });
 }
 
-async function handleConfiguration() {
-    let configName = 'prod';
-
-    if (passedArguments.includes('dev')) {
-        configName = 'dev';
-    } else if (passedArguments.includes('devtest')) {
-        configName = 'devtest';
-    }
-
-    if (!passedArguments.includes('dev')) {
-        await runFile(npx, 'vite', 'build', './src-webviews');
-    }
-
+function handleConfiguration() {
     copySync(`./configs/${configName}.toml`, `server.toml`);
-    await buildResources();
+    buildResources();
 }
 
 async function handleViteDevServer() {
@@ -150,20 +135,6 @@ async function handleViteDevServer() {
     });
 }
 
-function handleStreamerProcess(shouldAutoRestart = false) {
-    if (lastStreamerProcess && !lastStreamerProcess.killed) {
-        lastStreamerProcess.kill();
-    }
-
-    lastStreamerProcess = spawn(node, ['./scripts/streamer/dist/index.js'], { stdio: 'inherit' });
-    lastStreamerProcess.once('close', (code) => {
-        console.log(`Streamer process exited with code ${code}`);
-        if (shouldAutoRestart) {
-            handleStreamerProcess(shouldAutoRestart);
-        }
-    });
-}
-
 async function handleServerProcess(shouldAutoRestart = false) {
     if (lastServerProcess && !lastServerProcess.killed) {
         lastServerProcess.kill();
@@ -174,9 +145,6 @@ async function handleServerProcess(shouldAutoRestart = false) {
     }
 
     await areKeyResourcesReady();
-    await new Promise((resolve) => {
-        setTimeout(resolve, 1000);
-    });
 
     if (passedArguments.includes('cdn')) {
         lastServerProcess = spawn(serverBinary, ['--justpack'], { stdio: 'inherit' });
@@ -248,20 +216,24 @@ async function refreshFileWatching() {
  */
 async function coreBuildProcess() {
     const timer = createExecTime('>>> Core Build Time');
-    const filesUncompiled = await runCoreCompiler();
-    if (filesUncompiled.length >= 1) {
-        for (let uncompiledFilePath of filesUncompiled) {
-            console.log(uncompiledFilePath);
-        }
 
-        return false;
-    }
+    const promises = [runCoreCompiler(), runPluginsCompiler(), compileWebviewPlugins(), copyPluginFiles()];
 
-    await runPluginsCompiler();
-    compileWebviewPlugins();
-    copyPluginFiles();
+    await Promise.all(promises);
     timer.stop();
     return true;
+}
+
+async function compileWebViewPages() {
+    if (passedArguments.includes('dev')) {
+        configName = 'dev';
+    } else if (passedArguments.includes('devtest')) {
+        configName = 'devtest';
+    }
+
+    if (!passedArguments.includes('dev')) {
+        await runFile(npx, 'vite', 'build', './src-webviews');
+    }
 }
 
 async function devMode(firstRun = false) {
@@ -270,19 +242,16 @@ async function devMode(firstRun = false) {
         return;
     }
 
-    let promises = [];
-    promises.push(killChildProcess(lastStreamerProcess));
-    promises.push(killChildProcess(lastServerProcess));
-    await Promise.all(promises);
+    await killChildProcess(lastServerProcess);
 
     const didCoreBuild = await coreBuildProcess();
     if (!didCoreBuild) {
         return;
     }
 
-    await handleConfiguration();
+    await compileWebViewPages();
+    handleConfiguration();
 
-    await handleStreamerProcess(false);
     await handleServerProcess(false);
 }
 
@@ -300,18 +269,17 @@ async function runServer() {
 
     // Has to build first before building the rest.
     await coreBuildProcess();
-    await handleConfiguration();
+    await compileWebViewPages();
+    handleConfiguration();
 
     if (passedArguments.includes('dev')) {
         await sleep(50);
         await devMode(true);
-        await handleStreamerProcess(false);
         await handleServerProcess(false);
         return;
     }
 
     await sleep(50);
-    await handleStreamerProcess(true);
     await handleServerProcess(true);
 }
 
