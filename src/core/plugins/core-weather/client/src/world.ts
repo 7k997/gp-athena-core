@@ -57,7 +57,11 @@ export class World {
 
         const timeInMs = timeInSeconds * 1000;
 
-        await alt.Utils.waitFor(() => isTransitioning === false, timeInMs);
+        try {
+            await alt.Utils.waitFor(() => isTransitioning === false, timeInMs);
+        } catch (error) {
+            alt.logError(`[Athena] Weather transition timed out.`);
+        }
 
         isTransitioning = true;
 
