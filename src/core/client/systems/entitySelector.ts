@@ -364,7 +364,7 @@ const Internal = {
                     // FIXME: Log will result in circular structure!!!
                     // alt.logWarning('try to get dropped item: ' + JSON.stringify(droppedItem));
                     if (typeof droppedItem !== 'undefined') {
-                        // if (Config.DEBUG)
+                        if (Config.DEBUG)
                             alt.logWarning(
                                 'ScriptID 1: ' +
                                     object.scriptID +

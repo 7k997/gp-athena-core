@@ -6,7 +6,6 @@ import { IWheelOptionExt } from '../../shared/interfaces/wheelMenu.js';
 import { CreatedObject } from '@AthenaClient/streamers/object.js';
 import { CreatedDrop } from '@AthenaClient/streamers/item.js';
 
-
 export type ObjectMenuInjection = (
     existingObject: CreatedObject | CreatedDrop,
     options: Array<IWheelOptionExt>,

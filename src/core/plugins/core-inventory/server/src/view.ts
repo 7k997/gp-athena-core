@@ -125,6 +125,7 @@ const Internal = {
         await Athena.systems.inventory.drops.add(
             clonedItem,
             new alt.Vector3(player.pos.x, player.pos.y, player.pos.z - 1),
+            alt.Vector3.zero,
             player.dimension,
             player,
         );
@@ -260,6 +261,14 @@ const Internal = {
         data = Athena.document.character.get(player);
         startData = data[info.startType];
         endData = data[info.endType];
+
+        if (info.startType === 'custom') {
+            startData = openStorages[player.id];
+        }
+
+        if (info.endType === 'custom') {
+            endData = openStorages[player.id];
+        }
 
         if (typeof startItem === 'undefined') {
             return;

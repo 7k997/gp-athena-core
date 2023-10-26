@@ -172,6 +172,7 @@ export class InventoryUtil {
         await Athena.systems.inventory.drops.add(
             clonedItem,
             new alt.Vector3(player.pos.x, player.pos.y, player.pos.z - 1),
+            alt.Vector3.zero,
             player.dimension,
             player,
         );

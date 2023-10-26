@@ -122,15 +122,17 @@ export function open(vehicle: alt.Vehicle) {
 
     // Not Pushing & Vehicle is Currently Unlocked
     if (!isLocked && !isDestroyed) {
-        for (let i = 0; i < 5; i++) {
-            options.push({
-                name: `Door ${i}`,
-                callback: (vehicle: alt.Vehicle, door: number) => {
-                    alt.emitServer(VEHICLE_EVENTS.SET_DOOR, vehicle, door);
-                },
-                data: [vehicle, i],
-            });
-        }
+        // Corechange - Removed -> implement your own in a custom plugin
+        // AthenaClient.menu.vehicle.addInjection(VehicleControls.addVehicleMenuOptions);
+        // for (let i = 0; i < 5; i++) {
+        //     options.push({
+        //         name: `Door ${i}`,
+        //         callback: (vehicle: alt.Vehicle, door: number) => {
+        //             alt.emitServer(VEHICLE_EVENTS.SET_DOOR, vehicle, door);
+        //         },
+        //         data: [vehicle, i],
+        //     });
+        // }
     }
 
     for (const callback of Injections) {

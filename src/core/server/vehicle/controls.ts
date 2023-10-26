@@ -82,6 +82,39 @@ export async function toggleDoor(vehicle: alt.Vehicle, door: 0 | 1 | 2 | 3 | 4 |
 }
 
 /**
+ * Open a vehicle door.
+ *
+ *
+ * @param {alt.Vehicle} vehicle An alt:V Vehicle Entity
+ * @param {number} door
+ * @return {boolean} The new state of the door. true = open
+ */
+export async function openDoor(vehicle: alt.Vehicle, door: 0 | 1 | 2 | 3 | 4 | 5): Promise<void> {
+    if (Overrides.openDoor) {
+        return Overrides.openDoor(vehicle, door);
+    }
+
+    vehicle.setDoorState(door, 0);
+    updateLastUsed(vehicle);
+}
+
+/**
+ * Open a vehicle door.
+ *
+ *
+ * @param {alt.Vehicle} vehicle An alt:V Vehicle Entity
+ * @param {number} door
+ * @return {boolean} The new state of the door. true = open
+ */
+export async function closeDoor(vehicle: alt.Vehicle, door: 0 | 1 | 2 | 3 | 4 | 5): Promise<void> {
+    if (Overrides.closeDoor) {
+        return Overrides.closeDoor(vehicle, door);
+    }
+
+    vehicle.setDoorState(door, 7);
+    updateLastUsed(vehicle);
+}
+/**
  * Returns true if the vehicle is currently locked.
  *
  *
@@ -165,6 +198,8 @@ export async function updateLastUsed(vehicle: alt.Vehicle): Promise<void> {
 interface VehicleControlFuncs {
     toggleLock: typeof toggleLock;
     toggleDoor: typeof toggleDoor;
+    openDoor: typeof openDoor;
+    closeDoor: typeof closeDoor;
     toggleEngine: typeof toggleEngine;
     update: typeof update;
     isLocked: typeof isLocked;
@@ -174,6 +209,8 @@ const Overrides: Partial<VehicleControlFuncs> = {};
 
 export function override(functionName: 'toggleLock', callback: typeof toggleLock);
 export function override(functionName: 'toggleDoor', callback: typeof toggleDoor);
+export function override(functionName: 'openDoor', callback: typeof openDoor);
+export function override(functionName: 'closeDoor', callback: typeof closeDoor);
 export function override(functionName: 'toggleEngine', callback: typeof toggleEngine);
 export function override(functionName: 'update', callback: typeof update);
 export function override(functionName: 'isLocked', callback: typeof isLocked);

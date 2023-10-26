@@ -6,9 +6,9 @@ import { deepCloneArray, deepCloneObject } from '@AthenaShared/utility/deepCopy.
 
 export type dbName = string;
 
-export type ItemCombo = [dbName, dbName];
+export type ItemCombo = dbName[];
 
-export type Quantities = [number, number];
+export type Quantities = number[];
 
 export interface CraftRecipe {
     /**
@@ -20,7 +20,7 @@ export interface CraftRecipe {
     uid: string;
 
     /**
-     * Two items that can be combined.
+     * Multiple items that can be combined.
      *
      * @type {ItemCombo}
      *
@@ -34,6 +34,15 @@ export interface CraftRecipe {
      *
      */
     quantities: Quantities;
+
+
+     /**
+     * The dbname of the machine which must be used for the recipe.
+     *
+     * @type {Quantities}
+     *
+     */
+    machine?: string;
 
     /**
      * The crafting result.

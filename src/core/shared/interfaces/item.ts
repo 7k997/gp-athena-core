@@ -12,13 +12,16 @@ export type WeaponInfo = { hash: number; ammo: number; components?: Array<string
 export type ItemDrop = {
     _id: unknown;
     pos: alt.IVector3;
+    rot?: alt.IVector3;
     expiration: number;
     model?: string;
     name: string;
     hash?: number;
     dimension: number;
-    nocollision?: boolean;
-    nofreeze?: boolean;
+    collision?: boolean;
+    frozen?: boolean;
+    maxDistance?: number;
+    maxDistancePickup?: number;
 } & StoredItem;
 
 /**

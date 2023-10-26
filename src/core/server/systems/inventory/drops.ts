@@ -137,12 +137,17 @@ async function removeFromDatabase(id: string) {
  */
 export async function add(
     item: StoredItem,
-    pos: alt.IVector3,
+    pos: alt.IVector3,    
+    rot: alt.IVector3,  
     dimension: number,
     player: alt.Player = undefined,
+    collision: boolean = true,
+    frozen: boolean = true,
+    maxDistance: number = Config.DEFAULT_STREAMING_DISTANCE,
+    maxDistancePickup: number = Config.DEFAULT_PICKUP_DISTANCE,
 ): Promise<string> {
     if (Overrides.add) {
-        return await Overrides.add(item, pos, dimension, player);
+        return await Overrides.add(item, pos, rot, dimension, player);
     }
 
     const baseItem = Athena.systems.inventory.factory.getBaseItem(item.dbName);
@@ -175,6 +180,10 @@ export async function add(
         expiration,
         model: baseItem.model,
         dimension: dimension,
+        collision: collision,
+        frozen: frozen,
+        maxDistance: maxDistance,
+        maxDistancePickup: maxDistancePickup,
     });
 
     Athena.controllers.itemDrops.append(document);

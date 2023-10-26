@@ -7,6 +7,7 @@ export * as inventorySync from './inventorySync.js';
 export * as time from './time.js';
 export * as toolbar from './toolbar.js';
 export * as vehiclesDespawnOnLeave from './vehiclesDespawnOnLeave.js';
+export * as vehiclesDespawnOnDestroy from './vehiclesDespawnOnDestroy.js';
 export * as vehiclesSpawnOnJoin from './vehiclesSpawnOnJoin.js';
 export * as weaponItems from './weaponItems.js';
 export * as weather from './weather.js';

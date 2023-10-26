@@ -5,7 +5,6 @@ import { onTicksStart } from '@AthenaClient/events/onTicksStart.js';
 import { ITEM_SYNCED_META } from '@AthenaShared/enums/syncedMeta.js';
 import { Config } from '@AthenaPlugins/gp-athena-overrides/shared/config.js';
 
-
 export type CreatedDrop = ItemDrop & { createdObject?: alt.Entity };
 
 let maxDistance = 5;
@@ -59,13 +58,15 @@ const InternalFunctions = {
             }
 
             // Used to lower the distance checks between items.
-            if (dist <= startDistance) {
-                AthenaClient.screen.text.drawText3D(
-                    `~y~${items[i].name} (x${items[i].quantity})`,
-                    items[i].pos,
-                    0.4,
-                    new alt.RGBA(255, 255, 255, 255),
-                );
+            if (!Config.DISABLE_DROPPED_ITEMS_TEXTLABLES) {
+                if (dist <= startDistance) {
+                    AthenaClient.screen.text.drawText3D(
+                        `~y~${items[i].name} (x${items[i].quantity})`,
+                        items[i].pos,
+                        0.4,
+                        new alt.RGBA(255, 255, 255, 255),
+                    );
+                }
             }
 
             itemsCloseToPlayer.push(items[i]);

@@ -94,4 +94,20 @@ export interface OwnedVehicle extends BaseVehicle {
      *
      */
     extras?: Array<VehicleExtra>;
+
+    /**
+     * The trunk storage of a vehicle.
+     *
+     * @type {number}
+     *
+     */
+    trunkStorage?: string;
+
+    /**
+     * The glovebox storage of a vehicle.
+     *
+     * @type {number}
+     *
+     */
+    gloveboxStorage?: string;
 }

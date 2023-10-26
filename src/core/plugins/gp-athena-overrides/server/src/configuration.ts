@@ -12,5 +12,6 @@ export class Configuration {
         if (Config.DISABLE_DEFAULT_TIME_SYNC) Athena.systems.defaults.time.disable();
         if (Config.DISABLE_HOSPITAL_BLIPS) Athena.systems.defaults.hospitalBlips.disable();
         if (Config.DISABLE_DEFAULT_AMMO) Athena.systems.defaults.ammo.disable();
+        if (Config.DISABLE_VEHICLE_DESPAWN_ON_DESTROY) Athena.systems.defaults.vehiclesDespawnOnDestroy.disable();
     }
 }

@@ -56,7 +56,7 @@ export class World {
         }
 
         const timeInMs = timeInSeconds * 1000;
-
+        
         try {
             await alt.Utils.waitFor(() => isTransitioning === false, timeInMs);
         } catch (error) {

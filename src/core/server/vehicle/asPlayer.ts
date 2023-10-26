@@ -114,13 +114,73 @@ export async function toggleDoor(player: alt.Player, vehicle: alt.Vehicle, door:
     Athena.vehicle.events.trigger(eventToEmit, vehicle, door, player);
 }
 
+/**
+ * Opens a door lock as if a player toggled it.
+ *
+ * @param {alt.Player} player An alt:V Player Entity
+ * @param {alt.Vehicle} vehicle An alt:V Vehicle Entity
+ * @param {number} door
+ */
+export async function openDoor(player: alt.Player, vehicle: alt.Vehicle, door: 0 | 1 | 2 | 3 | 4 | 5) {
+    if (Overrides.openDoor) {
+        return Overrides.openDoor(player, vehicle, door);
+    }
+
+    if (!vehicle) {
+        vehicle = player.vehicle;
+    }
+
+    if (typeof door !== 'number') {
+        return;
+    }
+
+    if (!sharedOwnershipChecks(player, vehicle)) {
+        return;
+    }
+
+    if (Athena.vehicle.controls.isLocked(vehicle)) {
+        return;
+    }
+
+    const eventToEmit = 'door-opened'
+    Athena.vehicle.events.trigger(eventToEmit, vehicle, door, player);
+}
+
+/**
+ * Closes a door lock as if a player toggled it.
+ *
+ * @param {alt.Player} player An alt:V Player Entity
+ * @param {alt.Vehicle} vehicle An alt:V Vehicle Entity
+ * @param {number} door
+ */
+export async function closeDoor(player: alt.Player, vehicle: alt.Vehicle, door: 0 | 1 | 2 | 3 | 4 | 5) {
+    if (Overrides.closeDoor) {
+        return Overrides.closeDoor(player, vehicle, door);
+    }
+
+    if (!vehicle) {
+        vehicle = player.vehicle;
+    }
+
+    if (typeof door !== 'number') {
+        return;
+    }
+
+    const eventToEmit = 'door-closed'
+    Athena.vehicle.events.trigger(eventToEmit, vehicle, door, player);
+}
+
 alt.onClient(VEHICLE_EVENTS.SET_LOCK, toggleLock);
 alt.onClient(VEHICLE_EVENTS.SET_ENGINE, toggleEngine);
 alt.onClient(VEHICLE_EVENTS.SET_DOOR, toggleDoor);
+alt.onClient(VEHICLE_EVENTS.CLOSE_DOOR, closeDoor);
+alt.onClient(VEHICLE_EVENTS.OPEN_DOOR, openDoor);
 
 interface VehicleAsPlayerFuncs {
     toggleLock: typeof toggleLock;
     toggleDoor: typeof toggleDoor;
+    openDoor: typeof openDoor;
+    closeDoor: typeof closeDoor;
     toggleEngine: typeof toggleEngine;
 }
 
@@ -128,6 +188,8 @@ const Overrides: Partial<VehicleAsPlayerFuncs> = {};
 
 export function override(functionName: 'toggleLock', callback: typeof toggleLock);
 export function override(functionName: 'toggleDoor', callback: typeof toggleDoor);
+export function override(functionName: 'closeDoor', callback: typeof closeDoor);
+export function override(functionName: 'openDoor', callback: typeof openDoor);
 export function override(functionName: 'toggleEngine', callback: typeof toggleEngine);
 /**
  * Used to override vehicle control as a player functionality

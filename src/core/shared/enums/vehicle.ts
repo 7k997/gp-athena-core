@@ -26,6 +26,8 @@ export const VEHICLE_EVENTS = {
     SET_INTO: 'Vehicle-Set-Into',
     SET_LOCK: 'Vehicle-Set-Lock',
     SET_DOOR: 'Vehicle-Set-Door',
+    CLOSE_DOOR: 'Vehicle-Close-Door',
+    OPEN_DOOR: 'Vehicle-Open-Door',
     SET_ENGINE: 'Vehicle-Set-Engine',
     SET_SEATBELT: 'Vehicle-Seatbelt',
     PUSH: 'Vehicle-Push',
