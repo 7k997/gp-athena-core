@@ -4,7 +4,7 @@ import { SYSTEM_EVENTS } from '@AthenaShared/enums/system.js';
 import { IObject } from '@AthenaShared/interfaces/iObject.js';
 import { Config } from '@AthenaPlugins/gp-athena-overrides/shared/config.js';
 
-export type CreatedObject = IObject & { createdObject?: alt.Object };
+export type CreatedObject = IObject & { createdObject?: alt.LocalObject | alt.Object };
 
 const clientObjects: { [uid: string]: CreatedObject } = {};
 const serverObjects: { [uid: string]: CreatedObject } = {};

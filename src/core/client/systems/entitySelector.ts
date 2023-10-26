@@ -13,8 +13,10 @@ import {
 } from '@AthenaPlugins/gp-athena-overrides/client/src/replacements/mapObjectTarget.js';
 import { IWheelOptionExt } from '@AthenaShared/interfaces/wheelMenu.js';
 import { CreatedDrop } from '@AthenaClient/streamers/item.js';
+import { Config } from '@AthenaPlugins/gp-athena-overrides/shared/config.js';
 
 //Corechange: TODO remove entity selector over vehicles and maybe more
+import { CreatedObject } from '@AthenaClient/streamers/object.js';
 
 export type ValidEntityTypes = 'object' | 'pos' | 'npc' | 'player' | 'vehicle' | 'interaction';
 export type TargetInfo = {
@@ -277,62 +279,74 @@ const Internal = {
 
                     alt.logWarning('ScriptID 0: ' + selection.id);
                     alt.logWarning('alt.Objects.ScriptIDs: ' + alt.Object.all.map((x) => x.scriptID));
-                    const object = alt.Object.all.find((x) => x.scriptID === selection.id);
+                    let object = alt.Object.all.find((x) => x.scriptID === selection.id);
+                    let createdObject;
+                    if (!object) {
+                        let localObject = AthenaClient.streamers.object.getFromScriptId(selection.id);
+                        if (localObject && localObject.createdObject) {
+                            alt.logWarning('Created object found!');
+                            createdObject = localObject.createdObject;
 
-                    if (typeof object === 'undefined') {
-                        alt.logWarning('No object found, so its maybe a map object');
-                        //Corechange: Its maybe a map object and not alt.LocalObject check if it exists...
-                        const model = native.getEntityModel(selection.id);
-                        const rot = native.getEntityRotation(selection.id, 2);
-                        if (model) {
-                            //Create dummy alt.LocalObject
-                            const createdObject: alt.Object = {
-                                frozen: false,
-                                remoteID: undefined,
-                                model: model,
-                                pos: new alt.Vector3(selection.pos),
-                                rot: new alt.Vector3(rot),
-                                visible: false,
-                                alpha: 0,
-                                lodDistance: 0,
-                                isRemote: false,
-                                textureVariation: 0,
-                                id: 0,
-                                scriptID: selection.id,
-                                isSpawned: false,
-                                setMeta: undefined,
-                                deleteMeta: undefined,
-                                getMeta: undefined,
-                                hasMeta: undefined,
-                                getSyncedMeta: undefined,
-                                hasSyncedMeta: undefined,
-                                getStreamSyncedMeta: undefined,
-                                hasStreamSyncedMeta: undefined,
-                                getStreamSyncedMetaKeys: undefined,
-                                dimension: 0,
-                                valid: false,
-                                destroy: undefined,
-                                getMetaDataKeys: undefined,
-                                refCount: 0,
-                                netOwner: undefined,
-                                getSyncedMetaKeys: undefined,
-                                type: undefined,
-                            };
+                            if (!localObject.model) {
+                                //Just a very very dirty hack to get the model hash in a plugin
+                                localObject.model = 'seehash';
+                                localObject.hash = createdObject.model;
+                            }
+                        } else {
+                            alt.logWarning('No object found, so its maybe a map object');
+                            //Corechange: Its maybe a map object and not alt.LocalObject check if it exists...
+                            const model = native.getEntityModel(selection.id);
+                            const rot = native.getEntityRotation(selection.id, 2);
+                            if (model) {
+                                //Create dummy alt.LocalObject
+                                createdObject = {
+                                    frozen: false,
+                                    remoteID: undefined,
+                                    model: model,
+                                    pos: new alt.Vector3(selection.pos),
+                                    rot: new alt.Vector3(rot),
+                                    visible: false,
+                                    alpha: 0,
+                                    lodDistance: 0,
+                                    isRemote: false,
+                                    textureVariation: 0,
+                                    id: 0,
+                                    scriptID: selection.id,
+                                    isSpawned: false,
+                                    setMeta: undefined,
+                                    deleteMeta: undefined,
+                                    getMeta: undefined,
+                                    hasMeta: undefined,
+                                    getSyncedMeta: undefined,
+                                    hasSyncedMeta: undefined,
+                                    getStreamSyncedMeta: undefined,
+                                    hasStreamSyncedMeta: undefined,
+                                    getStreamSyncedMetaKeys: undefined,
+                                    dimension: 0,
+                                    valid: false,
+                                    destroy: undefined,
+                                    getMetaDataKeys: undefined,
+                                    refCount: 0,
+                                    netOwner: undefined,
+                                    getSyncedMetaKeys: undefined,
+                                    type: undefined,
+                                };
 
-                            const mapObjectInstance: AthenaClient.CreatedObject = {
-                                pos: selection.pos,
-                                model: 'seehash', //Just a very very dirty hack to get the model hash in a plugin
-                                hash: model,
-                                createdObject,
-                            };
+                                localObject = {
+                                    pos: selection.pos,
+                                    model: 'seehash', //Just a very very dirty hack to get the model hash in a plugin
+                                    hash: model,
+                                    createdObject,
+                                };
+                            }
 
-                            if (typeof mapObjectInstance !== 'undefined') {
+                            if (localObject) {
                                 wheelOptions.push({
-                                    name: model + '[' + mapObjectInstance.hash + ']',
+                                    name: model + '[' + localObject.hash + ']',
                                     icon: 'icon-lightbulb',
-                                    data: [mapObjectInstance],
-                                    callback: (_mapObjectInstance: AthenaClient.CreatedObject) => {
-                                        AthenaClient.menu.object.open(_mapObjectInstance);
+                                    data: [localObject],
+                                    callback: (_localObject: AthenaClient.CreatedObject) => {
+                                        AthenaClient.menu.object.open(_localObject);
                                     },
                                 });
 
@@ -340,16 +354,23 @@ const Internal = {
                             }
                         }
                         break;
+                    } else {
+                        createdObject = { ...(object.getStreamSyncedMeta('object') as Object), createdObject: object };
                     }
 
                     //Corechange: gp-athena-overrides
                     //Corechange: prevent duplicate entries for dropped items and objects, because there are always both.
                     const droppedItem = AthenaClient.streamers.item.getDropped(object.remoteID);
-                    alt.logWarning('try to get dropped item: ' + JSON.stringify(droppedItem));
+                    // FIXME: Log will result in circular structure!!!
+                    // alt.logWarning('try to get dropped item: ' + JSON.stringify(droppedItem));
                     if (typeof droppedItem !== 'undefined') {
-                        alt.logWarning(
-                            'ScriptID 1: ' + object.scriptID + ' ScriptID 2: ' + droppedItem?.createdObject.scriptID,
-                        );
+                        // if (Config.DEBUG)
+                            alt.logWarning(
+                                'ScriptID 1: ' +
+                                    object.scriptID +
+                                    ' ScriptID 2: ' +
+                                    droppedItem?.createdObject.scriptID,
+                            );
                         scriptIDsAdded.set(droppedItem.createdObject.scriptID, true);
                         wheelOptions.push({
                             name: droppedItem.name,
@@ -364,18 +385,21 @@ const Internal = {
 
                     if (!scriptIDsAdded.has(selection.id)) {
                         alt.logWarning('ScriptID 3: ' + selection.id);
-                        const objectInstance = AthenaClient.streamers.object.getFromScriptId(selection.id);
-                        if (typeof objectInstance !== 'undefined') {
-                            wheelOptions.push({
-                                name: 'Object',
-                                icon: 'icon-lightbulb',
-                                data: [objectInstance],
-                                callback: (_objectInstance: AthenaClient.CreatedObject) => {
-                                    AthenaClient.menu.object.open(_objectInstance);
-                                },
-                            });
+                        if (!createdObject) {
                             break;
                         }
+                        // const objectInstance = AthenaClient.streamers.object.getFromScriptId(selection.id);
+                        // if (typeof objectInstance !== 'undefined') {
+                        wheelOptions.push({
+                            name: 'Object',
+                            icon: 'icon-lightbulb',
+                            data: [createdObject],
+                            callback: (_createdObject: AthenaClient.CreatedObject) => {
+                                AthenaClient.menu.object.open(_createdObject);
+                            },
+                        });
+                        //     break;
+                        // // }
                     }
 
                     break;
