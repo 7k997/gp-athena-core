@@ -7,6 +7,7 @@ import { deepCloneArray, deepCloneObject } from '@AthenaShared/utility/deepCopy.
 import { ItemDrop, StoredItem } from '@AthenaShared/interfaces/item.js';
 import { INVENTORY_CONFIG } from '@AthenaPlugins/core-inventory/shared/config.js';
 import { ComplexSwapReturn } from '@AthenaServer/systems/inventory/manager.js';
+import { Config } from '@AthenaPlugins/gp-athena-overrides/shared/config.js';
 
 type PlayerCallback = (player: alt.Player) => void;
 type PlayerCloseCallback = (uid: string, items: Array<StoredItem>, player: alt.Player | undefined) => void;
@@ -121,6 +122,11 @@ const Internal = {
             return;
         }
 
+        let expiration = null;
+        if (Config.DISABLE_OBJECT_DROP_BYPLAYER_EXPIRATION) {
+            expiration = 0;
+        }
+
         await Athena.document.character.set(player, type, newDataSet);
         await Athena.systems.inventory.drops.add(
             clonedItem,
@@ -128,6 +134,9 @@ const Internal = {
             alt.Vector3.zero,
             player.dimension,
             player,
+            !baseItem.noCollision,
+            !baseItem.noFreeze,
+            expiration,
         );
     },
     /**
@@ -593,7 +602,7 @@ const Internal = {
         }
 
         if (!Athena.systems.inventory.drops.isItemAvailable(_id)) {
-            Athena.player.emit.notification(player, `[0x01] Item is unavailable. Try again in a moment.`);
+            Athena.player.emit.notification(player, `[0x01] Item is unavailable. Try again in a moment. ID: ${_id}`);
             return;
         }
 
@@ -601,7 +610,7 @@ const Internal = {
 
         const originalItem = Athena.systems.inventory.drops.get(_id);
         if (typeof originalItem === 'undefined') {
-            Athena.player.emit.notification(player, `[0x02] Item is unavailable. Try again in a moment.`);
+            Athena.player.emit.notification(player, `[0x02] Item is unavailable. Try again in a moment. ID: ${_id}`);
             Athena.systems.inventory.drops.markForTaken(_id, false);
             return;
         }
@@ -610,8 +619,11 @@ const Internal = {
         delete item._id;
         delete item.pos;
         delete item.expiration;
-        delete item.pos;
         delete item.name;
+        delete item.frozen;
+        delete item.collision;
+        delete item.maxDistance;
+        delete item.maxDistancePickup;
 
         const newInventory = Athena.systems.inventory.manager.add(item, data.inventory, 'inventory');
         if (typeof newInventory === 'undefined') {

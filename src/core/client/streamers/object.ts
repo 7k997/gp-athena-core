@@ -54,14 +54,19 @@ const InternalFunctions = {
             true,
             false,
             false,
-            Config.DEFAULT_STREAMING_DISTANCE
+            Config.DEFAULT_STREAMING_DISTANCE,
         );
 
         if (dataRef[uid].noCollision) {
             createdObject.toggleCollision(false, false);
         }
 
-        createdObject.positionFrozen = true;
+        if (dataRef[uid].noFreeze) {
+            createdObject.positionFrozen = false;
+        } else {
+            createdObject.positionFrozen = true;
+        }
+
         dataRef[uid].createdObject = createdObject;
     },
     populate(newObjects: Array<IObject>) {
@@ -97,14 +102,18 @@ const InternalFunctions = {
                 true,
                 false,
                 false,
-                Config.DEFAULT_STREAMING_DISTANCE
+                Config.DEFAULT_STREAMING_DISTANCE,
             );
 
             if (objRef.noCollision) {
                 createdObject.toggleCollision(false, false);
             }
 
-            createdObject.positionFrozen = true;
+            if (objRef.noFreeze) {
+                createdObject.positionFrozen = false;
+            } else {
+                createdObject.positionFrozen = true;
+            }
 
             serverObjects[objRef.uid] = {
                 ...objRef,
@@ -147,14 +156,19 @@ export function addObject(newObject: IObject) {
         true,
         false,
         false,
-        Config.DEFAULT_STREAMING_DISTANCE
+        Config.DEFAULT_STREAMING_DISTANCE,
     );
 
     if (newObject.noCollision) {
         createdObject.toggleCollision(false, false);
     }
 
-    createdObject.positionFrozen = true;
+    if (newObject.noFreeze) {
+        createdObject.positionFrozen = false;
+    } else {
+        createdObject.positionFrozen = true;
+    }
+
     clientObjects[newObject.uid] = {
         ...newObject,
         createdObject,

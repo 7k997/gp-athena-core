@@ -465,6 +465,11 @@ export interface BaseItem<Behavior = DefaultItemBehavior, CustomData = {}> exten
      *
      */
     msTimeout?: number;
+
+    noCollision?: boolean; //If true, the item will not collide with other items
+    noFreeze?: boolean; //If true, the item will not be freezed on drop/place (normally noCollision must be false)
+    maxDistance?: number; //TODO: Test and explain - used in item place preview
+    maxDistancePickup?: number; //TODO: Test and explain - used in item place preview
 }
 
 /**

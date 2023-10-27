@@ -53,12 +53,9 @@ export function append(objectData: IObject): string {
         object: new alt.Object(objectData.model, objectData.pos, objectData.rot ? objectData.rot : alt.Vector3.zero),
     };
 
-    newObject.object.frozen = true;
+    newObject.object.collision = objectData.noCollision ? false : true;
+    newObject.object.frozen = objectData.noFreeze ? false : true;
     newObject.object.dimension = objectData.dimension ? objectData.dimension : 0;
-
-    if (objectData.noCollision) {
-        newObject.object.collision = false;
-    }
 
     newObject.object.setStreamSyncedMeta('object', objectData);
     globalObjects.push(newObject);

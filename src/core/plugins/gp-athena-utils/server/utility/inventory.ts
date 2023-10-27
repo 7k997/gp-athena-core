@@ -4,6 +4,7 @@ import * as Athena from '@AthenaServer/api/index.js';
 import { InventoryType } from '@AthenaPlugins/core-inventory/shared/interfaces.js';
 import { ItemUtil } from './itemUtil.js';
 import { deepCloneObject } from '@AthenaShared/utility/deepCopy.js';
+import { Config } from '@AthenaPlugins/gp-athena-overrides/shared/config.js';
 
 /**
  *
@@ -169,12 +170,21 @@ export class InventoryUtil {
         }
 
         await Athena.document.character.set(player, type, newDataSet);
+
+        let expiration = null;
+        if (Config.DISABLE_OBJECT_DROP_BYPLAYER_EXPIRATION) {
+            expiration = 0;
+        }
+
         await Athena.systems.inventory.drops.add(
             clonedItem,
             new alt.Vector3(player.pos.x, player.pos.y, player.pos.z - 1),
             alt.Vector3.zero,
             player.dimension,
             player,
+            !baseItem.noCollision,
+            !baseItem.noFreeze,
+            expiration,
         );
     }
 }

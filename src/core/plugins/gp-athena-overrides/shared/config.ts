@@ -16,7 +16,10 @@ export const Config = {
     DISABLE_DEFAULT_TIME_SYNC: false, //Disable the default time sync.
     DISABLE_HOSPITAL_BLIPS: false, //Disable the hospital blips.
     WEATHER_SYNC_INTERVAL: 1000 * 60 * 1, //1 minutes, DO NOT SET IT BELOW 1 MINUTE.
-    DISABLE_OBJECT_DROP_EXPIRATION: true, //Disable the object drop expiration.
+    DROP_DEFAULT_EXPIRATION: 1000 * 60 * 5, //5 minutes, DO NOT SET IT BELOW 1 MINUTE.
+    DROP_EXPIRATION_INTERVAL: 1000 * 60 * 5, //5 minutes, DO NOT SET IT BELOW 1 MINUTE.
+    DISABLE_OBJECT_DROP_EXPIRATION: false, //Disable the object drop expiration, for all droped items in database. Leave it false normally!
+    DISABLE_OBJECT_DROP_BYPLAYER_EXPIRATION: true, //Disable the object drop expiration for dropped items by player.
 
     DEFAULT_STREAMING_DISTANCE: 500, //Default streaming distance for objects. (Athena Core Default is 100 or lower)
     DEFAULT_PICKUP_DISTANCE: 2, //Default pickup distance for objects. (Athena Core Default is 2)

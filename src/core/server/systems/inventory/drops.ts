@@ -7,8 +7,8 @@ import { Config } from '@AthenaPlugins/gp-athena-overrides/shared/config.js';
 
 type UnpushedItemDrop = Omit<ItemDrop, '_id'>;
 
-const DEFAULT_EXPIRATION = 60000 * 5; // 5 Minutes
-const drops: Array<ItemDrop> = [];
+const DEFAULT_EXPIRATION = Config.DROP_DEFAULT_EXPIRATION;
+const drops: Map<unknown, ItemDrop> = new Map();
 const markAsTaken: { [key: string]: boolean } = {};
 
 export type ItemDropInit = (itemDrop: ItemDrop) => Promise<ItemDrop>;
@@ -57,10 +57,12 @@ async function init() {
             }
         }
 
-        drops.push(results[i]);
+        drops.set(results[i]._id, results[i]);
         Athena.controllers.itemDrops.append(results[i]);
         markAsTaken[String(results[i]._id)] = false;
     }
+
+    alt.setInterval(cleanUpExpiredDrops, Config.DROP_EXPIRATION_INTERVAL);
 }
 
 /**
@@ -76,7 +78,7 @@ async function addToDatabase(storedItem: UnpushedItemDrop): Promise<ItemDrop> {
     const convertedDoc = <ItemDrop>document;
     convertedDoc._id = String(convertedDoc._id);
     markAsTaken[String(convertedDoc._id)] = false;
-    drops.push(convertedDoc);
+    drops.set(convertedDoc._id, convertedDoc);
     return convertedDoc;
 }
 
@@ -104,13 +106,11 @@ async function updateToDatabase(itemDrop: ItemDrop, item: UnpushedItemDrop): Pro
     markAsTaken[String(itemDrop._id)] = false;
 
     // Find the index of the item drop in the array
-    const index = drops.findIndex((x) => x._id === itemDrop._id);
+    const drop = drops.get(itemDrop._id);
 
-    if (index !== -1) {
+    if (drop) {
         // Update the object in the array with the new item drop data
-        const existingId = drops[index]._id;
-        drops[index] = { ...drops[index], ...refeshedItemDrop };
-        drops[index]._id = existingId;
+        drops.set(itemDrop._id, { ...drop, ...refeshedItemDrop });
 
         Athena.controllers.itemDrops.update(refeshedItemDrop);
         return true;
@@ -137,12 +137,13 @@ async function removeFromDatabase(id: string) {
  */
 export async function add(
     item: StoredItem,
-    pos: alt.IVector3,    
-    rot: alt.IVector3,  
+    pos: alt.IVector3,
+    rot: alt.IVector3,
     dimension: number,
     player: alt.Player = undefined,
     collision: boolean = true,
     frozen: boolean = true,
+    expiration?: number,
     maxDistance: number = Config.DEFAULT_STREAMING_DISTANCE,
     maxDistancePickup: number = Config.DEFAULT_PICKUP_DISTANCE,
 ): Promise<string> {
@@ -159,8 +160,10 @@ export async function add(
         return undefined;
     }
 
-    const expiration =
-        typeof baseItem.msTimeout === 'number' ? Date.now() + baseItem.msTimeout : Date.now() + DEFAULT_EXPIRATION;
+    if (expiration !== 0) {
+        expiration =
+            typeof baseItem.msTimeout === 'number' ? Date.now() + baseItem.msTimeout : Date.now() + DEFAULT_EXPIRATION;
+    }
 
     item.isEquipped = false;
 
@@ -176,8 +179,8 @@ export async function add(
     const document = await addToDatabase({
         ...item,
         name: baseItem.name,
-        pos,
-        expiration,
+        pos: pos,
+        expiration: expiration,
         model: baseItem.model,
         dimension: dimension,
         collision: collision,
@@ -226,8 +229,19 @@ export function get(id: string): ItemDrop | undefined {
         return Overrides.get(id);
     }
 
-    return drops.find((x) => x._id === id);
+    return drops.get(id);
 }
+
+export async function cleanUpExpiredDrops() {
+    if (Config.DISABLE_OBJECT_DROP_EXPIRATION) return;
+
+    for (const drop of drops.values()) {
+        if (drop.expiration !== 0 && Date.now() > drop.expiration) {
+            await sub(drop._id as string);
+        }
+    }
+}
+
 /**
  * Remove the dropped item based on identifier.
  *
@@ -242,40 +256,35 @@ export async function sub(id: string): Promise<StoredItem | undefined> {
     alt.logWarning('Sub item drop!!!!: ' + id);
     let itemClone: StoredItem = undefined;
 
-    for (let i = drops.length - 1; i >= 0; i--) {
-        if (!Config.DISABLE_OBJECT_DROP_EXPIRATION && Date.now() > drops[i].expiration && drops[i]._id !== id) {
-            delete markAsTaken[id];
-            drops.splice(i, 1);
+    let remove = true;
+    for (const callback of RemoveInjections) {
+        try {
+            remove = await callback(drops.get(id));
+        } catch (err) {
+            console.warn(`Got Itemdrop Remove Injection Error: ${err}`);
             continue;
         }
-
-        if (drops[i]._id !== id) {
-            continue;
-        }
-
-        let remove = true;
-        for (const callback of RemoveInjections) {
-            try {
-                remove = await callback(drops[i]);
-            } catch (err) {
-                console.warn(`Got Itemdrop Remove Injection Error: ${err}`);
-                continue;
-            }
-        }
-        if (!remove) return null;
-
-        delete markAsTaken[id];
-
-        Athena.controllers.itemDrops.remove(id);
-        const newItem = deepCloneObject<ItemDrop>(drops.splice(i, 1));
-        await removeFromDatabase(id);
-        delete newItem._id;
-        delete newItem.pos;
-        delete newItem.expiration;
-        delete newItem.pos;
-        delete newItem.name;
-        itemClone = newItem;
     }
+    if (!remove) return null;
+
+    delete markAsTaken[id];
+
+    Athena.controllers.itemDrops.remove(id);
+    alt.logWarning('Sub item drop 1: ' + id);
+    alt.logWarning('Sub item drop 2: ' + JSON.stringify(drops.get(id)));
+    const newItem = deepCloneObject<ItemDrop>(drops.get(id));
+    drops.delete(id);
+    await removeFromDatabase(id);
+    delete newItem._id;
+    delete newItem.pos;
+    delete newItem.expiration;
+    delete newItem.pos;
+    delete newItem.name;
+    delete newItem.frozen;
+    delete newItem.collision;
+    delete newItem.maxDistance;
+    delete newItem.maxDistancePickup;
+    itemClone = newItem;
 
     return itemClone;
 }
