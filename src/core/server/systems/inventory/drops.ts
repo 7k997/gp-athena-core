@@ -110,11 +110,15 @@ async function updateToDatabase(itemDrop: ItemDrop, item: UnpushedItemDrop): Pro
 
     if (drop) {
         // Update the object in the array with the new item drop data
+        const existingId = drops.get(itemDrop._id)._id;
         drops.set(itemDrop._id, { ...drop, ...refeshedItemDrop });
+        //reset id because it will be replaced by undefined from refreshedItemDrop
+        drops.get(itemDrop._id)._id = existingId;
 
         Athena.controllers.itemDrops.update(refeshedItemDrop);
         return true;
     } else {
+        alt.logError(`Item Drop not found in the array: ${itemDrop._id}`);
         return false; // Item drop not found in the array
     }
 }
@@ -236,7 +240,7 @@ export async function cleanUpExpiredDrops() {
     if (Config.DISABLE_OBJECT_DROP_EXPIRATION) return;
 
     for (const drop of drops.values()) {
-        if (drop.expiration !== 0 && Date.now() > drop.expiration) {
+        if (drop && drop.expiration !== 0 && Date.now() > drop.expiration) {
             await sub(drop._id as string);
         }
     }
@@ -270,8 +274,6 @@ export async function sub(id: string): Promise<StoredItem | undefined> {
     delete markAsTaken[id];
 
     Athena.controllers.itemDrops.remove(id);
-    alt.logWarning('Sub item drop 1: ' + id);
-    alt.logWarning('Sub item drop 2: ' + JSON.stringify(drops.get(id)));
     const newItem = deepCloneObject<ItemDrop>(drops.get(id));
     drops.delete(id);
     await removeFromDatabase(id);
