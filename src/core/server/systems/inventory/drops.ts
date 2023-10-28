@@ -111,11 +111,12 @@ async function updateToDatabase(itemDrop: ItemDrop, item: UnpushedItemDrop): Pro
     if (drop) {
         // Update the object in the array with the new item drop data
         const existingId = drops.get(itemDrop._id)._id;
-        drops.set(itemDrop._id, { ...drop, ...refeshedItemDrop });
+        const tmpItemDrop = { ...drop, ...refeshedItemDrop };
+        drops.set(itemDrop._id, itemDrop);
         //reset id because it will be replaced by undefined from refreshedItemDrop
         drops.get(itemDrop._id)._id = existingId;
 
-        Athena.controllers.itemDrops.update(refeshedItemDrop);
+        Athena.controllers.itemDrops.update(tmpItemDrop);
         return true;
     } else {
         alt.logError(`Item Drop not found in the array: ${itemDrop._id}`);
@@ -184,6 +185,7 @@ export async function add(
         ...item,
         name: baseItem.name,
         pos: pos,
+        rot: rot,
         expiration: expiration,
         model: baseItem.model,
         dimension: dimension,
@@ -219,6 +221,8 @@ export async function update(itemDrop: ItemDrop, item: UnpushedItemDrop): Promis
             continue;
         }
     }
+
+    drops.set(itemDrop._id, itemDrop);
     return updateToDatabase(itemDrop, item);
 }
 

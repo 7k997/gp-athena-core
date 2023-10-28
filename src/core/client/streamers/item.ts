@@ -113,10 +113,7 @@ function onStreamSyncedMetaChange(entity: alt.Entity, key: string, newValue: any
     }
 
     const index = items.findIndex((x) => x._id === info._id);
-    if (index >= 1) {
-        return;
-    }
-
+    
     if (index >= 0) {
         items[index] = { ...info, createdObject: entity };
     }

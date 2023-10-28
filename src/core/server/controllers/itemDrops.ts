@@ -26,13 +26,12 @@ export function append(itemDrop: ItemDrop): string {
     }
 
     //Corechange: added properties like frozen, collision, maxDistance
-    let rotation = alt.Vector3.zero;
-    if(itemDrop.rot) {
-        rotation = new alt.Vector3(itemDrop.rot);
-    } 
-    const object = new alt.Object(itemDrop.model ? itemDrop.model : defaultModel, itemDrop.pos, rotation);
+    const object = new alt.Object(
+        itemDrop.model ? itemDrop.model : defaultModel,
+        itemDrop.pos,
+        itemDrop.rot ? itemDrop.rot : alt.Vector3.zero,
+    );
     object.streamingDistance = itemDrop.maxDistance;
-
     object.frozen = itemDrop.frozen;
     object.collision = itemDrop.collision;
     object.setStreamSyncedMeta(ITEM_SYNCED_META.ITEM_DROP_INFO, deepCloneObject(itemDrop));
