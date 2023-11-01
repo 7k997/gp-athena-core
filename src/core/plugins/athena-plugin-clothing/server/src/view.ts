@@ -333,29 +333,27 @@ export class ClothingFunctions {
                     dlc = dlcInfo.dlcName;
                 }
 
-                // if (dlc != 0) {
-                if (isProp) {
-                    if (drawable <= -1) {
-                        player.clearProp(id);
+                if (dlc != 0) {
+                    if (isProp) {
+                        if (drawable <= -1) {
+                            player.clearProp(id);
+                        } else {
+                            player.setDlcProp(dlc, id, drawable, texture);
+                        }
                     } else {
-                        player.setDlcProp(dlc, id, drawable, texture);
+                        player.setDlcClothes(dlc, id, drawable, texture, palette);
                     }
                 } else {
-                    player.setDlcClothes(dlc, id, drawable, texture, palette);
+                    if (isProp) {
+                        if (drawable <= -1) {
+                            player.clearProp(id);
+                        } else {
+                            player.setProp(id, drawable, texture);
+                        }
+                    } else {
+                        player.setClothes(id, drawable, texture, palette);
+                    }
                 }
-                // } else {
-
-                //     if (isProp) {
-                //         if (drawable <= -1) {
-                //             player.clearProp(id);
-                //         } else {
-                //             player.setProp(id, drawable, texture);
-                //         }
-                //     } else {
-                //         player.setClothes(id, drawable, texture, palette);
-
-                //     }
-                // }
             }
         }
 

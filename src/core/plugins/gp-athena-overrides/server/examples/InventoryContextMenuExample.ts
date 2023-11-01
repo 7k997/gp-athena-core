@@ -4,10 +4,11 @@ import { ISharedItem } from '@AthenaPlugins/gp-items-shared/shared/interfaces.js
 
 export class InventoryContextMenuExample {
     static init() {
-        Athena.systems.inventory.factory.addInjection(
-            'fromStoredItem_AfterInjection',
-            InventoryContextMenuExample.addContextMenu,
-        );
+        //TODO Example menu..check if it works. also check db, should not be saved! Too much data!
+        // Athena.systems.inventory.factory.addInjection(
+        //     'fromStoredItem_AfterInjection',
+        //     InventoryContextMenuExample.addContextMenu,
+        // );
     }
 
     static addContextMenu<CustomData = ISharedItem, CustomBehavior = DefaultItemBehavior>(

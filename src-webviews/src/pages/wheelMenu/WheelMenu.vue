@@ -30,7 +30,7 @@
                     />
                 </template>
                 <template v-else>
-                    <img class="wheel-icon mb-2" :src="ResolvePath(option.image)" :alt="option.label" />
+                    <img class="wheel-icon mb-2" :src="getImage(option)" :alt="option.label" />
                 </template>
                 <div class="wheel-text" :class="getColor(option)">
                     {{ option.name }}
@@ -93,7 +93,8 @@ export default defineComponent({
     methods: {
         ResolvePath,
         getImage(option: IWheelOption) {
-            return option.image ? option.image : this.ResolvePath('/assets/images/wheel-menu/question.png');
+            const image = option.image ? option.image : "/assets/images/wheel-menu/question.png"          
+            return ResolvePath(image);
         },
         getColor(option: IWheelOption) {
             if (!option.color) {

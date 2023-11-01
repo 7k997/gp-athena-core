@@ -209,7 +209,7 @@ export function hasItem(
             continue;
         }
 
-        if (item.version !== version) {
+        if (version && item.version !== version) {
             continue;
         }
 
@@ -217,6 +217,24 @@ export function hasItem(
     }
 
     return count >= quantity;
+}
+
+export function getItem(dataSet: Array<StoredItem>, dbName: string, version: number = undefined): StoredItem | null {
+    alt.logWarning(`Data Set: ${JSON.stringify(dataSet)}`);
+    alt.logWarning(`DB Name: ${dbName}`);
+    for (let item of dataSet) {
+        if (item.dbName !== dbName) {
+            continue;
+        }
+
+        if (version && item.version !== version) {
+            continue;
+        }
+
+        return item;
+    }
+
+    return null;
 }
 
 export function upsertData<DataType = {}>(

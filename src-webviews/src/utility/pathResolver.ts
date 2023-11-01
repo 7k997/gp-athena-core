@@ -29,7 +29,9 @@ export default function resolvePath(currentPath: string, pluginName = ''): strin
         currentPath = currentPath.replace('../', '');
     }
 
-    if (currentPath.includes('assets/')) {
+    if (currentPath.includes('/assets/')) {
+        currentPath = currentPath.replace('/assets/', './assets/');
+    } else if (currentPath.includes('assets/')) {
         currentPath = currentPath.replace('assets/', './assets/');
     }
 

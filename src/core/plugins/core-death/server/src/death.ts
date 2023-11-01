@@ -92,7 +92,7 @@ export class DeathSystem {
      * @param {IVector3} [position=undefined]
      * @memberof DeathSystem
      */
-    private static async handleCharacterRespawn(player: alt.Player, position: IVector3 = undefined) {
+    static async handleCharacterRespawn(player: alt.Player, position: IVector3 = undefined) {
         alt.logWarning('handleCharacterRespawn');
         let nearestHopsital = position;
         if (!position) {

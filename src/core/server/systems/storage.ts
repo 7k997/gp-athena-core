@@ -67,6 +67,10 @@ export interface StorageInstance<CustomData = {}> {
      *
      */
     items: Array<StoredItem<CustomData>>;
+
+    maxWeight?: number;
+    maxSlots?: number;
+    supportedItemTypes?: string[];
 }
 
 export function subscribe(player: alt.Player, storage: string): void {
@@ -116,13 +120,24 @@ export function notifyChanges(storage: string): void {
  * @param {Array<StoredItem>} items
  * @return {Promise<string>}
  */
-export async function create(items: Array<StoredItem>): Promise<string> {
+export async function create(
+    items: Array<StoredItem>,
+    maxSlots?: number,
+    maxWeight?: number,
+    supportedItemTypes?: string[],
+): Promise<string> {
     if (Overrides.create) {
-        return Overrides.create(items);
+        return Overrides.create(items, maxSlots, maxWeight, supportedItemTypes);
     }
 
     const document = await Database.insertData<StorageInstance>(
-        { items, lastUsed: Date.now() },
+        {
+            items,
+            lastUsed: Date.now(),
+            maxSlots: maxSlots,
+            maxWeight: maxWeight,
+            supportedItemTypes: supportedItemTypes,
+        },
         Athena.database.collections.Storage,
         true,
     );

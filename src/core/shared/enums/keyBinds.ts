@@ -14,7 +14,7 @@ export const KEY_BINDS = {
     //------------------------------GP Keys---------------------------------
 
     // Stern Special Key
-    NOCLIP: 171,
+    NOCLIP: 106,
 
     //5: 53,
     INTERACTION_EFFECT: 53,
@@ -137,7 +137,7 @@ export const KEY_BINDS = {
     QUICKTEST2: 192,
 
     //* numpad
-    GENERATOR: 106,
+    GENERATOR: 171,
 
     //Blinker und Lights
     TURNLEFT_SIGNAL: 37,

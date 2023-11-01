@@ -140,6 +140,14 @@ async function handleServerProcess(shouldAutoRestart = false) {
         lastServerProcess.kill();
     }
 
+    let shouldCreateServerLogBackup = true; //Corechange, make it configurable
+    if (shouldCreateServerLogBackup) {
+        await fs.rename('server.log', 'server.log-' + new Date().getTime() + '.bak', (err) => {
+            if (err) throw err;
+            console.log('Server Log Backup created!');
+        });
+    }
+
     if (process.platform !== 'win32') {
         await runFile('chmod', '+x', `./altv-server`);
     }

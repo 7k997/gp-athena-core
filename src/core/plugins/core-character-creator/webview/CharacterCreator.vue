@@ -42,11 +42,11 @@
 <script lang="ts">
 import { defineComponent, defineAsyncComponent } from 'vue';
 
-import MakeupList from './utility/makeupList';
-import OverlaysList from './utility/overlaysList';
-import { MaleHairOverlays, FemaleHairOverlays } from './utility/hairOverlays';
-import { MalePresets, FemalePresets } from './utility/presets';
-import { CHARACTER_CREATOR_LOCALE } from '../shared/locale';
+import MakeupList from './utility/makeupList.js';
+import OverlaysList from './utility/overlaysList.js';
+import { MaleHairOverlays, FemaleHairOverlays } from './utility/hairOverlays.js';
+import { MalePresets, FemalePresets } from './utility/presets.js';
+import { CHARACTER_CREATOR_LOCALE } from '../shared/locale.js';
 import { CHARACTER_CREATOR_WEBVIEW_EVENTS } from '../shared/events.js';
 
 const ComponentName = 'CharacterCreator';

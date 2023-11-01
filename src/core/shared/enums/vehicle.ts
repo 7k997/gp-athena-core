@@ -13,6 +13,9 @@ export const VEHICLE_LOCK_STATE = {
     LOCKED: 2,
     LOCKOUT_PLAYER: 3,
     KIDNAP_MODE: 4,
+    INITIALLY_LOCKED: 5,
+    FORCE_DOORS_SHUT: 6,
+    LOCKED_CAN_BE_DAMAGED: 7,
 };
 
 /**

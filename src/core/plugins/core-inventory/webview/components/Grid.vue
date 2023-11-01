@@ -60,7 +60,7 @@
                     @contextmenu="(e) => unequip(e, index)"
                 >
                     <template v-slot:image v-if="hasItem('toolbar', index)">
-                        <img :src="getImagePath(getItem('toolbar', index))" />
+                        <img :src="getImagePath(getItem('toolbar', index))" @error="handleImageError"/>
                     </template>
                     <template v-slot:index v-else>
                         <template v-if="config.showToolbarNumbers">
@@ -88,6 +88,7 @@
                         <img
                             :src="getImagePath(getItem('inventory', index))"
                             :class="`outlined-image-${getItemSex('inventory', index)}`"
+                            @error="handleImageError"
                         />
                     </template>
                     <template v-slot:index v-else>
@@ -143,15 +144,15 @@
 
 <script lang="ts">
 import { defineComponent, defineAsyncComponent } from 'vue';
-import { CustomContextAction, CustomSubMenu, Item } from '@AthenaShared/interfaces/item';
-import { makeDraggable } from '@ViewUtility/drag';
+import { CustomContextAction, CustomSubMenu, Item } from '@AthenaShared/interfaces/item.js';
+import { makeDraggable } from '@ViewUtility/drag.js';
 import WebViewEvents from '@ViewUtility/webViewEvents.js';
 import { INVENTORY_EVENTS } from '../../shared/events.js';
-import { getImagePath } from '../utility/inventoryIcon';
-import { INVENTORY_CONFIG } from '../../shared/config';
-import { debounceReady } from '../utility/debounce';
-import { DualSlotInfo, InventoryType } from '@AthenaPlugins/core-inventory/shared/interfaces';
-import { SlotInfo } from '../utility/slotInfo';
+import { getImagePath } from '../utility/inventoryIcon.js';
+import { INVENTORY_CONFIG } from '../../shared/config.js';
+import { debounceReady } from '../utility/debounce.js';
+import { DualSlotInfo, InventoryType } from '@AthenaPlugins/core-inventory/shared/interfaces.js';
+import { SlotInfo } from '../utility/slotInfo.js';
 
 export default defineComponent({
     name: 'Inventory',
@@ -207,6 +208,10 @@ export default defineComponent({
         };
     },
     methods: {
+        handleImageError(e: Event) {
+            const target = e.target as HTMLImageElement;
+            target.src = './assets/icons/crate_grey.png';
+        },
         getImagePath,
         drag: makeDraggable,
         updateDescriptor(type: InventoryType, index: number) {
@@ -739,4 +744,48 @@ export default defineComponent({
         /* Pink (oben links) */ rgba(17, 118, 212, 0.5) 100% /* Blau (unten rechts) */
     ); /* Glow-Effekt (Mischung aus pink und blue) */
 }
+
+.green-background {
+    background-color: green;
+}
+
+.inventory-slots .slot:nth-child(-n+5) {
+    background: rgba(0, 255, 0, 0.1); /* Leicht transparentes Grün */
+    box-sizing: border-box;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    position: relative; /* Damit wir das Symbol absolut positionieren können */
+}
+
+/* Schlosssymbol */
+.inventory-slots .slot:nth-child(-n+5)::before {
+    content: "🔒"; /* Hier kannst du ein anderes Symbol verwenden, wenn du möchtest */
+    position: absolute;
+    top: 50%; /* Vertikal zentriert */
+    left: 50%; /* Horizontal zentriert */
+    transform: translate(-50%, -50%); /* Zentriert das Symbol */
+    font-size: 20px; /* Passe die Größe des Symbols nach Bedarf an */
+    color: rgba(0, 0, 0, 0.7); /* Farbe des Symbols */
+}
+
+/* Die letzten 2 Slots */
+.inventory-slots .slot:nth-last-child(-n+5) {
+    background: rgba(255, 0, 0, 0.1); /* Leicht transparentes Rot */
+    box-sizing: border-box;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    position: relative; /* Damit wir das Symbol absolut positionieren können */
+}
+
+/* Schlosssymbol für die letzten 2 Slots */
+.inventory-slots .slot:nth-last-child(-n+5)::before {
+    content: "🙈"; /* Hier kannst du ein anderes Symbol verwenden, wenn du möchtest */
+    position: absolute;
+    top: 50%; /* Vertikal zentriert */
+    left: 50%; /* Horizontal zentriert */
+    transform: translate(-50%, -50%); /* Zentriert das Symbol */
+    font-size: 20px; /* Passe die Größe des Symbols nach Bedarf an */
+    color: rgba(0, 0, 0, 0.7); /* Farbe des Symbols */
+}
+
 </style>

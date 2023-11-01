@@ -17,6 +17,8 @@ const CallbackList: { [key: string]: { [dbName: string]: StoredItemCallbacks } }
     'item-drop': {},
     'item-drop-from-inventory': {},
     'item-drop-from-toolbar': {},
+    'item-pickup': {},
+    'item-give': {},
 };
 
 type InjectionEvents = keyof typeof InjectionList;

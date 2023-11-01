@@ -25,7 +25,7 @@
 </template>
 
 <script lang="ts">
-import { CustomSubMenu, CustomContextAction } from '@AthenaShared/interfaces/item';
+import { CustomSubMenu, CustomContextAction } from '@AthenaShared/interfaces/item.js';
 import { defineComponent, ref, toRefs } from 'vue';
 import ContextSubRecursive from './ContextCustomSub.vue';
 

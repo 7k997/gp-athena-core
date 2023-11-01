@@ -138,6 +138,8 @@ const Internal = {
             !baseItem.noFreeze,
             expiration,
         );
+
+        Athena.systems.inventory.drop.invoke('item-drop', player, clonedItem, type);
     },
     /**
      * Using the split interface; the result will try to push this.
@@ -569,6 +571,9 @@ const Internal = {
         delete offers[data.uid];
         await Athena.document.character.set(player, 'inventory', playerInventory);
         await Athena.document.character.set(target, 'inventory', targetInventory);
+
+        Athena.systems.inventory.drop.invoke('item-give', player, null, 'inventory');
+        Athena.systems.inventory.drop.invoke('item-give', target, null, 'inventory');
     },
     giveDecline(target: alt.Player, data: { uid: string }) {
         const offer = offers[data.uid];
@@ -639,6 +644,8 @@ const Internal = {
             `@plugins/sounds/${INVENTORY_CONFIG.PLUGIN_FOLDER_NAME}/inv_pickup.ogg`,
             0.2,
         );
+
+        Athena.systems.inventory.drop.invoke('item-pickup', player, item, 'inventory');
     },
 };
 

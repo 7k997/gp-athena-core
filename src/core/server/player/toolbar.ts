@@ -128,6 +128,20 @@ export async function has(player: alt.Player, dbName: string, quantity: number, 
     return Athena.systems.inventory.manager.hasItem(data.toolbar, dbName, quantity, version);
 }
 
+//Corechange: Added get by dbName
+export function get(player: alt.Player, dbName: string, version = undefined): StoredItem | null {
+    const data = document.character.get(player);
+    if (typeof data === 'undefined') {
+        return null;
+    }
+
+    if (typeof data.toolbar === 'undefined') {
+        return null;
+    }
+
+    return Athena.systems.inventory.manager.getItem(data.toolbar, dbName, version);
+}
+
 /**
  * Returns the custom item data assigned to a specific item.
  *
@@ -393,6 +407,7 @@ export function findSlots<CustomData = {}>(
 interface ToolbarFunctions {
     add: typeof add;
     has: typeof has;
+    get: typeof get;
     getAt: typeof getAt;
     sub: typeof sub;
     remove: typeof remove;

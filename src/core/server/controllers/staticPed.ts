@@ -37,7 +37,7 @@ export function append(pedData: IPed): string {
     const ped = new alt.Ped(
         pedData.model,
         new alt.Vector3(pedData.pos),
-        pedData.rotation ? new alt.Vector3(pedData.pos) : alt.Vector3.zero,
+        pedData.rotation ? new alt.Vector3(pedData.rotation) : alt.Vector3.zero,
         50,
     );
 

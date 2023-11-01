@@ -305,6 +305,31 @@ export async function modifyItemData<CustomData = {}>(
     return true;
 }
 
+export async function updateItem(player: alt.Player, slot: number, item: StoredItem): Promise<boolean> {
+    // if (Overrides.modifyItemData) {
+    //     return await Overrides.modifyItemData(player, slot, customData);
+    // }
+
+    const data = document.character.get(player);
+    if (typeof data === 'undefined') {
+        return false;
+    }
+
+    if (typeof data.inventory === 'undefined') {
+        return false;
+    }
+
+    const inventoryRef = deepCloneArray<StoredItem>(data.inventory);
+    const index = inventoryRef.findIndex((x) => x.slot === slot);
+    if (index <= -1) {
+        return false;
+    }
+
+    inventoryRef[index] = item;
+    await document.character.set(player, 'inventory', inventoryRef);
+    return true;
+}
+
 interface InventoryFunctions {
     add: typeof add;
     has: typeof has;
@@ -313,6 +338,7 @@ interface InventoryFunctions {
     sub: typeof sub;
     modifyItemData: typeof modifyItemData;
     getItemData: typeof getItemData;
+    updateItem: typeof updateItem;
 }
 
 const Overrides: Partial<InventoryFunctions> = {};
