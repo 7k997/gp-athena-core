@@ -1,12 +1,16 @@
 import * as alt from 'alt-server';
 import * as Athena from '@AthenaServer/api/index.js';
 import { DefaultItemBehavior, Item, StoredItem } from '@AthenaShared/interfaces/item.js';
-import { ISharedItem } from '@AthenaPlugins/gp-items-shared/shared/interfaces.js';
 import { InventoryType } from '@AthenaPlugins/core-inventory/shared/interfaces.js';
 
 const enum ExampleActions {
     Action1 = 'gp-athena-overrides:example:action1',
 }
+
+export interface ICustomItemExample {
+    type: string;
+}
+
 export class InventoryContextMenuExample {
     static init() {
         //TODO Example menu..check if it works. also check db, should not be saved! Too much data!
@@ -23,7 +27,7 @@ export class InventoryContextMenuExample {
         //To something with item...
     }
 
-    static addContextMenu<CustomData = ISharedItem, CustomBehavior = DefaultItemBehavior>(
+    static addContextMenu<CustomData = ICustomItemExample, CustomBehavior = DefaultItemBehavior>(
         functionName: string,
         item: Item<CustomBehavior & DefaultItemBehavior, CustomData>,
     ) {
@@ -59,7 +63,7 @@ export class InventoryContextMenuExample {
         item.customEventsToCall.push({ name: contextMenuName, eventToCall: ExampleActions.Action1 });
 
         //Example for submenues
-        if ((item as StoredItem<ISharedItem>).data.type === 'clothing') {
+        if ((item as StoredItem<ICustomItemExample>).data.type === 'clothing') {
             item.customSubMenus.push({
                 name: clothingContextMenuName,
                 isOpen: false,
