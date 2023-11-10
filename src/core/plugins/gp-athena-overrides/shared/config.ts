@@ -1,8 +1,9 @@
 export const Config = {
     //DEBUG SETTINGS
-    DEBUG: false,
-    DEBUG_INFO: false,
-    DEBUG_WARNING: false,
+    DEBUG: true,
+    DEBUG_INFO: true,
+    DEBUG_WARNING: true,
+    DEVTOOLS: true, //Enable dev tools, in test set to false for test and production!
 
     ENTITY_SELECTOR_MARKER_OFF: true, //Turn the marker off
     MAPOBJECT_SELECTOR_MARKER_OFF: false, //Turn the marker off

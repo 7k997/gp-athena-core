@@ -111,7 +111,7 @@
             <Context :contextTitle="context.title" :x="context.x" :y="context.y" v-if="context && contextShow">
                 <div v-if="context.hasUseEffect" @click="contextAction('use')">Use</div>
                 <template v-for="customAction in context.customEvents">
-                    <div @click="contextAction('use', customAction.eventToCall)">{{ customAction.name }}</div>
+                    <div @click="contextAction('custom', customAction.eventToCall)">{{ customAction.name }}</div>
                 </template>
 
                 <!-- Hier beginnt die Hinzufügung der rekursiven Untermenüs -->
@@ -438,7 +438,7 @@ export default defineComponent({
             type: 'use' | 'split' | 'drop' | 'give' | 'cancel' | 'custom',
             eventToCall: string | string[] = undefined,
         ) {
-            console.log('eventToCall: ' + eventToCall);
+            console.log('eventToCall: ' + eventToCall + ' type: ' + type);
 
             const slot = this.context.slot;
             this.context = undefined;
@@ -457,12 +457,14 @@ export default defineComponent({
 
             // Send custom Event
             if (type === 'custom') {
+                console.log('eventToCall 2: ' + eventToCall + ' type: ' + type);
                 WebViewEvents.emitServer(eventToCall, 'inventory', slot);
                 return;
             }
 
             // Send Event to do the thing it describes
             if (type === 'use') {
+                console.log('eventToCall 3: ' + eventToCall + ' type: ' + type);
                 WebViewEvents.emitServer(INVENTORY_EVENTS.TO_SERVER.USE, 'inventory', slot, eventToCall);
                 return;
             }

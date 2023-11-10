@@ -72,6 +72,24 @@ export function get<K extends keyof AthenaSession.Player>(
 }
 
 /**
+ * Retrieve data from a player's session storage.
+ *
+ * @param {alt.Player} player
+ * @param {keyof AthenaSession.Player} key The value you want to get from the player.
+ * @returns {AthenaSession.Player[K]}
+ */
+export function getById<K extends keyof AthenaSession.Player>(
+    playerId: number,
+    key: K,
+): AthenaSession.Player[K] | undefined {
+    if (typeof sessionStorage[playerId] === 'undefined') {
+        return undefined;
+    }
+
+    return sessionStorage[playerId][key];
+}
+
+/**
  * Returns true, if it has any value set for a given key.
  *
  * @export

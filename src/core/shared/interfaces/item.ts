@@ -470,6 +470,8 @@ export interface BaseItem<Behavior = DefaultItemBehavior, CustomData = {}> exten
     noFreeze?: boolean; //If true, the item will not be freezed on drop/place (normally noCollision must be false)
     maxDistance?: number; //TODO: Test and explain - used in item place preview
     maxDistancePickup?: number; //TODO: Test and explain - used in item place preview
+    zaxisadjustment?: number; //TODO: Test and explain
+    rotation?: alt.IVector3; //TODO: Test and explain
 }
 
 /**

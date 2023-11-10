@@ -5,6 +5,7 @@ import { InventoryType } from '@AthenaPlugins/core-inventory/shared/interfaces.j
 import { ItemUtil } from './itemUtil.js';
 import { deepCloneObject } from '@AthenaShared/utility/deepCopy.js';
 import { Config } from '@AthenaPlugins/gp-athena-overrides/shared/config.js';
+import { ANIMATION_FLAGS } from '@AthenaShared/flags/animationFlags.js';
 
 /**
  *
@@ -164,6 +165,8 @@ export class InventoryUtil {
             return;
         }
 
+        Athena.player.emit.animation(player, 'random@mugging4', 'pickup_low', ANIMATION_FLAGS.NORMAL, 1200);
+
         const newDataSet = Athena.systems.inventory.slot.removeAt(slot, data[type]);
         if (typeof newDataSet === 'undefined') {
             return;
@@ -176,10 +179,23 @@ export class InventoryUtil {
             expiration = 0;
         }
 
+        let position = new alt.Vector3(player.pos.x, player.pos.y, player.pos.z - 1);
+        let rotation = alt.Vector3.zero;
+        if (Config.DEBUG) alt.logWarning('DropItem: ' + JSON.stringify(baseItem));
+        if (baseItem.zaxisadjustment) {
+            if (Config.DEBUG) alt.logWarning(`zaxisadjustment: ${baseItem.zaxisadjustment}`);
+            position = new alt.Vector3(player.pos.x, player.pos.y, player.pos.z - 1 + baseItem.zaxisadjustment);
+        }
+
+        if (baseItem.rotation) {
+            if (Config.DEBUG) alt.logWarning(`rotation: ${JSON.stringify(baseItem.rotation)}`);
+            rotation = new alt.Vector3(baseItem.rotation);
+        }
+
         await Athena.systems.inventory.drops.add(
             clonedItem,
-            new alt.Vector3(player.pos.x, player.pos.y, player.pos.z - 1),
-            alt.Vector3.zero,
+            position,
+            rotation,
             player.dimension,
             player,
             !baseItem.noCollision,

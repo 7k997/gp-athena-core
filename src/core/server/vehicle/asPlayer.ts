@@ -1,6 +1,7 @@
 import * as alt from 'alt-server';
 import * as Athena from '@AthenaServer/api/index.js';
 import { VEHICLE_EVENTS } from '@AthenaShared/enums/vehicle.js';
+import { ANIMATION_FLAGS } from '@AthenaShared/flags/animationFlags.js';
 
 function sharedOwnershipChecks(player: alt.Player, vehicle: alt.Vehicle) {
     if (!vehicle || !vehicle.valid) {
@@ -49,6 +50,7 @@ export async function toggleLock(player: alt.Player, vehicle: alt.Vehicle) {
 
     const isLocked = await Athena.vehicle.controls.toggleLock(vehicle);
     const soundName = isLocked ? 'car_unlock' : 'car_lock';
+    Athena.player.emit.animation(player, 'anim@heists@keycard@', 'idle_a', ANIMATION_FLAGS.NORMAL, 1000);
     Athena.player.emit.sound2D(player, soundName);
 
     const eventToEmit = isLocked ? 'doors-locked' : 'doors-unlocked';

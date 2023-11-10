@@ -20,7 +20,7 @@ export function buildResources() {
         "type = 'js' \r\n" +
         "main = 'server/startup.js' \r\n" +
         "client-main = 'client/startup.js' \r\n" +
-        "required-permissions = ['Screen Capture'] \r\n" +
+        "required-permissions = ['Screen Capture','WebRTC', 'Clipboard Access', 'Extended Voice API'] \r\n" +
         "client-files = ['client/*', 'shared/*', \r\n";
 
     const folders = getClientPluginFolders();

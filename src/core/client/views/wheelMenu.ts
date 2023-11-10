@@ -6,6 +6,7 @@ import { SYSTEM_EVENTS } from '@AthenaShared/enums/system.js';
 import { VIEW_EVENTS_WHEEL_MENU } from '@AthenaShared/enums/views.js';
 import { IWheelOptionExt } from '@AthenaShared/interfaces/wheelMenu.js';
 import ViewModel from '@AthenaClient/models/viewModel.js';
+import { Config } from '@AthenaPlugins/gp-athena-overrides/shared/config.js';
 
 const PAGE_NAME = 'WheelMenu';
 let _label = '';
@@ -113,7 +114,7 @@ export async function open(label: string, options: Array<IWheelOptionExt>, setMo
         return;
     }
 
-    alt.logWarning('Opening Wheel Menu with options: ' + JSON.stringify(options));
+    if (Config.DEBUG) alt.logWarning('Opening Wheel Menu with options: ' + JSON.stringify(options));
     _label = label;
     _options = options;
 

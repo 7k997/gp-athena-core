@@ -88,6 +88,32 @@ export function open(object: CreatedObject | CreatedDrop): void {
         return;
     }
 
+    // If only one option, execute it. No need for another dialog.
+    // Force Single Option Invoke
+    if (options.length === 1) {
+        const option = options[0];
+
+        if (option.callback) {
+            const data = option.data ? option.data : [];
+            option.callback(...data);
+            return;
+        }
+
+        if (option.emitServer) {
+            const data = option.data ? option.data : [];
+            alt.emitServer(option.emitServer, ...data);
+            return;
+        }
+
+        if (option.emitClient) {
+            const data = option.data ? option.data : [];
+            alt.emit(option.emitClient, ...data);
+            return;
+        }
+
+        return;
+    }
+
     AthenaClient.systems.wheelMenu.open('Object', options);
 }
 

@@ -129,7 +129,11 @@ export async function has(player: alt.Player, dbName: string, quantity: number, 
 }
 
 //Corechange: Added get by dbName
-export function get(player: alt.Player, dbName: string, version = undefined): StoredItem | null {
+export function get<CustomData = {}>(
+    player: alt.Player,
+    dbName: string,
+    version = undefined,
+): StoredItem<CustomData> | null {
     const data = document.character.get(player);
     if (typeof data === 'undefined') {
         return null;
@@ -139,7 +143,9 @@ export function get(player: alt.Player, dbName: string, version = undefined): St
         return null;
     }
 
-    return Athena.systems.inventory.manager.getItem(data.toolbar, dbName, version);
+    const item = Athena.systems.inventory.manager.getItem(data.toolbar, dbName, version);
+
+    return deepCloneObject<StoredItem<CustomData>>(item);
 }
 
 /**
@@ -234,6 +240,31 @@ export async function modifyItemData<CustomData = {}>(
     return true;
 }
 
+export async function updateItem<CustomData = {}>(
+    player: alt.Player,
+    slot: number,
+    item: StoredItem<CustomData>,
+): Promise<boolean> {
+    const data = document.character.get(player);
+    if (typeof data === 'undefined') {
+        return false;
+    }
+
+    if (typeof data.toolbar === 'undefined') {
+        return false;
+    }
+
+    const toolbarRef = deepCloneArray<StoredItem>(data.toolbar);
+    const index = toolbarRef.findIndex((x) => x.slot === slot);
+    if (index <= -1) {
+        return false;
+    }
+
+    toolbarRef[index] = item;
+    await document.character.set(player, 'toolbar', toolbarRef);
+    return true;
+}
+
 /**
  *
  * Returns an item from a specific slot.
@@ -273,11 +304,6 @@ export function getAt<CustomData = {}>(player: alt.Player, slot: number): Stored
     }
 
     return deepCloneObject<StoredItem<CustomData>>(item);
-}
-
-interface CustomData {
-    hash: string; // Example: assuming 'hash' is a property in CustomData
-    // Other properties can be added here
 }
 
 /**

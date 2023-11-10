@@ -110,13 +110,13 @@ export function get<T = Character>(player: alt.Player): T | undefined {
 }
 
 //Corechange - getById chars
-// export function getById<T = Character>(id: number): T | undefined {
-//     // if (Overrides.get) {
-//     //     return Overrides.get(player);
-//     // }
+export function getById<T = Character>(id: number): T | undefined {
+    // if (Overrides.get) {
+    //     return Overrides.get(player);
+    // }
 
-//     return <T>Athena.session.player.get(player, SessionKey);
-// }
+    return <T>Athena.session.player.getById(id, SessionKey);
+}
 
 // //Corechange - getAll chars
 // export function getAll(): { [id: string]: Character } {

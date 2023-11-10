@@ -6,9 +6,11 @@ type ClothingInfo = { sex: number; components: Array<ClothingComponent> };
 
 export function getImagePath(item: Item): string {
     // Set Default Image
-    if (!item.data || !item.behavior || !item.behavior.isClothing) {
+    if (!item.data || (item.behavior && !item.behavior.isClothing)) {
         return ResolvePath(item.icon.includes('.png') ? item.icon : item.icon + '.png');
     }
+
+    // Set Clothing Image
 
     const convertedItem = item as Item<DefaultItemBehavior, ClothingInfo>;
 
