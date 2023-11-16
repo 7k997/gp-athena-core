@@ -69,27 +69,20 @@ export async function getBaseItemAsync<CustomData = {}, CustomBehavior = {}>(
         return await Overrides.getBaseItemAsync<CustomData, CustomBehavior>(dbName, version);
     }
 
-    const index = databaseItems.findIndex((item) => {
-        const hasMatchingName = item.dbName === dbName;
-
-        if (!hasMatchingName) {
-            return false;
+    let matchingItems = databaseItems.filter((item) => item.dbName === dbName);
+    if(matchingItems.length > 0) {
+        // Corechange: Get newest version if no version defined
+        if (version === undefined) {
+            matchingItems.sort((a, b) => b.version - a.version);
+            version = matchingItems[0].version; 
         }
 
-        const hasMatchingVersion = item.version === version;
-        if (!hasMatchingVersion) {
-            return false;
-        }
-
-        return true;
-    });
-
-    if (index <= -1) {
-        alt.logWarning(`Could not find item with dbName: ${dbName} in getBaseItem`);
+        const index = matchingItems.findIndex((item) => item.version === version);
+        return deepCloneObject<BaseItem<DefaultItemBehavior & CustomBehavior, CustomData>>(matchingItems[index]);
+    } else {
+        alt.logWarning(`Could not find item with dbName: ${dbName} in getBaseItemAsync`);
         return undefined;
     }
-
-    return deepCloneObject<BaseItem<DefaultItemBehavior & CustomBehavior, CustomData>>(databaseItems[index]);
 }
 
 /**
@@ -300,27 +293,20 @@ export function getBaseItem<CustomData = {}, CustomBehavior = {}>(
         return Overrides.getBaseItem<CustomData, CustomBehavior>(dbName, version);
     }
 
-    const index = databaseItems.findIndex((item) => {
-        const hasMatchingName = item.dbName === dbName;
-
-        if (!hasMatchingName) {
-            return false;
+    let matchingItems = databaseItems.filter((item) => item.dbName === dbName);
+    if(matchingItems.length > 0) {
+        // Corechange: Get newest version if no version defined
+        if (version === undefined) {
+            matchingItems.sort((a, b) => b.version - a.version);
+            version = matchingItems[0].version; 
         }
 
-        const hasMatchingVersion = item.version === version;
-        if (!hasMatchingVersion) {
-            return false;
-        }
-
-        return true;
-    });
-
-    if (index <= -1) {
-        alt.logWarning(`Could not find item with dbName: ${dbName} in getBaseItem`);
+        const index = matchingItems.findIndex((item) => item.version === version);
+        return deepCloneObject<BaseItem<DefaultItemBehavior & CustomBehavior, CustomData>>(matchingItems[index]);
+    } else {
         return undefined;
     }
 
-    return deepCloneObject<BaseItem<DefaultItemBehavior & CustomBehavior, CustomData>>(databaseItems[index]);
 }
 
 // export function applyBeforeInjections(functionName: string, item: any): any {
@@ -534,7 +520,6 @@ export function getBaseItems(): Array<BaseItem> {
  * - Exact name
  * - Partial name
  * - Partial dbname
- *
  * @export
  * @template CustomData
  * @param {string} partialName

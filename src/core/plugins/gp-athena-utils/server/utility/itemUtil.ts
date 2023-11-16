@@ -1,6 +1,6 @@
 import * as alt from 'alt-server';
 import * as Athena from '@AthenaServer/api/index.js';
-import { ItemEx } from '@AthenaShared/interfaces/item.js';
+import { ItemEx, StoredItemEx } from '@AthenaShared/interfaces/item.js';
 import { Character } from '@AthenaShared/interfaces/character.js';
 import { InventoryType } from '@AthenaPlugins/core-inventory/shared/interfaces.js';
 
@@ -16,6 +16,14 @@ export class ItemUtil {
             }
         }
         return null;
+    }
+
+    static getStoredItem<CustomData>(player: alt.Player, slot: number, type: InventoryType): StoredItemEx<CustomData> {
+        if (type === 'toolbar') {
+            return Athena.player.toolbar.getAt(player, slot);
+        } else {
+            return Athena.player.inventory.getAt(player, slot);
+        }
     }
 
     static getPlayerData(player: alt.Player): Character {

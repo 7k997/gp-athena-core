@@ -427,7 +427,7 @@ export default defineComponent({
             };
 
             if (e.altKey) {
-                // Use item direct if Ctrl is pressed
+                // Use item direct if alt is pressed
                 this.contextAction('use');
                 return;
             } else {

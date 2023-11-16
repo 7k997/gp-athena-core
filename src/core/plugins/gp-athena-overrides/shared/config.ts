@@ -13,6 +13,7 @@ export const Config = {
 
     DISABLE_DROPPED_ITEMS_TEXTLABLES: true, //Disable the dropped items textlabels.
     DISABLE_DEFAULT_WEAPON_ITEMS: true, //Disable the default weapon items.
+    DISABLE_WEAPON_REMOVE_ON_DEATH: true, //Disable the weapon remove on death.
     DISABLE_DEFAULT_AMMO: true, //Disable the default ammo.
     DISABLE_DEFAULT_TIME_SYNC: false, //Disable the default time sync.
     DISABLE_HOSPITAL_BLIPS: false, //Disable the hospital blips.

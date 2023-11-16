@@ -1,6 +1,8 @@
+import { Config } from '@AthenaPlugins/gp-athena-overrides/shared/config.js';
+
 export const DEATH_CONFIG = {
     RESPAWN_TIME: 30000,
-    LOSE_ALL_WEAPONS_ON_RESPAWN: true,
+    LOSE_ALL_WEAPONS_ON_RESPAWN: !Config.DISABLE_WEAPON_REMOVE_ON_DEATH,
     RESPAWN_HEALTH: 199,
     RESPAWN_ARMOUR: 0,
     HOSPITALS: [

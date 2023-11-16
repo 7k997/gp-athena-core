@@ -428,7 +428,7 @@ const Internal = {
             return;
         }
 
-        const itemClone = deepCloneObject<StoredItem>(existingItem);
+        let itemClone = deepCloneObject<StoredItem>(existingItem);
         const openSlot = Athena.systems.inventory.slot.findOpen('inventory', data.inventory);
         if (typeof openSlot === 'undefined') {
             return;
@@ -436,9 +436,21 @@ const Internal = {
 
         let inventoryClone = deepCloneArray<StoredItem>(data.inventory);
         itemClone.slot = openSlot;
-        inventoryClone.push(itemClone);
 
-        //TODO Injections!
+        itemClone = await Athena.systems.inventory.swap.invokeInjection(
+            'before-unequip',
+            'before-unequip-1',
+            player,
+            itemClone,
+            {
+                startType: 'toolbar',
+                startIndex: slot,
+                endType: 'inventory',
+                endIndex: openSlot,
+            },
+        );
+
+        inventoryClone.push(itemClone);
 
         let toolbarClone = deepCloneArray<StoredItem>(data.toolbar);
         toolbarClone = Athena.systems.inventory.slot.removeAt(slot, toolbarClone);
@@ -450,6 +462,8 @@ const Internal = {
             toolbar: toolbarClone,
             inventory: inventoryClone,
         });
+
+        Athena.systems.inventory.swap.invoke('item-unequip', 'unequip', player, itemClone, null);
     },
     /**
      * Creates a 'give' request that the target player must accept to recieve an item.

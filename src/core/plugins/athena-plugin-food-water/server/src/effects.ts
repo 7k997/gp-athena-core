@@ -8,6 +8,7 @@ import { VITAL_NAMES } from '../../shared/enums.js';
 import { VitalsSystem } from './system.js';
 import { StoredItem, StoredItemEx } from '@AthenaShared/interfaces/item.js';
 import { InventoryType } from '@AthenaPlugins/core-inventory/shared/interfaces.js';
+import { PedBone } from '@AthenaShared/enums/boneIds.js';
 
 export class InternalFunctions {
     /**
@@ -38,7 +39,7 @@ export class InternalFunctions {
         if (vitalsName === VITAL_NAMES.FOOD) {
             const attachedObject: IAttachable = {
                 model: 'prop_cs_burger_01',
-                bone: 71,
+                bone: PedBone.SKEL_R_Hand,
                 pos: { x: 0.15, y: -0.02, z: -0.05 },
                 rot: { x: -180, y: -150, z: -95 },
             };
@@ -58,7 +59,7 @@ export class InternalFunctions {
         if (vitalsName === VITAL_NAMES.WATER) {
             const attachedObject: IAttachable = {
                 model: 'prop_beer_bottle',
-                bone: 71,
+                bone: PedBone.SKEL_R_Hand,
                 pos: { x: 0.13, y: -0.12, z: -0.05 },
                 rot: { x: 100, y: -220, z: 180 },
             };

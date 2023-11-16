@@ -18,10 +18,11 @@ export default function resolvePath(currentPath: string, pluginName = ''): strin
                 currentPath = currentPath.replace(/.*\@plugins\//gm, `./plugins/`);
             }
         }
+        return currentPath;
     }
 
     // Handles Older Path Values - Previous Item Types
-    if (!currentPath.includes('/') && !currentPath.includes('../')) {
+    if (!currentPath.includes('../') && !currentPath.includes('assets/')) {
         return `./assets/icons/${currentPath}`;
     }
 

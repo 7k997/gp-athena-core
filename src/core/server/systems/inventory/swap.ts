@@ -2,6 +2,7 @@ import * as alt from 'alt-server';
 import { StoredItem, StoredItemEx } from '@AthenaShared/interfaces/item.js';
 import { InventoryType } from './manager.js';
 import { DualSlotInfo } from '@AthenaPlugins/core-inventory/shared/interfaces.js';
+import { Config } from '@AthenaPlugins/gp-athena-overrides/shared/config.js';
 
 const anyDbNamePlaceholder = 'any1sd2f3g4h5j6k7l8';
 
@@ -19,6 +20,8 @@ const InjectionList: { [key: string]: { [dbName: string]: StoredItemInjections }
     'before-swap': {},
     'before-swap-to-inventory': {},
     'before-swap-from-toolbar-to-inventory': {},
+    'before-equip': {}, //NOT IMPLEMENTED
+    'before-unequip': {},
 
     //TODO unequip from toolbar.
 
@@ -40,6 +43,7 @@ const InjectionList: { [key: string]: { [dbName: string]: StoredItemInjections }
 };
 
 const CallbackList: { [key: string]: { [dbName: string]: StoredItemCallbacks } } = {
+    //Callbacks, use to listen to a specific item being swapped.
     'item-swap': {},
     'item-combine': {},
     'item-swap-to-toolbar': {},
@@ -49,6 +53,8 @@ const CallbackList: { [key: string]: { [dbName: string]: StoredItemCallbacks } }
     'item-swap-from-toolbar-to-inventory': {},
     'item-swap-from-toolbar-to-custom': {},
     'item-swap-from-inventory-to-custom': {},
+    'item-equip': {}, //NOT IMPLEMENTED
+    'item-unequip': {},
 };
 
 type InjectionEvents = keyof typeof InjectionList;
@@ -85,7 +91,7 @@ export function invoke(event: Events, sourceID: string, player: alt.Player, item
                 invoke('item-swap-from-toolbar-to-custom', sourceID, player, item, info);
             }
         }
-    }
+    } 
 
     if (!CallbackList[event] || !item) {
         return;
@@ -124,7 +130,7 @@ export async function invokeInjection(
     item: StoredItem,
     info: DualSlotInfo,
 ): Promise<StoredItem> {
-    alt.logWarning(`Invoking ${event}|${sourceID} from ${info.startType} to ${info.endType}`);
+    if (Config.DEBUG) alt.logWarning(`Invoking ${event}|${sourceID} from ${info.startType} to ${info.endType}`);
     //Autoinvoke
 
     if (event === 'before-swap') {
@@ -142,6 +148,7 @@ export async function invokeInjection(
             }
         }
     }
+
     if (!InjectionList[event] || !item) {
         return item;
     }

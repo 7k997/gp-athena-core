@@ -342,8 +342,6 @@ export function add<CustomData = {}>(
         return Overrides.add(item, data, size);
     }
 
-    alt.logWarning(`Adding item3`);
-
     if (item.quantity <= 0) {
         alt.logWarning(`ItemManager: Cannot add negative quantity, or zero quantity to an item.`);
         return undefined;
@@ -352,8 +350,6 @@ export function add<CustomData = {}>(
     if (item.quantity === 0) {
         return Athena.systems.inventory.weight.update<CustomData>(data);
     }
-
-    alt.logWarning(`Adding item4`);
     // Lookup the base item based on the dbName of the item.
     const baseItem = Athena.systems.inventory.factory.getBaseItem(item.dbName, item.version);
     if (typeof baseItem === 'undefined') {
@@ -378,23 +374,19 @@ export function add<CustomData = {}>(
     if (!baseItem.behavior.canStack || actualMaxStack === 1 || availableStackIndex === -1 || item.id) {
         // Ensure there is enough room to add items.
 
-        alt.logWarning(`Adding item5`);
         if (copyOfData.length >= parseFloat(String(size))) {
             return undefined;
         }
-        alt.logWarning(`Adding item5.2`);
         // Determine open slot for item.
         // If undefined; do not try to add anything else; return undefined as a failure.
         const openSlot = Athena.systems.inventory.slot.findOpen(size, copyOfData, reservedSlot);
         if (typeof openSlot === 'undefined') {
             return undefined;
         }
-        alt.logWarning(`Adding item5.3`);
 
         let itemClone = deepCloneObject<StoredItem<CustomData>>(item);
         itemClone.slot = openSlot;
 
-        alt.logWarning(`Adding item5.4`);
         // Use quantity to subtract from max stack size or use amount left
         if (baseItem.behavior.canStack) {
             itemClone.quantity = item.quantity < actualMaxStack ? item.quantity : actualMaxStack;
@@ -407,22 +399,18 @@ export function add<CustomData = {}>(
         copyOfData.push(itemClone);
 
         if (item.quantity === 0) {
-            alt.logWarning(`Adding item quantity 0!`);
             return Athena.systems.inventory.weight.update<CustomData>(copyOfData);
         }
 
-        alt.logWarning(`test1`);
         return add(item, copyOfData, size);
     }
 
-    alt.logWarning(`Adding item6`);
     // If the item.quantity is less than the stack size and less than or equal to amount missing. Simply add to it.
     const amountMissing = actualMaxStack - copyOfData[availableStackIndex].quantity;
     if (item.quantity <= amountMissing) {
         copyOfData[availableStackIndex].quantity += item.quantity;
         copyOfData[availableStackIndex] = calculateItemWeight(baseItem, copyOfData[availableStackIndex]);
 
-        alt.logWarning(`Adding item7`);
         return copyOfData;
     }
 
@@ -433,7 +421,6 @@ export function add<CustomData = {}>(
     copyOfData[availableStackIndex] = calculateItemWeight(baseItem, copyOfData[availableStackIndex]);
 
     item.quantity -= amountMissing;
-    alt.logWarning(`test2 ${item.quantity}`);
     return add(item, copyOfData, size);
 }
 
@@ -987,12 +974,32 @@ export async function toggleItem(player: alt.Player, slot: number, type: Invento
         shouldUpdateClothing = true;
     }
 
-    if (type === 'toolbar') {
+    alt.logWarning('Test Weapon equiped');
+    if (type === 'inventory') {
+        // If weapon will equiped from inventory, unequip all other weapons in toolbar.
+        // Logic to move weapon automatically must be implemented separately.
+        alt.logWarning('Test Weapon equiped 1');
+        const toolbarCopy = deepCloneArray<StoredItem<{ sex?: number; hash?: number; ammo?: number }>>(data['toolbar']);
+        for (let i = 0; i < toolbarCopy.length; i++) {
+            if (typeof toolbarCopy[i].data === 'undefined' || typeof toolbarCopy[i].data.hash === 'undefined') {
+                continue;
+            }
+            alt.logWarning('Test Weapon equiped 2');
+            if (!toolbarCopy[i].isEquipped) {
+                continue;
+            }
+
+            alt.logWarning('Unequip Weapon: ' + dataCopy[i].slot);
+            toolbarCopy[i].isEquipped = false;
+            Athena.player.events.trigger('player-weapon-unequipped', player, toolbarCopy[i].slot, 'toolbar');
+        }
+        await Athena.document.character.set(player, 'toolbar', toolbarCopy);
+    } else if (type === 'toolbar') {
+        // If weapon is equipped from toolbar, unequip all other weapons in toolbar.
         for (let i = 0; i < dataCopy.length; i++) {
             if (typeof dataCopy[i].data === 'undefined' || typeof dataCopy[i].data.hash === 'undefined') {
                 continue;
             }
-
             if (!dataCopy[i].isEquipped) {
                 continue;
             }
@@ -1000,13 +1007,17 @@ export async function toggleItem(player: alt.Player, slot: number, type: Invento
             if (i === index) {
                 continue;
             }
-
             dataCopy[i].isEquipped = false;
             Athena.player.events.trigger('player-weapon-unequipped', player, dataCopy[i].slot, type);
         }
     }
 
+    // if (dataCopy[index].data && typeof dataCopy[index].data.hash !== 'undefined' && type === 'inventory') {
+    //     //FIXME: This is a hack to not set equipped to weapons.
+    //     dataCopy[index].isEquipped = false;
+    // } else {
     dataCopy[index].isEquipped = !dataCopy[index].isEquipped ? true : false;
+    // }
     await Athena.document.character.set(player, type, dataCopy);
 
     const baseItem = Athena.systems.inventory.factory.getBaseItem(dataCopy[index].dbName, dataCopy[index].version);

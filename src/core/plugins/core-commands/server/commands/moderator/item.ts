@@ -37,6 +37,14 @@ Athena.commands.register(
             return;
         }
 
+        //Corechange find latest version of item
+        if (typeof version == 'undefined') {
+            alt.logWarning('Version is undefined');
+            const latestItem = Athena.systems.inventory.factory.getBaseItem(baseItem.dbName);
+            actualVersion = latestItem.version;
+            alt.logWarning('Version is now: ' + actualVersion);
+        }
+
         const result = await Athena.player.inventory.add(player, {
             dbName: baseItem.dbName,
             quantity: actualAmount,

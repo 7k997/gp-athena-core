@@ -3,8 +3,9 @@ import * as AthenaClient from '@AthenaClient/api/index.js';
 import { CHAT_WEBVIEW_EVENTS } from '../shared/events.js';
 import { MessageInfo } from '@AthenaClient/systems/messenger.js';
 import { onTicksStart } from '@AthenaClient/events/onTicksStart.js';
+import { KEY_BINDS } from '@AthenaShared/enums/keyBinds.js';
 
-const THE_LETTER_T = 84;
+const CHAT_KEY = KEY_BINDS.CHAT;
 const PAGE_NAME = 'Chat';
 let hasRegistered = false;
 
@@ -81,7 +82,7 @@ const InternalFunctions = {
 
 onTicksStart.add(() => {
     AthenaClient.systems.hotkeys.add({
-        key: THE_LETTER_T,
+        key: CHAT_KEY,
         description: 'Open Chat Box',
         identifier: 'open-chat-box',
         keyDown: InternalFunctions.openMessageBox,

@@ -78,8 +78,6 @@ const ClientAttachableSystem = {
             return;
         }
 
-        alt.log(`Deleting Attachable for ${entity.id}`);
-
         await ClientAttachableSystem.remove(entity);
 
         delete cache[entity.id];

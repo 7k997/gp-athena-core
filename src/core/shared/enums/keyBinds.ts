@@ -48,7 +48,7 @@ export const KEY_BINDS = {
     // K
     FACTIONS: 75,
     //F4
-    // WALKIETALKIE: 115,
+    // F4: 115,
     // T
     WALKIETALKIE_TALK: 84,
     // F5
