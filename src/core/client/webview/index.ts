@@ -27,6 +27,16 @@ let _currentEvents: { eventName: string; callback: any }[] = [];
 let _cursorCount: number = 0;
 let _isDisconnecting = false;
 
+// Static pages
+const staticEmptyPageNamePrefix = 'EmptyStaticPage';
+let StaticPages: Array<{ name: string }> = [
+    { name: staticEmptyPageNamePrefix + '0' },
+    { name: staticEmptyPageNamePrefix + '1' },
+    { name: staticEmptyPageNamePrefix + '2' },
+    { name: staticEmptyPageNamePrefix + '3' },
+    { name: staticEmptyPageNamePrefix + '4' },
+];
+
 const InternalFunctions = {
     /**
      * Gets all current pages and updates the WebView process.
@@ -42,7 +52,17 @@ const InternalFunctions = {
         }
 
         alt.log(`[Vue] === Updating Pages`);
+        alt.log(`[Vue] === Static pages` + JSON.stringify(StaticPages));
 
+        // Set Static Pages
+        view.emit(
+            WebViewEventNames.SET_PAGES,
+            StaticPages.map((page) => {
+                return { name: page.name };
+            }),
+            'static',
+        );
+        
         // Set Pages
         view.emit(
             WebViewEventNames.SET_PAGES,
@@ -439,6 +459,109 @@ export async function openPages(
     }
 
     Pages = pagesToAppend.concat(Pages);
+    const view = await get();
+    if (!view) {
+        isUpdating = false;
+        return;
+    }
+
+    await InternalFunctions.updatePages();
+    alt.nextTick(() => {
+        isUpdating = false;
+    });
+}
+
+/**
+     * Used to open one static page.
+     * Use a single page if you have closing callbacks.
+     *
+     * @static
+     * @param {(string)} staticPageName Single page name. Case sensitive.
+     * @param {() => void} [closeOnEscapeCallback=undefined] An event to call when the page is closed.
+     * @return {*}
+     * @memberof WebViewController
+     */
+export async function openStaticPage(
+    staticPageName: string,
+    hideOverlays: boolean = true,
+    closeOnEscapeCallback: () => void = undefined,
+) {
+    if (isUpdating) {
+        await InternalFunctions.isDoneUpdating();
+    }
+
+    isUpdating = true;
+
+    if (hideOverlays) {
+        setOverlaysVisible(false, true);
+    }
+
+    const pageIndex = StaticPages.findIndex((x) => x.name === staticPageName);
+
+    // Already opened, not opening twice.
+    if (pageIndex > -1) {
+        isUpdating = false;
+        return;
+    }
+
+    if (closeOnEscapeCallback) {
+        CloseEvents[staticPageName] = closeOnEscapeCallback;
+    }
+
+    //Static pages array must be always have the same length
+    //Find free slot
+    const staticFreeIndex = StaticPages.findIndex((page) => page.name.startsWith(staticEmptyPageNamePrefix));
+    if (staticFreeIndex <= -1) {
+        isUpdating = false;
+        return; //No static page slot free! Cannot open page.
+    }
+
+    alt.logWarning('!!!!!!!! open static page: ' + staticPageName);
+    alt.logWarning('!!!!!!!! freeIndex ' + staticFreeIndex);
+
+    StaticPages[staticFreeIndex] = { name: staticPageName };
+
+    const view = await get();
+    if (!view) {
+        isUpdating = false;
+        return;
+    }
+
+    await InternalFunctions.updatePages();
+    alt.nextTick(() => {
+        isUpdating = false;
+    });
+}
+
+
+/**
+     * Close a group of static pages that may or may not be open.
+     *
+     * @static
+     * @param {Array<string>} pageName
+     * @memberof WebViewController
+     */
+export async function closeStaticPage(staticPageName: string, showOverlays = false) {
+    if (isUpdating) {
+        await InternalFunctions.isDoneUpdating();
+    }
+
+    isUpdating = true;
+
+    const staticPageIndex = StaticPages.findIndex((page) => page.name === staticPageName);
+    if (staticPageIndex <= -1) {
+        isUpdating = false;
+        return;
+    }
+
+    alt.logWarning('!!!!!!!! close static page: ' + staticPageName);
+    alt.logWarning('!!!!!!!! replace with ' + staticEmptyPageNamePrefix + staticPageIndex);
+    StaticPages[staticPageIndex] = { name: staticEmptyPageNamePrefix + staticPageIndex };
+
+    if (showOverlays) {
+        await setOverlaysVisible(true, true);
+    }
+
     const view = await get();
     if (!view) {
         isUpdating = false;

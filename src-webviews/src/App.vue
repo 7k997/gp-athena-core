@@ -7,6 +7,38 @@
             @DevUpdatePages="devUpdatePages"
             v-if="isDevMenu()"
         />
+        <!-- Displays up to 5 individual pages - no reload - for gp-voice -->
+        <component
+            v-if="static[0]"
+            :is="static[0].component"
+            :id="'page-' + static[0].name"
+            :state="state"
+        ></component>
+        <component
+            v-if="static[1]"
+            :is="static[1].component"
+            :id="'page-' + static[1].name"
+            :state="state"
+        ></component>
+        <component
+            v-if="static[2]"
+            :is="static[2].component"
+            :id="'page-' + static[2].name"
+            :state="state"
+        ></component>
+        <component
+            v-if="static[3]"
+            :is="static[3].component"
+            :id="'page-' + static[3].name"
+            :state="state"
+        ></component>
+        <component
+            v-if="static[4]"
+            :key="0"
+            :is="static[4].component"
+            :id="'page-' + static[4].name"
+            :state="state"
+        ></component>
         <!-- Displays Individual Pages -->
         <component
             v-for="(page, index) in pages"
@@ -73,6 +105,7 @@ export default defineComponent({
     data() {
         return {
             isPagesUpdating: false,
+            static: [] as Array<IPageData>,
             persistent: [] as Array<IPageData>,
             overlays: [] as Array<IPageData>,
             pages: [] as Array<IPageData>,
@@ -115,7 +148,7 @@ export default defineComponent({
 
             return false;
         },
-        async handleSetPages(pages: Array<{ name: string }>, type: 'pages' | 'overlays' | 'persistent') {
+        async handleSetPages(pages: Array<{ name: string }>, type: 'pages' | 'overlays' | 'persistent'| 'static') {
             if (!pages || !Array.isArray(pages)) {
                 console.error(`Failed to set any pages.`);
                 return;
@@ -125,9 +158,14 @@ export default defineComponent({
                 await this.isPageUpdateReady();
             }
 
-            const foundPages = this.pageBindings.filter((page) =>
+            const foundPagesWrongOrder = this.pageBindings.filter((page) =>
                 pages.find((pageType) => pageType.name === page.name),
             );
+
+            //Reorder to pages order
+            const foundPages = pages.map((page) => {
+                return foundPagesWrongOrder.find((foundPage) => foundPage.name === page.name);
+            });
 
             this[type] = foundPages;
             console.log(`[Vue] ${type} -> ${JSON.stringify(foundPages.map((x) => x.name))}`);
