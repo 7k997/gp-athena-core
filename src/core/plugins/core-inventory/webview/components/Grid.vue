@@ -34,6 +34,7 @@
             <Split
                 :name="splitData.name"
                 :slot="splitData.slot"
+                :inventoryType="giveData.inventoryType"
                 :quantity="splitData.quantity"
                 @cancel-split="cancelSplit"
                 v-if="splitData"
@@ -42,6 +43,7 @@
             <Give
                 :name="giveData.name"
                 :slot="giveData.slot"
+                :inventoryType="giveData.inventoryType"
                 :quantity="giveData.quantity"
                 @cancel-give="cancelGive"
                 v-if="giveData"
@@ -57,7 +59,7 @@
                     @mouseenter="updateDescriptor('toolbar', index)"
                     @mouseleave="updateDescriptor(undefined, undefined)"
                     @mousedown="(e) => drag(e, { endDrag, canBeDragged: hasItem('toolbar', index), startDrag })"
-                    @contextmenu="(e) => unequip(e, index)"
+                    @contextmenu="(e) => contextMenuToolbar(e, index)"
                 >
                     <template v-slot:image v-if="hasItem('toolbar', index)">
                         <img :src="getImagePath(getItem('toolbar', index))" @error="handleImageError"/>
@@ -133,10 +135,10 @@
                 </template>
                 <!-- Hier endet die Hinzufügung der rekursiven Untermenüs -->
 
-                <div @click="contextAction('split')">Split</div>
+                <div @click="contextAction('split')" v-if="context.inventoryType === 'inventory'">Split</div>
                 <div @click="contextAction('drop')">Drop</div>
                 <div @click="contextAction('give')">Give</div>
-                <div @click="contextAction('cancel')">Cancel</div>
+                <!-- <div @click="contextAction('cancel')">Cancel</div> -->
             </Context>
         </div>
     </div>
@@ -187,6 +189,7 @@ export default defineComponent({
                       y: number;
                       title: string;
                       slot: number;
+                      inventoryType: InventoryType;
                       hasUseEffect: boolean;
                       customEvents: Array<CustomContextAction>;
                       customSubMenus: Array<CustomSubMenu>;
@@ -196,8 +199,8 @@ export default defineComponent({
             itemName: '',
             itemDescription: '',
             totalWeight: 0,
-            splitData: undefined as { name: string; slot: number; quantity: number },
-            giveData: undefined as { name: string; slot: number; quantity: number },
+            splitData: undefined as { name: string; slot: number; quantity: number, inventoryType: InventoryType},
+            giveData: undefined as { name: string; slot: number; quantity: number, inventoryType: InventoryType },
             config: {
                 units: INVENTORY_CONFIG.WEBVIEW.WEIGHT.UNITS,
                 showGridNumbers: INVENTORY_CONFIG.WEBVIEW.GRID.SHOW_NUMBERS,
@@ -400,6 +403,45 @@ export default defineComponent({
                 this.slotLimits = newSlotLimits;
             }
         },
+        contextMenuToolbar(e: MouseEvent, slot: number) {
+            if (e.altKey) {
+                // Unequip item if alt key is pressed
+                this.unequip(e, slot);
+                return;
+            }
+
+            e.preventDefault();
+            if (!this.hasItem('toolbar', slot)) {
+                return;
+            }            
+
+            const item = this.getItem('toolbar', slot);
+
+            // Let's check, if this item can be used. This information is used to show/hide the "Use" context menu action.
+            const hasUseEffect: boolean =
+                typeof item.consumableEventToCall !== 'undefined' ||
+                (item.behavior && (item.behavior.isEquippable || item.behavior.isWeapon || item.behavior.isClothing));
+
+            this.contextShow = false;
+            this.context = {
+                title: item.name,
+                slot: item.slot,
+                inventoryType: "toolbar",
+                x: e.clientX,
+                y: e.clientY,
+                hasUseEffect: hasUseEffect,
+                customEvents: item.customEventsToCall,
+                customSubMenus: item.customSubMenus,
+            };
+
+            if (e.altKey) {
+                // Unequip item if alt key is pressed
+                this.unequip(e, slot);
+                return;
+            } else {
+                this.contextShow = true;
+            }
+        },
         contextMenu(e: MouseEvent, slot: number) {
             //TODO: Allow running with inventory.
 
@@ -419,6 +461,7 @@ export default defineComponent({
             this.context = {
                 title: item.name,
                 slot: item.slot,
+                inventoryType: "inventory",
                 x: e.clientX,
                 y: e.clientY,
                 hasUseEffect: hasUseEffect,
@@ -441,6 +484,7 @@ export default defineComponent({
             console.log('eventToCall: ' + eventToCall + ' type: ' + type);
 
             const slot = this.context.slot;
+            const inventoryType = this.context.inventoryType;
             this.context = undefined;
 
             if (typeof slot === 'undefined') {
@@ -458,19 +502,19 @@ export default defineComponent({
             // Send custom Event
             if (type === 'custom') {
                 console.log('eventToCall 2: ' + eventToCall + ' type: ' + type);
-                WebViewEvents.emitServer(eventToCall, 'inventory', slot);
+                WebViewEvents.emitServer(eventToCall, inventoryType, slot);
                 return;
             }
 
             // Send Event to do the thing it describes
             if (type === 'use') {
                 console.log('eventToCall 3: ' + eventToCall + ' type: ' + type);
-                WebViewEvents.emitServer(INVENTORY_EVENTS.TO_SERVER.USE, 'inventory', slot, eventToCall);
+                WebViewEvents.emitServer(INVENTORY_EVENTS.TO_SERVER.USE, inventoryType, slot, eventToCall);
                 return;
             }
 
             if (type === 'split' || type === 'give') {
-                const item = this.getItem('inventory', slot);
+                const item = this.getItem(inventoryType, slot);
                 if (typeof item === 'undefined') {
                     return;
                 }
@@ -483,6 +527,7 @@ export default defineComponent({
                 this[dataName] = {
                     name: item.name,
                     quantity: item.quantity,
+                    inventoryType: inventoryType,
                     slot: slot,
                 };
 
@@ -490,7 +535,7 @@ export default defineComponent({
             }
 
             if (type === 'drop') {
-                WebViewEvents.emitServer(INVENTORY_EVENTS.TO_SERVER.DROP, 'inventory', slot);
+                WebViewEvents.emitServer(INVENTORY_EVENTS.TO_SERVER.DROP, inventoryType, slot);
                 return;
             }
         },

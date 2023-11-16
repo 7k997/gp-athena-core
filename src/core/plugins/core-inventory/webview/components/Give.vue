@@ -50,6 +50,10 @@ export default defineComponent({
             type: Number,
             required: true,
         },
+        inventoryType: {
+            type: String,
+            required: true,
+        },
     },
     methods: {
         adjust(value: number) {
@@ -63,7 +67,7 @@ export default defineComponent({
             }
         },
         finish(id: number) {
-            WebViewEvents.emitServer(INVENTORY_EVENTS.TO_SERVER.GIVE, 'inventory', this.slot, id);
+            WebViewEvents.emitServer(INVENTORY_EVENTS.TO_SERVER.GIVE, this.inventoryType, this.slot, id);
             this.$emit('cancel-give');
         },
         setClosestPlayers(players: PlayerList) {

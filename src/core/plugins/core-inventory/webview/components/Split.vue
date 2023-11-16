@@ -48,6 +48,10 @@ export default defineComponent({
             type: Number,
             required: true,
         },
+        inventoryType: {
+            type: String,
+            required: true,
+        },
     },
     methods: {
         adjust(value: number) {
@@ -61,7 +65,7 @@ export default defineComponent({
             }
         },
         finish() {
-            WebViewEvents.emitServer(INVENTORY_EVENTS.TO_SERVER.SPLIT, 'inventory', this.slot, this.amount);
+            WebViewEvents.emitServer(INVENTORY_EVENTS.TO_SERVER.SPLIT, this.inventoryType, this.slot, this.amount);
             this.$emit('cancel-split');
         },
     },
