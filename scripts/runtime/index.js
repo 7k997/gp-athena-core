@@ -142,9 +142,12 @@ async function handleServerProcess(shouldAutoRestart = false) {
 
     let shouldCreateServerLogBackup = true; //Corechange, make it configurable
     if (shouldCreateServerLogBackup) {
-        await fs.rename('server.log', 'server.log-' + new Date().getTime() + '.bak', (err) => {
-            if (err) throw err;
-            console.log('Server Log Backup created!');
+        fs.exists('server.log', async (exists) => {
+            if(!exists) return;
+            await fs.rename('server.log', 'server.log-' + new Date().getTime() + '.bak', (err) => {
+                if (err) throw err;
+                console.log('Server Log Backup created!');
+            });
         });
     }
 
