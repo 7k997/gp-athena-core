@@ -12,8 +12,7 @@ export type AthenaVehicleEvents =
     | 'vehicle-destroyed'
     | 'vehicle-repaired'
     | 'vehicle-spawned'
-    | 'vehicle-repaired'
-    | 'vehicle-update';
+    | 'vehicle-repaired';
 
 const vehicleEvents: Array<{ eventName: string; callback: Function }> = [];
 
@@ -36,14 +35,6 @@ export function trigger<CustomEvents = AthenaVehicleEvents>(
         vehicleEvents[i].callback(vehicle, ...args);
     }
 }
-
-/**
- * Triggered when a vehicle will be updated (very othen).
- *
- * @param {'vehicle-updated'} eventName
- * @param {(vehicle: alt.Vehicle) => void} callback
- */
-export function on(eventName: 'vehicle-updated', callback: (vehicle: alt.Vehicle) => void);
 
 /**
  * Triggered when a vehicle has been spawned / created.

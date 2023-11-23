@@ -16,7 +16,7 @@ import { CreatedDrop } from '@AthenaClient/streamers/item.js';
 import { Config } from '@AthenaPlugins/gp-athena-overrides/shared/config.js';
 
 //Corechange: TODO remove entity selector over vehicles and maybe more
-// import { CreatedObject } from '@AthenaClient/streamers/object.js';
+import { CreatedObject } from '@AthenaClient/streamers/object.js';
 
 export type ValidEntityTypes = 'object' | 'pos' | 'npc' | 'player' | 'vehicle' | 'interaction';
 export type TargetInfo = {
@@ -104,7 +104,7 @@ const Internal = {
 
         return entityInfo;
     },
-    getClosestNearby(dataSet: Array<alt.Entity>, distance = Config.MAX_INTERACTION_DISTANCE) {
+    getClosestNearby(dataSet: Array<alt.Entity>, distance = 25) {
         const closest = dataSet.filter((x) => {
             if (x.pos.x === 0 && x.pos.y === 0) {
                 return false;
@@ -122,12 +122,10 @@ const Internal = {
     },
     updateSelectionList() {
         const players = Internal.getClosestNearby([...alt.Player.all]);
-        const peds = Internal.getClosestNearby([...alt.Ped.all]);
         const vehicles = Internal.getClosestNearby([...alt.Vehicle.streamedIn]);
         const objects = Internal.getClosestNearby([...alt.Object.all]);
 
         let entityInfo: Array<TargetInfo> = Internal.convert(players, 'player');
-        entityInfo = entityInfo.concat(Internal.convert(peds, 'npc'));
         entityInfo = entityInfo.concat(Internal.convert(vehicles, 'vehicle'));
         entityInfo = entityInfo.concat(Internal.convert(objects, 'object'));
 
@@ -237,7 +235,7 @@ const Internal = {
             switch (selection.type) {
                 case 'npc':
                     wheelOptions.push({
-                        name: `Person`,
+                        name: `NPC`,
                         icon: 'icon-user-tie',
                         data: [selection.id],
                         callback: (_scriptID: number) => {
@@ -251,7 +249,7 @@ const Internal = {
                         break;
                     }
                     wheelOptions.push({
-                        name: `Person`,
+                        name: `Player`,
                         icon: 'icon-person',
                         data: [targetPlayer],
                         callback: (_targetPlayer: alt.Player) => {

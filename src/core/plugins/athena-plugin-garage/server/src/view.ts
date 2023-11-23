@@ -68,12 +68,9 @@ export class GarageFunctions {
     static async add(garage: IGarage) {
         alt.log(`~g~Registered Garage - ${garage.index}`);
 
-        //FIXME: This is a temporary fix for the garage types.
-        const properTypeName = garage.types[0].charAt(0).toUpperCase() + garage.types[0].slice(1);
-
         Athena.controllers.interaction.append({
             position: garage.position,
-            description: `${LOCALE_GARAGE_FUNCS.BLIP_GARAGE} ${properTypeName}`,
+            description: `${LOCALE_GARAGE_FUNCS.BLIP_GARAGE}`,
             data: [garage.index], // Shop Index
             callback: GarageFunctions.open,
             isPlayerOnly: true,
@@ -146,6 +143,7 @@ export class GarageFunctions {
 
         const garage = activeGarages[index];
         const garageTypes = activeGarages[index].types;
+        const garageTypesExcluded = activeGarages[index].typesExcluded;
 
         // 2
         alt.logWarning(`open - 2`);
@@ -176,10 +174,23 @@ export class GarageFunctions {
             // 5
             // Filter Vehicles by Type
             let typeValid = false;
-            for (let i = 0; i < garageTypes.length; i++) {
-                const type = garageTypes[i];
-                if (isVehicleType(data.type, type)) {
-                    typeValid = true;
+            if (garageTypes && garageTypes.length > 0) {
+                for (let i = 0; i < garageTypes.length; i++) {
+                    const type = garageTypes[i];
+                    if (isVehicleType(data.type, type)) {
+                        typeValid = true;
+                    }
+                }
+            } else {
+                typeValid = true;
+
+                if (garageTypesExcluded && garageTypesExcluded.length > 0) {
+                    for (let i = 0; i < garageTypesExcluded.length; i++) {
+                        const type = garageTypesExcluded[i];
+                        if (isVehicleType(data.type, type)) {
+                            typeValid = false;
+                        }
+                    }
                 }
             }
 

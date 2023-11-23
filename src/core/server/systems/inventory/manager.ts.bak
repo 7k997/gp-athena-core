@@ -995,10 +995,11 @@ export async function toggleItem(player: alt.Player, slot: number, type: Invento
         }
         await Athena.document.character.set(player, 'toolbar', toolbarCopy);
     } else if (type === 'toolbar') {
-        // Corechange: Not only weapons can be equipped from toolbar. So set isEquipped to false for all items.
-        // ONLY one item can be equipped at a time in toolbar. For inventory this is different and multiple items can be equipped.
         // If weapon is equipped from toolbar, unequip all other weapons in toolbar.
         for (let i = 0; i < dataCopy.length; i++) {
+            if (typeof dataCopy[i].data === 'undefined' || typeof dataCopy[i].data.hash === 'undefined') {
+                continue;
+            }
             if (!dataCopy[i].isEquipped) {
                 continue;
             }
@@ -1006,14 +1007,8 @@ export async function toggleItem(player: alt.Player, slot: number, type: Invento
             if (i === index) {
                 continue;
             }
-
-            if (dataCopy[i].data && dataCopy[i].data.hash && dataCopy[i].isEquipped) {
-                dataCopy[i].isEquipped = false;
-                Athena.player.events.trigger('player-weapon-unequipped', player, dataCopy[i].slot, type);
-            } else if (dataCopy[i].isEquipped) {
-                dataCopy[i].isEquipped = false;
-                Athena.player.events.trigger('item-unequipped', player, dataCopy[i].slot, type);
-            }
+            dataCopy[i].isEquipped = false;
+            Athena.player.events.trigger('player-weapon-unequipped', player, dataCopy[i].slot, type);
         }
     }
 

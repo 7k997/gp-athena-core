@@ -84,10 +84,10 @@ export default defineComponent({
         relayClosePage() {
             WebViewEvents.emitClose();
         },
-        setLocales(localeObject) {
+        setLocales(localeObject: any) {
             this.locales = localeObject;
         },
-        spawn(index) {
+        spawn(index: string | number) {
             if (!('alt' in window)) {
                 console.log(this.vehicles[index]);
                 return;

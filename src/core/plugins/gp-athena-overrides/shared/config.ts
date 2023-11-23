@@ -5,6 +5,8 @@ export const Config = {
     DEBUG_WARNING: true,
     DEVTOOLS: true, //Enable dev tools, in test set to false for test and production!
 
+    MAX_INTERACTION_DISTANCE: 5, //Max interaction distance for interaction with objects, items, players and NPCs. Athena Default is 25
+    NPC_MENU_DISTANCE: 5, //Max interaction distance for the NPC menu. Athena Default is 5
     ENTITY_SELECTOR_MARKER_OFF: true, //Turn the marker off
     MAPOBJECT_SELECTOR_MARKER_OFF: false, //Turn the marker off
     ENTITY_SELECTOR_AUTOMODE: true, //Find the closest entity and not allow cycling targets.

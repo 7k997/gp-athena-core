@@ -144,8 +144,7 @@ export function get<CustomData = {}>(
     }
 
     const item = Athena.systems.inventory.manager.getItem(data.toolbar, dbName, version);
-    if (!item) return null;
-    
+
     return deepCloneObject<StoredItem<CustomData>>(item);
 }
 

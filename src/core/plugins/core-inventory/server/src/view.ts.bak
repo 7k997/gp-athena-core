@@ -9,7 +9,6 @@ import { INVENTORY_CONFIG } from '@AthenaPlugins/core-inventory/shared/config.js
 import { ComplexSwapReturn } from '@AthenaServer/systems/inventory/manager.js';
 import { Config } from '@AthenaPlugins/gp-athena-overrides/shared/config.js';
 import { ANIMATION_FLAGS } from '@AthenaShared/flags/animationFlags.js';
-import { getForwardVector } from '@AthenaShared/utility/vector.js';
 
 type PlayerCallback = (player: alt.Player) => void;
 type PlayerCloseCallback = (uid: string, items: Array<StoredItem>, player: alt.Player | undefined) => void;
@@ -133,14 +132,7 @@ const Internal = {
 
         await Athena.document.character.set(player, type, newDataSet);
 
-        //Corechange: Drop item in front of player
-        const forwardVector = getForwardVector(player.rot);
-        let position = new alt.Vector3(
-            player.pos.x + forwardVector.x * 1,
-            player.pos.y + forwardVector.y * 1,
-            player.pos.z - 1,
-        );
-
+        let position = new alt.Vector3(player.pos.x, player.pos.y, player.pos.z - 1);
         let rotation = alt.Vector3.zero;
         if (Config.DEBUG) alt.logWarning('DropItem: ' + JSON.stringify(baseItem));
         if (baseItem.zaxisadjustment) {

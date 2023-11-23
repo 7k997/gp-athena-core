@@ -4,7 +4,6 @@ import * as AthenaClient from '@AthenaClient/api/index.js';
 
 import { IWheelOptionExt } from '@AthenaShared/interfaces/wheelMenu.js';
 import { IPed } from '@AthenaShared/interfaces/iPed.js';
-import { Config } from '@AthenaPlugins/gp-athena-overrides/shared/config.js';
 
 export type NpcMenuInjection = (scriptID: number, ped: IPed, options: Array<IWheelOptionExt>) => Array<IWheelOptionExt>;
 
@@ -44,28 +43,30 @@ export function open(scriptID: number): void {
     if (Overrides.open) {
         return Overrides.open(scriptID);
     }
-    
+
     if (disabled) {
         return;
     }
+
     if (AthenaClient.webview.isAnyMenuOpen()) {
         return;
     }
-    //Corechange: Check if entity is a ped failes for some reason.
-    // if (!native.isEntityAPed(scriptID)) {
-    //     return;
-    // }
 
-    //Corechange: Get ped also if its not created by athena api.
-    const ped = AthenaClient.streamers.ped.getGlobal(scriptID);
+    if (!native.isEntityAPed(scriptID)) {
+        return;
+    }
+
+    const ped = AthenaClient.streamers.ped.get(scriptID);
     if (!ped) {
         return;
     }
+
     const coords = native.getEntityCoords(scriptID, false);
     const dist = AthenaClient.utility.vector.distance(alt.Player.local.pos, coords);
-    if (dist >= Config.NPC_MENU_DISTANCE) {
+    if (dist >= 5) {
         return;
     }
+
     let options: Array<IWheelOptionExt> = [];
 
     for (const callback of Injections) {

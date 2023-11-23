@@ -182,7 +182,6 @@ function handleDrawPeds() {
 
 /**
  * Gets an NPC based on their scriptID if present.
- * Gets only NPC which are created by athena API. If u need also peds created from other scripts use getGlobal.
  *
  * @static
  * @param {number} scriptId
@@ -217,37 +216,6 @@ export function get(scriptId: number): IPed | undefined {
 
     return undefined;
 }
-
-/**
- * Gets an Global NPC based on their scriptID if present.
- * @beta
- *
- * @static
- * @param {number} scriptId
- *
- */
-export function getGlobal(scriptId: number): IPed | undefined {
-    let ped = get(scriptId);
-    if(ped) return ped;
-
-    // let filtered = alt.Ped.all.filter((v) => scriptId == v.id);
-    // alt.logWarning(`Filtered: ${JSON.stringify(filtered)}`);
-    // alt.logWarning(`ScriptID: ${scriptId}`);
-    // if (filtered.length === 0) return undefined;
-
-    ped = {
-        uid: 'global-' + scriptId,
-        model: native.getEntityModel(scriptId) + "",
-        pos: native.getEntityCoords(scriptId, true),
-        rotation: native.getEntityRotation(scriptId, 2),
-        maxDistance: 25,
-        animations: [],
-        randomizeAppearance: false,
-    };
-
-    return ped;
-}
-
 
 /**
  * Create a client-only static pedestrian.

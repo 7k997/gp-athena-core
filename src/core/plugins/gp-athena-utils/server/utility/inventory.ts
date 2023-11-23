@@ -6,6 +6,7 @@ import { ItemUtil } from './itemUtil.js';
 import { deepCloneObject } from '@AthenaShared/utility/deepCopy.js';
 import { Config } from '@AthenaPlugins/gp-athena-overrides/shared/config.js';
 import { ANIMATION_FLAGS } from '@AthenaShared/flags/animationFlags.js';
+import { getForwardVector } from '@AthenaShared/utility/vector.js';
 
 /**
  *
@@ -165,21 +166,29 @@ export class InventoryUtil {
             return;
         }
 
-        Athena.player.emit.animation(player, 'random@mugging4', 'pickup_low', ANIMATION_FLAGS.NORMAL, 1200);
+        //No Animation for server drop without player interaction!
+        //Athena.player.emit.animation(player, 'random@mugging4', 'pickup_low', ANIMATION_FLAGS.NORMAL, 1200);
 
         const newDataSet = Athena.systems.inventory.slot.removeAt(slot, data[type]);
         if (typeof newDataSet === 'undefined') {
             return;
         }
 
-        await Athena.document.character.set(player, type, newDataSet);
-
         let expiration = null;
         if (Config.DISABLE_OBJECT_DROP_BYPLAYER_EXPIRATION) {
             expiration = 0;
         }
 
-        let position = new alt.Vector3(player.pos.x, player.pos.y, player.pos.z - 1);
+        await Athena.document.character.set(player, type, newDataSet);
+
+        //Corechange: Drop item in front of player
+        const forwardVector = getForwardVector(player.rot);
+        let position = new alt.Vector3(
+            player.pos.x + forwardVector.x * 1,
+            player.pos.y + forwardVector.y * 1,
+            player.pos.z - 1,
+        );
+
         let rotation = alt.Vector3.zero;
         if (Config.DEBUG) alt.logWarning('DropItem: ' + JSON.stringify(baseItem));
         if (baseItem.zaxisadjustment) {
@@ -202,5 +211,7 @@ export class InventoryUtil {
             !baseItem.noFreeze,
             expiration,
         );
+
+        Athena.systems.inventory.drop.invoke('item-drop', player, clonedItem, type);
     }
 }

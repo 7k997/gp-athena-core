@@ -528,12 +528,11 @@ export function getBaseItems(): Array<BaseItem> {
 export function getBaseItemByFuzzySearch<CustomData = {}>(
     partialName: string,
 ): BaseItem<DefaultItemBehavior, CustomData> | undefined {
-    const dbName = partialName;
     partialName = partialName.replaceAll('_', ' ');
 
     const index = databaseItems.findIndex((item) => {
         // 'myitem' -> 'myitem'
-        if (item.dbName === dbName) {
+        if (item.dbName === partialName) {
             return true;
         }
 

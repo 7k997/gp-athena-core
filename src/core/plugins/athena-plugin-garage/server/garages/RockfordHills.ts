@@ -4,7 +4,7 @@ import IGarage from '@AthenaPlugins/athena-plugin-garage/shared/interfaces/iGara
 
 const garage: IGarage = {
     position: { x: -798.5142822265625, y: -110.65055084228516, z: 37.0 },
-    types: [VEHICLE_TYPE.CAR],
+    types: [],
     index: 'rockford-hills',
     parking: [
         {
