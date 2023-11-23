@@ -45,7 +45,7 @@
 import { defineComponent, defineAsyncComponent } from 'vue';
 
 import { VehicleInfo } from '@AthenaShared/interfaces/vehicleInfo.js';
-import { DEALERSHIP_LOCALE } from '../../shared/locale.js';
+import { DEALERSHIP_LOCALE } from '../../shared/config.js';
 
 export default defineComponent({
     name: 'Preview',
