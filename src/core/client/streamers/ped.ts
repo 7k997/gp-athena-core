@@ -128,6 +128,7 @@ function handleDrawPeds() {
                 false,
                 false,
             );
+
             native.setEntityNoCollisionEntity(pedInfo[pedData.uid], alt.Player.local.scriptID, false);
             native.setEntityAsMissionEntity(pedInfo[pedData.uid], true, false); // make sure its not despawned by game engine
             native.setBlockingOfNonTemporaryEvents(pedInfo[pedData.uid], true); // make sure ped doesnt flee etc only do what its told
@@ -152,6 +153,15 @@ function handleDrawPeds() {
             native.setPedCombatAttributes(pedInfo[pedData.uid], 17, true);
             native.setPedAsEnemy(pedInfo[pedData.uid], false);
             native.setEntityInvincible(pedInfo[pedData.uid], true);
+
+            //Corechange: peacefull peds
+            alt.logWarning(`Ped: ${pedData.uid} is peaceful: ${pedData.isPeaceful}`);
+            if (pedData.isPeaceful) {
+                alt.logWarning(`Ped: ${pedData.uid} is peaceful`);
+                const ped = getPedById(pedInfo[pedData.uid]);
+                alt.logWarning(`Ped: ${ped} is peaceful`);
+                if (ped) setupPeacefulPed(ped);
+            }
 
             alt.nextTick(() => {
                 native.setEntityRotation(
@@ -180,6 +190,82 @@ function handleDrawPeds() {
     }
 }
 
+export function getPedById(id: number) {
+    let filtered = alt.Ped.all.filter((v) => id == v.id);
+    if (filtered.length == 0) return null;
+    return filtered[0];
+}
+
+export function setupPeacefulPed(ped: alt.Ped) {
+    alt.logWarning(`Ped: ${ped.scriptID} is peaceful`);
+    native.stopPedSpeaking(ped.scriptID, true);
+    native.taskSetBlockingOfNonTemporaryEvents(ped.scriptID, true);
+    native.setEntityProofs(
+        ped.scriptID,
+        true, // bullet
+        true, // fire
+        true, // explosion
+        true, // collision
+        true, // melee
+        true, // steam
+        true, // DontResetDamageFlagsOnCleanupMissionState (?)
+        true, // water
+    );
+    native.setPedTreatedAsFriendly(ped.scriptID, 1, 0);
+
+    enum eRagdollBlockingFlags {
+        RBF_ALL = 262143,
+        RBF_BULLET_IMPACT = 0,
+        RBF_VEHICLE_IMPACT = 1,
+        RBF_FIRE = 2,
+        RBF_ELECTROCUTION = 3,
+        RBF_PLAYER_IMPACT = 4,
+        RBF_EXPLOSION = 5,
+        RBF_IMPACT_OBJECT = 6,
+        RBF_MELEE = 7,
+        RBF_RUBBER_BULLET = 8,
+        RBF_FALLING = 9,
+        RBF_WATER_JET = 10,
+        RBF_DROWNING = 11,
+        _0x9F52E2C4 = 12,
+        RBF_PLAYER_BUMP = 13,
+        RBF_PLAYER_RAGDOLL_BUMP = 14,
+        RBF_PED_RAGDOLL_BUMP = 15,
+        RBF_VEHICLE_GRAB = 16,
+        RBF_SMOKE_GRENADE = 17,
+    }
+
+    enum PED_RESET_FLAG {
+        // PreventLockonToFriendlyPlayers = 1,
+        BlockFallTaskFromExplosionDamage = 458,
+        BlockWeaponReactionsUnlessDead = 64,
+        DisablePotentialBlastReactions = 249,
+        DisableVehicleDamageReactions = 248,
+    }
+
+    native.setRagdollBlockingFlags(ped.scriptID, eRagdollBlockingFlags.RBF_ALL);
+
+    everyTickWhile(
+        () => ped.valid,
+        () => {
+            alt.logWarning(`Ped: ${ped.scriptID} is peaceful`);
+            // native.setPedResetFlag(alt.Player.local, PED_RESET_FLAG.PreventLockonToFriendlyPlayers, true);
+            native.setPedResetFlag(ped.scriptID, PED_RESET_FLAG.BlockFallTaskFromExplosionDamage, true);
+            native.setPedResetFlag(ped.scriptID, PED_RESET_FLAG.BlockWeaponReactionsUnlessDead, true);
+            native.setPedResetFlag(ped.scriptID, PED_RESET_FLAG.DisablePotentialBlastReactions, true);
+            native.setPedResetFlag(ped.scriptID, PED_RESET_FLAG.DisableVehicleDamageReactions, true);
+        },
+    );
+}
+
+export function everyTickWhile(whileFunc: () => boolean, doFunc: () => void) {
+    alt.everyTick(() => {
+        if (whileFunc()) {
+            doFunc();
+        }
+    });
+}
+  
 /**
  * Gets an NPC based on their scriptID if present.
  * Gets only NPC which are created by athena API. If u need also peds created from other scripts use getGlobal.

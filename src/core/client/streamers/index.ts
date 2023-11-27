@@ -5,7 +5,7 @@ import * as marker from './marker.js';
 import * as markerVirtual from './markerVirtual.js';
 import * as object from './object.js';
 import * as ped from './ped.js';
-import * as pedVirtual from './ped.js';
+import * as pedVirtual from './pedVirtual.js';
 import * as textLabel from './textlabel.js';
 import * as textLabelVirtual from './textLabelVirtual.js';
 import * as worldNotifications from './worldNotifications.js';

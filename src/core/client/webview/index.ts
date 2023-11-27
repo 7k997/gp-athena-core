@@ -373,6 +373,10 @@ export function setOverlayVisible(pageName: string, state: boolean) {
  *
  */
 export async function get(): Promise<alt.WebView> {
+    if (_isReady && _webview && _webview.valid) {
+        return _webview;
+    }
+
     return new Promise((resolve: Function) => {
         let attempts = 0;
 
