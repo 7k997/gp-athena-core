@@ -1,4 +1,5 @@
 export const NET_OWNER_PED = {
+    INIT: 'ped-init',
     ANIMATE: 'ped-animate',
     FOLLOW: 'ped-follow',
     UNFOLLOW: 'ped-unfollow',

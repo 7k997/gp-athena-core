@@ -67,3 +67,5 @@ resources/webviews/**
 typedefs.d.ts
 
 .server-crashes-cache/
+
+server.log-*

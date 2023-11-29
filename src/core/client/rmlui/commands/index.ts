@@ -26,7 +26,7 @@ interface CommandInput {
 type MessageCallback = (msg: string | undefined) => void;
 
 const MAXIMUM_HISTORY_LENGTH = 128;
-const MAX_SUGGESTIONS = 4;
+const MAX_SUGGESTIONS = 8; // DO NOT CHANGE. index.xml is hardcoded to 8.
 const KEY_CODES = {
     ESCAPE_KEY: 27,
     ENTER_KEY: 13,
@@ -42,6 +42,7 @@ let commands: Array<Omit<MessageCommand<alt.Player>, 'callback'>> = [];
 let history: Array<string> = [];
 let historyIndex = -1;
 let isCommandInputOpen = false;
+let lastSearchCommand: string[] = null;
 
 async function autoFillCommand() {
     if (Overrides.autoFillCommand) {
@@ -53,7 +54,20 @@ async function autoFillCommand() {
         return;
     }
 
-    const splitCommand = msg.replaceAll('/', '').toLowerCase().split(' ');
+    let splitCommand = msg.replaceAll('/', '').toLowerCase().split(' ');
+    const splitCommandCurrent = splitCommand;
+
+    if (
+        lastSearchCommand &&
+        lastSearchCommand.length > 0 &&
+        splitCommand.length > 0 &&
+        splitCommand[0].includes(lastSearchCommand[0])
+    ) {
+        splitCommand = lastSearchCommand;
+    } else {
+        lastSearchCommand = splitCommand;
+    }
+
     if (!splitCommand[0]) {
         return;
     }
@@ -78,14 +92,21 @@ async function autoFillCommand() {
         return undefined;
     }
 
-    // Before you go and try to move the caret position to the end of the input box.
-    // There is no way to move the caret position.
-    // There is no access to element.setSelectionRange
-    // There is no access to element.move
-    // Unfocus and Refocus does not work either
-    // Pretty much no option to make the caret position at the end of the input box for RMLUI.
+    // For tabbing through commands, find the last selected command.
+    let index = 0;
+    if (splitCommandCurrent[0]) {
+        const indexLast = suggestions.findIndex((x) => x.name.includes(splitCommandCurrent[0]));
+        alt.log('indexLast', indexLast);
+        if (indexLast !== -1) {
+            if (indexLast + 1 >= suggestions.length) {
+                index = 0;
+            } else {
+                index = indexLast + 1;
+            }
+        }
+    }
 
-    const fullCommand = '/' + suggestions[0].name;
+    const fullCommand = '/' + suggestions[index].name;
     const newElement = document.createElement('input');
     newElement.setAttribute('value', fullCommand);
     newElement.setAttribute('id', 'input');
@@ -124,7 +145,9 @@ function updateSuggestions(suggestions: Array<Omit<MessageCommand<alt.Player>, '
         return Overrides.updateSuggestions(suggestions);
     }
 
-    for (let i = 0; i < MAX_SUGGESTIONS; i++) {
+    const count = suggestions.length > MAX_SUGGESTIONS ? MAX_SUGGESTIONS : suggestions.length;
+
+    for (let i = 0; i < count; i++) {
         const suggestion = suggestions[i];
         const element = document.getElementByID(`suggestion-${i}`);
         if (typeof element === 'undefined') {
@@ -242,6 +265,7 @@ function handleKeyUp(keycode: number) {
 
     if (keycode === KEY_CODES.TAB) {
         autoFillCommand();
+        moveCursorToEnd();
         return;
     }
 
@@ -251,6 +275,22 @@ function handleKeyUp(keycode: number) {
     }
 
     handleMessageUpdate();
+}
+
+function moveCursorToEnd() {
+    // Before you go and try to move the caret position to the end of the input box.
+    // There is no way to move the caret position.
+    // There is no access to element.setSelectionRange
+    // There is no access to element.move
+    // Unfocus and Refocus does not work either
+    // Pretty much no option to make the caret position at the end of the input box for RMLUI.
+    // See: https://github.com/altmp/altv-issues/issues/1777
+    // const element = document.getElementByID('input');
+    // if (typeof element === 'undefined') {
+    //     alt.logWarning(`Could not find rmlui commands element with id 'input'`);
+    //     return;
+    // }
+    // element.focus();
 }
 
 async function submit() {

@@ -95,4 +95,11 @@ export interface IPed {
      *
      */
     dimension?: number;
+
+    /**
+     * Is this ped peaceful?
+     * @type {boolean}
+     *
+     */
+    isPeaceful?: boolean;
 }
