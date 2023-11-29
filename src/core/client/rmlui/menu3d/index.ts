@@ -165,7 +165,7 @@ const InternalFunctions = {
  * @return {void}
  */
 export function create(pos: alt.IVector3, options: Array<OptionFor3DMenu>, maxDistance = 8): void {
-    if (AthenaClient.webview.isAnyMenuOpen(false)) {
+    if (AthenaClient.webview.isAnyMenuOpen(true)) {
         alt.logWarning(`Menu could not be created because a menu is already open.`);
         return undefined;
     }

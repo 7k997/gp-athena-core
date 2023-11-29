@@ -115,7 +115,7 @@ const InternalFunctions = {
  * @return {Promise<boolean>}
  */
 export function create(info: QuestionInfo): Promise<boolean> {
-    if (AthenaClient.webview.isAnyMenuOpen(false)) {
+    if (AthenaClient.webview.isAnyMenuOpen(true)) {
         console.warn(`Input box could not be created because a menu is already open.`);
         return undefined;
     }

@@ -328,7 +328,7 @@ export function create(inputInfo: CommandInput, skipMenuCheck = false): Promise<
 
     if (!skipMenuCheck) {
         wasMenuCheckSkipped = false;
-        if (AthenaClient.webview.isAnyMenuOpen()) {
+        if (AthenaClient.webview.isAnyMenuOpen(true)) {
             console.warn(`Input box could not be created because a menu is already open.`);
             return undefined;
         }

@@ -3,7 +3,7 @@ import * as Athena from '@AthenaServer/api/index.js';
 
 Athena.commands.register(
     'additem',
-    '/additem [partialName] [amount] [version?]',
+    '/additem [partialName] [amount?] [version?]',
     ['admin'],
     async (player: alt.Player, partialName: string, amount: string, version: string | undefined) => {
         if (typeof partialName === 'undefined') {
@@ -12,8 +12,7 @@ Athena.commands.register(
         }
 
         if (typeof amount === 'undefined') {
-            Athena.player.emit.message(player, `Must specify an amount to add.`);
-            return;
+            amount = '1';
         }
 
         const actualAmount = parseInt(amount);

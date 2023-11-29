@@ -28,7 +28,7 @@ const InternalFunctions = {
         drawable.element = undefined;
     },
     tick() {
-        if (AthenaClient.webview.isAnyMenuOpen()) {
+        if (AthenaClient.webview.isAnyMenuOpen(true)) {
             return;
         }
 

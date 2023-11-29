@@ -19,7 +19,7 @@ const InternalFunctions = {
      * @return {void}
      */
     handleKeyPress(keyCode: number) {
-        if (AthenaClient.webview.isAnyMenuOpen()) {
+        if (AthenaClient.webview.isAnyMenuOpen(true)) {
             return;
         }
 
@@ -85,6 +85,7 @@ onTicksStart.add(() => {
         key: CHAT_KEY,
         description: 'Open Chat Box',
         identifier: 'open-chat-box',
+        allowIfDead: true,
         keyDown: InternalFunctions.openMessageBox,
     });
 

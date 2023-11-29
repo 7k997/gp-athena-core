@@ -9,6 +9,11 @@ function handleMessage(player: alt.Player, msg: string) {
         return;
     }
 
+    if (data.isDead) {
+        Athena.systems.messenger.messaging.send(player, `You cannot chat while dead.`);
+        return;
+    }
+
     const closestPlayers = Athena.getters.players.inRange(player.pos, CHAT_CONFIG.settings.range);
     Athena.systems.messenger.messaging.sendToPlayers(closestPlayers, `${data.name}: ${msg}`);
 }

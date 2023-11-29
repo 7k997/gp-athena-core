@@ -403,7 +403,7 @@ const InternalFunctions = {
  * @return {void}
  */
 export function create(info: MenuInfo): void {
-    if (AthenaClient.webview.isAnyMenuOpen(false)) {
+    if (AthenaClient.webview.isAnyMenuOpen(true)) {
         alt.logWarning(`Menu could not be created because a menu is already open.`);
         return undefined;
     }
