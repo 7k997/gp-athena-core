@@ -475,6 +475,21 @@ export async function play() {
     }
 }
 
+export async function setOne(index: number): Promise<boolean> {
+    if (nodes.length <= 0) {
+        return false;
+    }
+
+    await InternalFunctions.isCameraUpdating();
+
+    currentCamIndex = index;
+
+    const nextCam = nodes[currentCamIndex];
+    await InternalFunctions.next(nextCam);
+
+    return true;
+}
+
 interface CinematicCamFuncs {
     addNode: typeof addNode;
     destroy: typeof destroy;
@@ -483,6 +498,7 @@ interface CinematicCamFuncs {
     previous: typeof previous;
     switchNode: typeof switchNode;
     play: typeof play;
+    setOne: typeof setOne;
 }
 
 const Overrides: Partial<CinematicCamFuncs> = {};
@@ -494,6 +510,7 @@ export function override(functionName: 'next', callback: typeof next);
 export function override(functionName: 'switchNode', callback: typeof switchNode);
 export function override(functionName: 'previous', callback: typeof previous);
 export function override(functionName: 'play', callback: typeof play);
+export function override(functionName: 'setOne', callback: typeof setOne);
 export function override(functionName: keyof CinematicCamFuncs, callback: any): void {
     Overrides[functionName] = callback;
 }
