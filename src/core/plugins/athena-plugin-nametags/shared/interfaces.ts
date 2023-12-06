@@ -42,7 +42,14 @@ export interface INametagConfig {
      * @type {boolean}
      * @memberof INametagConfig
      */
-    SHOW_NAMETAGS_WITH_KEY: boolean;
+    SHOW_NAMETAGS_AND_ID_WITH_KEY: boolean;
+
+    /**
+     * If true, only admins can see nametags and ids.
+     * @type {boolean}
+     * @memberof INametagConfig
+     */
+    SHOW_NAMETAGS_AND_ID_ONLY_FOR_ADMINS: boolean;
 
     /**
      * Javascript Key Code for the key to use to show / hide.

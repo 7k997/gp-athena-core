@@ -6,7 +6,7 @@ import { distance2d } from '@AthenaShared/utility/vector.js';
 import { NAMETAG_EVENTS } from '../shared/enums.js';
 import { INametagConfig } from '../shared/interfaces.js';
 
-let showNametags = true;
+let showNametags = false;
 let config: INametagConfig;
 let interval: number;
 
@@ -21,7 +21,7 @@ class ClientNametags {
         interval = alt.setInterval(ClientNametags.render, 0);
         config = _config;
 
-        if (config.SHOW_NAMETAGS_WITH_KEY) {
+        if (config.SHOW_NAMETAGS_AND_ID_WITH_KEY) {
             alt.on('keydown', ClientNametags.keyDown);
             alt.on('keyup', ClientNametags.keyUp);
             showNametags = false;
@@ -57,6 +57,10 @@ class ClientNametags {
         }
 
         if (!showNametags) {
+            return;
+        }
+
+        if (config.SHOW_NAMETAGS_AND_ID_ONLY_FOR_ADMINS && !alt.Player.local.meta.isAdmin) {
             return;
         }
 
