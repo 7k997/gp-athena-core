@@ -14,6 +14,7 @@ export const DefaultRanks: Array<FactionRank> = [
             manageRanks: true,
             manageRankPermissions: true,
             canOpenStorages: true,
+            canTuneVehicles: false,
         },
         vehicles: [],
         weight: 99,
@@ -30,6 +31,7 @@ export const DefaultRanks: Array<FactionRank> = [
             manageRanks: false,
             manageRankPermissions: false,
             canOpenStorages: true,
+            canTuneVehicles: false,
         },
         vehicles: [],
         weight: 1,
@@ -46,4 +48,5 @@ export const AllRankPermissions: Complete<RankPermissions> = {
     manageRankPermissions: false,
     manageVehicles: false,
     canOpenStorages: false,
+    canTuneVehicles: false,
 };

@@ -20,6 +20,15 @@ export function applyState(vehicle: alt.Vehicle, state: Partial<VehicleState> | 
     }
 
     Object.keys(state).forEach((key) => {
+        //Corechange: Special cases
+        if (key === 'neon') {
+            //Activate Neon only if neon lights on.
+            if (state.neonEnabled) {
+                vehicle.neon = state[key];
+            } else {
+                vehicle.neon = null;
+            }
+        }
         vehicle[key] = state[key];
     });
 }

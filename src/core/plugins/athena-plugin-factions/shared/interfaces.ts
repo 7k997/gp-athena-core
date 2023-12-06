@@ -124,6 +124,8 @@ export interface RankPermissions {
      * @memberof RankPermissions
      */
     canOpenStorages: boolean;
+
+    canTuneVehicles: boolean;
 }
 
 /**

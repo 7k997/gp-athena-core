@@ -150,7 +150,7 @@ export interface VehicleState {
     /**
      * Gets or sets the roof state of a vehicle (closed or open).
      */
-    roofState: boolean;
+    roofClosed: boolean;
 
     /**
      * Gets or sets the current secondary color.
@@ -265,4 +265,6 @@ export interface VehicleState {
     hybridExtraActive: boolean;
 
     hybridExtraState: number;
+
+    neonEnabled: boolean;
 }

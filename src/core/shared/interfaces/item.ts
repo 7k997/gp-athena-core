@@ -1,5 +1,5 @@
 import * as alt from 'alt-shared';
-import { type } from 'os';
+// import { type } from 'os';
 
 /**
  * Default Weapon Data Information

@@ -178,8 +178,8 @@ export function driver(vehicle: alt.Vehicle): alt.Player | undefined {
  * @param {alt.Player} player An alt:V Player Entity
  * @return {(alt.Player | undefined)}
  */
-export function closestToPlayer(player: alt.Player): alt.Player | undefined {
-    return Athena.utility.closest.getClosestPlayer(player.pos);
+export function closestToPlayer(player: alt.Player): alt.Vehicle | undefined {
+    return Athena.utility.closest.getClosestVehicle(player.pos);
 }
 
 /**
@@ -188,6 +188,6 @@ export function closestToPlayer(player: alt.Player): alt.Player | undefined {
  * @param {alt.Vehicle} vehicle An alt:V Vehicle Entity
  * @return {(alt.Player | undefined)}
  */
-export function closestToVehicle(player: alt.Player): alt.Vehicle | undefined {
-    return Athena.utility.closest.getClosestVehicle(player.pos);
+export function closestToVehicle(vehicle: alt.Vehicle): alt.Vehicle | undefined {
+    return Athena.utility.closest.getClosestVehicle(vehicle.pos);
 }
