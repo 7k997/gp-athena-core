@@ -589,6 +589,18 @@ export function objectAttach(player: alt.Player, attachable: IAttachable, remove
     return attachable.uid;
 }
 
+export function objectAttachAnimated(
+    player: alt.Player,
+    attachable: IAttachable,
+    dictionary: string,
+    name: string,
+    flags: ANIMATION_FLAGS,
+    removeAfterMilliseconds = -1,
+): string | null {
+    animation(player, dictionary, name, flags, removeAfterMilliseconds);
+    return objectAttach(player, attachable, removeAfterMilliseconds);
+}
+
 /**
  * Remove an attachment object from the player.
  *
@@ -630,6 +642,19 @@ export function objectRemove(player: alt.Player, uid: string) {
         player.setStreamSyncedMeta(PLAYER_SYNCED_META.ATTACHABLES, player.attachables);
         return;
     }
+}
+
+export function objectRemoveAnimated(
+    player: alt.Player,
+    uid: string,
+    dictionary: string,
+    name: string,
+    flags: ANIMATION_FLAGS,
+    removeAfterMilliseconds = -1,
+) {
+    animation(player, dictionary, name, flags, removeAfterMilliseconds);
+    clearAnimation(player);
+    objectRemove(player, uid);
 }
 
 /**
