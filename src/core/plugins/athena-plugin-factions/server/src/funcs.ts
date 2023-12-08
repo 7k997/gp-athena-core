@@ -522,6 +522,7 @@ export class FactionFuncs {
                 manageRanks: false,
                 manageRankPermissions: false,
                 canOpenStorages: false,
+                canTuneVehicles: false,
             },
             vehicles: [],
             weight,

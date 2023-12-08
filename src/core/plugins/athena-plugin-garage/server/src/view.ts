@@ -366,20 +366,11 @@ export class GarageFunctions {
      * @memberof GarageFunctions
      */
     static async despawnVehicle(player: alt.Player, id: number) {
-        alt.logWarning('try despawn vehicle ' + id);
-        alt.logWarning('try despawn vehicle ' + player + player.valid + player.id);
         if (!player || !player.valid) {
             return;
         }
 
-        alt.logWarning('try despawn vehicle A0 ' + id);
-
         // Check that the vehicle is currently spawned and exists.
-
-        alt.Vehicle.all.forEach((ref) => {
-            alt.logWarning('altvehicles ' + ref.id);
-        });
-
         let vehicle = Athena.vehicle.get.spawnedVehicleByDatabaseID(id);
 
         if (!vehicle) {
@@ -387,7 +378,6 @@ export class GarageFunctions {
             return;
         }
 
-        alt.logWarning('try despawn vehicle A ' + id);
         // Get the garage garage information, and position.
         // Determine if the vehicle is close enough to the garage.
         const shopIndex = GarageUsers[player.id];
@@ -399,18 +389,7 @@ export class GarageFunctions {
 
         const garage = activeGarages[index];
         const vehicleData = Athena.document.vehicle.get(vehicle);
-        alt.logWarning(
-            'try despawn vehicle B ' +
-                id +
-                ' ' +
-                index +
-                JSON.stringify(vehicleData.pos) +
-                JSON.stringify(garage.position) +
-                JSON.stringify(vehicle.pos),
-        );
         const dist = Athena.utility.vector.distance2d(vehicleData.pos, garage.position);
-
-        alt.logWarning('try despawn vehicle B dist ' + dist);
 
         // Check if the vehicle is either close to a parking spot or the garage itself.
         if (dist >= 10 && !GarageFunctions.isCloseToSpot(vehicleData.pos, garage.parking)) {
@@ -419,13 +398,8 @@ export class GarageFunctions {
             return;
         }
 
-        alt.logWarning('try despawn vehicle C ' + id);
-
         // Set the garage index.
-        alt.logWarning('Read garageInfo: ' + vehicleData.garageInfo);
         Athena.document.vehicle.set(vehicle, 'garageInfo', shopIndex);
-        alt.logWarning('GarageInfo updated to: ' + shopIndex);
-
         await Athena.vehicle.controls.update(vehicle);
         //Athena.vehicle.funcs.save(vehicle, { garageIndex: vehicle.id.garageIndex });
 
@@ -433,5 +407,21 @@ export class GarageFunctions {
         // After setting the garage index. Despawn the vehicle.
         Athena.vehicle.despawn.one(vehicle.id);
         Athena.player.emit.soundFrontend(player, 'Hack_Success', 'DLC_HEIST_BIOLAB_PREP_HACKING_SOUNDS');
+    }
+
+    static async despawnVehicleIntoClosestGarage(vehicle: alt.Vehicle) {
+        //TODO: Get nearest garage
+        Athena.document.vehicle.set(vehicle, 'garageInfo', 'banham-canyon');
+        Athena.vehicle.despawn.one(vehicle.id);
+    }
+
+    static async spawnVehicleOutOfGarage(vehicle: OwnedVehicle) {
+        const ownedVehicle = await Athena.vehicle.get.ownedVehicleByDatabaseID(vehicle.id);
+        if (ownedVehicle && ownedVehicle.garageInfo) {
+            ownedVehicle.pos = vehicle.pos;
+            ownedVehicle.rot = vehicle.rot;
+            const newVehicle = Athena.vehicle.spawn.persistent(ownedVehicle);
+            Athena.document.vehicle.set(newVehicle, 'garageInfo', null);
+        }
     }
 }
