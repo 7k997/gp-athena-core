@@ -1,3 +1,4 @@
+import { FUEL_TYPE, VEHICLE_CLASS, VEHICLE_TYPE } from '@AthenaShared/enums/vehicleTypeFlags.js';
 import * as alt from 'alt-shared';
 
 /**
@@ -124,4 +125,34 @@ export interface BaseVehicle {
      * @memberof BaseVehicle
      */
     groups?: { [key: string]: Array<string> };
+
+    /**
+     * The type of vehicle this is.
+     */
+    type: VEHICLE_TYPE;
+
+    /**
+     * The class of vehicle this is.
+     */
+    class: VEHICLE_CLASS;
+
+    /**
+     * The fuel type of this vehicle.
+     */
+    fuelType: FUEL_TYPE;
+
+    /**
+     * The maximum storage capacity of this vehicle.
+     */
+    storage: number;
+
+    /**
+     * The maximum number of seats in this vehicle.
+     */
+    seats: number;
+
+    /**
+     * The manufacturer of this vehicle.
+     */
+    manufacturer: string;
 }

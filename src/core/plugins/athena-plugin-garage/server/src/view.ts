@@ -418,7 +418,7 @@ export class GarageFunctions {
     static async spawnVehicleOutOfGarage(vehicle: OwnedVehicle) {
         const ownedVehicle = await Athena.vehicle.get.ownedVehicleByDatabaseID(vehicle.id);
         if (ownedVehicle && ownedVehicle.garageInfo) {
-            ownedVehicle.pos = vehicle.pos;
+            ownedVehicle.pos = new alt.Vector3(ownedVehicle.pos.x, ownedVehicle.pos.y, ownedVehicle.pos.z + 1);
             ownedVehicle.rot = vehicle.rot;
             const newVehicle = Athena.vehicle.spawn.persistent(ownedVehicle);
             Athena.document.vehicle.set(newVehicle, 'garageInfo', null);

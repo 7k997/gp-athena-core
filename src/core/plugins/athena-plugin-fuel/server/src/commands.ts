@@ -1,6 +1,5 @@
 import * as alt from 'alt-server';
 import * as Athena from '@AthenaServer/api/index.js';
-import { VehicleData } from '@AthenaShared/information/vehicles.js';
 import { Vehicle_Behavior, VEHICLE_STATE } from '../../shared/vehicle.js';
 import { isFlagEnabled } from '@AthenaShared/utility/flags.js';
 import { FUEL_CONFIG } from './config.js';

@@ -4,6 +4,7 @@ import Database from '@stuyk/ezmongodb';
 import { OwnedVehicle } from '@AthenaShared/interfaces/vehicleOwned.js';
 import { VehicleState } from '@AthenaShared/interfaces/vehicleState.js';
 import IVehicleTuning from '@AthenaShared/interfaces/vehicleTuning.js';
+import { VehicleData } from '@AthenaShared/information/vehicles.js';
 
 export interface AddOptions {
     /**
@@ -82,6 +83,8 @@ export async function toPlayer(
         await Athena.systems.global.increase('vehicleId');
         const id = await Athena.systems.global.getKey<number>('vehicleId');
 
+        const vehicleData = VehicleData.filter((x) => x.name.toLowerCase() === model.toLowerCase())[0];
+
         const ownedVehicle: OwnedVehicle = {
             dimension: 0,
             keys: options && options.keys ? options.keys : [],
@@ -93,6 +96,12 @@ export async function toPlayer(
             pos,
             rot: { x: 0, y: 0, z: 0 },
             id,
+            type: vehicleData.type,
+            class: vehicleData.class,
+            fuelType: vehicleData.fuelType,
+            storage: vehicleData.storage,
+            seats: vehicleData.seats,
+            manufacturer: vehicleData.manufacturer,
         };
 
         if (typeof options !== 'undefined') {
@@ -148,6 +157,8 @@ export async function toDatabase(
         await Athena.systems.global.increase('vehicleId');
         const id = await Athena.systems.global.getKey<number>('vehicleId');
 
+        const vehicleData = VehicleData.filter((x) => x.name.toLowerCase() === model.toLowerCase())[0];
+
         const ownedVehicle: OwnedVehicle = {
             dimension: 0,
             keys: options && options.keys ? options.keys : [],
@@ -160,6 +171,12 @@ export async function toDatabase(
             rot: { x: 0, y: 0, z: 0 },
             id,
             doNotDespawn: options && options.doNotDespawn ? options.doNotDespawn : false,
+            type: vehicleData.type,
+            class: vehicleData.class,
+            fuelType: vehicleData.fuelType,
+            storage: vehicleData.storage,
+            seats: vehicleData.seats,
+            manufacturer: vehicleData.manufacturer,
         };
 
         if (typeof options !== 'undefined') {
