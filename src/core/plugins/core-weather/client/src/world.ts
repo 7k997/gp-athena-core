@@ -3,6 +3,7 @@ import * as native from 'natives';
 import { WEATHER_EVENTS } from '@AthenaPlugins/core-weather/shared/events.js';
 import { WORLD_WEATHER } from '@AthenaPlugins/core-weather/shared/weather.js';
 import { Config } from '@AthenaPlugins/gp-athena-overrides/shared/config.js';
+import { SYSTEM_EVENTS } from '@AthenaShared/enums/system.js';
 
 let isTransitioning = false;
 let isFrozen = false;
@@ -33,12 +34,21 @@ export class World {
     static minute: number = 0;
 
     static init() {
+        if (!Config.DISABLE_CORE_WEATHER_UPDATE_METHOD) {
         alt.onServer(WEATHER_EVENTS.UPDATE_WEATHER, World.updateWeather);
+        }
+
+        if (!Config.DISABLE_CORE_WEATHER_SYNC_INTERVAL) {
         alt.setInterval(World.getWeatherUpdate, Config.WEATHER_SYNC_INTERVAL);
+        }
+
+        if (!Config.DISABLE_CORE_WEATHER_UPDATE_TIME) {
         // alt.onServer(SYSTEM_EVENTS.WORLD_UPDATE_TIME, World.updateTime);
+    }
     }
 
     static getWeatherUpdate() {
+        alt.log(`[Athena] Requesting weather update.`);
         alt.emitServer(WEATHER_EVENTS.GET_WEATHER_UPDATE);
     }
 

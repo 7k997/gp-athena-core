@@ -19,6 +19,9 @@ export const Config = {
     DISABLE_DEFAULT_AMMO: true, //Disable the default ammo.
     DISABLE_DEFAULT_TIME_SYNC: false, //Disable the default time sync.
     DISABLE_HOSPITAL_BLIPS: false, //Disable the hospital blips.
+    DISABLE_CORE_WEATHER_UPDATE_METHOD: true, //Disable the core-weather plugin system. (Default is false)
+    DISABLE_CORE_WEATHER_SYNC_INTERVAL: false, //Disable the core-weather sync interval. (Default is false)
+    DISABLE_CORE_WEATHER_UPDATE_TIME: true, //Disable the core-weather update time. (Default is false) TODO: Maybe can be removed.
     WEATHER_SYNC_INTERVAL: 1000 * 60 * 1, //1 minutes, DO NOT SET IT BELOW 1 MINUTE.
     DROP_DEFAULT_EXPIRATION: 1000 * 60 * 5, //5 minutes, DO NOT SET IT BELOW 1 MINUTE.
     DROP_EXPIRATION_INTERVAL: 1000 * 60 * 5, //5 minutes, DO NOT SET IT BELOW 1 MINUTE.
