@@ -10,13 +10,15 @@ export class MenuHelper {
         return openedMenuCount > 0;
     }
 
-    static openMenu(allowMultipleMenues: boolean = true) {
+    static openMenu(isAllowToolbarKeys: boolean = true) {
         openedMenuCount++;
         if (Config.DEBUG) alt.log('Open menu, count: ' + openedMenuCount);
         AthenaClient.webview.focus();
         AthenaClient.webview.showCursor(true);
         alt.toggleGameControls(false);
-        if (!allowMultipleMenues) alt.Player.local.isMenuOpen = true;
+
+        alt.Player.local.isMenuOpen = true;
+        alt.Player.local.isAllowToolbarKeys = isAllowToolbarKeys;
     }
 
     static closeMenu(doNotCount: boolean = false) {
@@ -29,6 +31,7 @@ export class MenuHelper {
             AthenaClient.webview.showCursor(false);
             AthenaClient.webview.setOverlaysVisible(true);
             alt.Player.local.isMenuOpen = false;
+            alt.Player.local.isAllowToolbarKeys = false;
         }
     }
 }

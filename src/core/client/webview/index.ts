@@ -825,6 +825,14 @@ export function isAnyMenuOpen(excludeDead = false): boolean {
     return false;
 }
 
+export function isAllowToolbarKeys(): boolean {
+    if (alt.Player.local.isAllowToolbarKeys) {
+        return true;
+    }
+
+    return false;
+}
+
 alt.on('keyup', InternalFunctions.handleKeyDownEvent);
 alt.on('disconnect', dispose);
 alt.onceServer(SYSTEM_EVENTS.WEBVIEW_INFO, create);

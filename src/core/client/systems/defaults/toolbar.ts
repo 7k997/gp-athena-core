@@ -84,7 +84,7 @@ const Internal = {
             return;
         }
 
-        if (AthenaClient.webview.isAnyMenuOpen()) {
+        if (AthenaClient.webview.isAnyMenuOpen() && !AthenaClient.webview.isAllowToolbarKeys()) {
             return;
         }
 

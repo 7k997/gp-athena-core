@@ -11,5 +11,6 @@ declare module 'alt-client' {
         isActionMenuOpen: boolean;
         isLeaderboardOpen: boolean;
         isNoClipOn: boolean;
+        isAllowToolbarKeys: boolean;
     }
 }
