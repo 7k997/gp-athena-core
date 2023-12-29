@@ -357,10 +357,10 @@ export function add<CustomData = {}>(
         return undefined;
     }
 
-    const actualMaxStack = baseItem.maxStack ? baseItem.maxStack : 512;
+    const actualMaxStack = baseItem.maxStack ? baseItem.maxStack : Config.ITEM_MAX_STACK;
     const copyOfData = deepCloneArray<StoredItem<CustomData>>(data);
     let availableStackIndex = -1;
-    if (baseItem.behavior.canStack && actualMaxStack > 1) {
+    if (baseItem.behavior.canStack && (actualMaxStack > 1 || actualMaxStack === -1)) {
         availableStackIndex = copyOfData.findIndex(
             (x) => x.dbName === item.dbName && x.version === item.version && x.quantity !== actualMaxStack && !x.id,
         );
@@ -389,8 +389,14 @@ export function add<CustomData = {}>(
 
         // Use quantity to subtract from max stack size or use amount left
         if (baseItem.behavior.canStack) {
+            if (actualMaxStack === -1) {
+                //Corechange: Allow endless stack if item not provide a max size.
+                itemClone.quantity = item.quantity;
+                item.quantity = 0;
+            } else {
             itemClone.quantity = item.quantity < actualMaxStack ? item.quantity : actualMaxStack;
             item.quantity -= itemClone.quantity;
+            }
         } else {
             itemClone.quantity = 1;
             item.quantity -= 1;
@@ -613,13 +619,21 @@ export function combineAt<CustomData = {}>(
         return undefined;
     }
 
-    if (copyOfData[fromIndex].quantity + copyOfData[toIndex].quantity <= baseItem.maxStack) {
+    //Corechange: baseItem.maxStack can be undefined -> check max stack config / -1 for endless stack
+    const maxStack = baseItem.maxStack ? baseItem.maxStack : Config.ITEM_MAX_STACK;
+    if (maxStack === -1) {
         copyOfData[toIndex].quantity += copyOfData[fromIndex].quantity;
         copyOfData.splice(fromIndex, 1);
         return Athena.systems.inventory.weight.update<CustomData>(copyOfData);
     }
 
-    const spaceAvailable = baseItem.maxStack - copyOfData[toIndex].quantity;
+    if (copyOfData[fromIndex].quantity + copyOfData[toIndex].quantity <= maxStack) {
+        copyOfData[toIndex].quantity += copyOfData[fromIndex].quantity;
+        copyOfData.splice(fromIndex, 1);
+        return Athena.systems.inventory.weight.update<CustomData>(copyOfData);
+    }
+
+    const spaceAvailable = maxStack - copyOfData[toIndex].quantity;
     copyOfData[fromIndex].quantity -= spaceAvailable;
     copyOfData[toIndex].quantity += spaceAvailable;
 
