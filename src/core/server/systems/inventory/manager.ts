@@ -3,6 +3,7 @@ import * as Athena from '@AthenaServer/api/index.js';
 import { BaseItem, StoredItem, Item, DefaultItemBehavior } from '@AthenaShared/interfaces/item.js';
 import { deepCloneArray, deepCloneObject } from '@AthenaShared/utility/deepCopy.js';
 import { GLOBAL_SYNCED } from '@AthenaShared/enums/globalSynced.js';
+import { Config } from '@AthenaPlugins/gp-athena-overrides/shared/config.js';
 
 alt.setSyncedMeta(GLOBAL_SYNCED.INVENTORY_WEIGHT_ENABLED, true);
 

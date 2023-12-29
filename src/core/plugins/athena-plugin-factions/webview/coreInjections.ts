@@ -23,6 +23,6 @@ export const FactionCorePageInjections = {
         /*DefaultSettings: defineAsyncComponent(
             () => import('../../gp-factions-defaults/components/DefaultSettings.vue'),
         ),*/
-        //Storage: defineAsyncComponent(() => import('../../gp-faction-storage/components/GPFactionStorage.vue')),
+        Storage: defineAsyncComponent(() => import('../../gp-faction-storage/components/GPFactionStorage.vue')),
     },
 };
