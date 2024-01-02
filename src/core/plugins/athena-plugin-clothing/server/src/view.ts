@@ -11,6 +11,7 @@ import clothingStores from './stores.js';
 import { PolygonShape } from '@AthenaServer/extensions/extColshape.js';
 import { sha256 } from '@AthenaServer/utility/hash.js';
 import { Blip } from '@AthenaShared/interfaces/blip.js';
+import { DlcHelper } from './dlcHelper.js';
 
 // Do not change order
 const icons = [
@@ -244,24 +245,13 @@ export class ClothingFunctions {
             : CLOTHING_CONFIG.MAXIMUM_COMPONENT_VALUES[playerData.appearance.sex][id];
 
         if (drawable <= defaultMaxSize) {
-            //Attention: Needed...
-            //Set clothes by drawable non relative
-            //Read correct dlc value
-            //Set clothes by dlc and relative drawable
-            if (isProp) {
-                if (drawable <= -1) {
-                    player.clearProp(id);
-                } else {
-                    player.setProp(id, drawable, texture);
-                }
-            } else {
-                player.setClothes(id, drawable, texture, palette);
-            }
-            const dlcData = isProp ? player.getDlcProp(id) : player.getDlcClothes(id);
+            
+            const dlcData = isProp ? DlcHelper.getDlcPropInfo(playerData.appearance.sex, id, drawable) : DlcHelper.getDlcClothesInfo(playerData.appearance.sex, id, drawable);
+
             return {
-                dlcName: dlcData.dlc,
-                drawable: dlcData.drawable,
-                texture: dlcData.texture,
+                dlcName: dlcData.DlcCollectionHash,
+                drawable: dlcData.RelativeCollectionDrawableId,
+                texture: texture,
                 palette: palette,
                 isProp: isProp,
             };
@@ -316,54 +306,29 @@ export class ClothingFunctions {
 
             for (let i = 0; i < page.drawables.length; i++) {
                 const id = page.ids[i];
-                let drawable = page.drawables[i];
-                let texture = page.textures[i];
-                let isProp = page.isProp;
-                let dlc = 0;
+                const drawable = page.drawables[i];
+                const texture = page.textures[i];
+                const isProp = page.isProp;
 
                 let palette = 0;
                 if (page.palettes && page.palettes.length >= i) {
                     palette = page.palettes[i];
-                }
-
-                const dlcInfo = ClothingFunctions.getDlc(player, id, drawable, texture, palette, isProp);
-                if (dlcInfo) {
-                    drawable = dlcInfo.drawable;
-                    texture = dlcInfo.texture;
-                    dlc = dlcInfo.dlcName;
-                }
-
-                if (dlc != 0) {
-                    if (isProp) {
-                        if (drawable <= -1) {
-                            player.clearProp(id);
-                        } else {
-                            player.setDlcProp(dlc, id, drawable, texture);
-                        }
+                }              
+    
+                if (isProp) {
+                    if (drawable <= -1) {
+                        player.clearProp(id);
                     } else {
-                        player.setDlcClothes(dlc, id, drawable, texture, palette);
+                        const dlcInfo = ClothingFunctions.getDlc(player, id, drawable, texture, palette, isProp);
+                        player.setDlcProp(dlcInfo.dlcName, id, dlcInfo.drawable, dlcInfo.texture);
                     }
                 } else {
-                    if (isProp) {
-                        if (drawable <= -1) {
-                            player.clearProp(id);
-                        } else {
-                            player.setProp(id, drawable, texture);
-                        }
-                    } else {
-                        player.setClothes(id, drawable, texture, palette);
-                    }
+                    const dlcInfo = ClothingFunctions.getDlc(player, id, drawable, texture, palette, isProp);
+                    player.setDlcClothes(dlcInfo.dlcName, id, dlcInfo.drawable, dlcInfo.texture, dlcInfo.palette);
                 }
+              
             }
         }
-
-        // const result = await Athena.systems.inventory.manager.get(storableItem, data.inventory, 'inventory');
-        // const result = await Athena.systems.inventory.manager.add(storableItem, data.inventory, 'inventory');
-        // if (typeof result === 'undefined') {
-        //     return;
-        // }
-
-        // await Athena.document.character.set(player, 'inventory', result);
 
         if (justSync) {
             return;
@@ -468,11 +433,14 @@ export class ClothingFunctions {
 
         await alt.Utils.wait(500);
 
+        alt.logWarning(`Clothing Purchase: ${JSON.stringify(clothes)}`);
         const storableItem = Athena.systems.inventory.clothing.outfitFromPlayer(player, clothes);
         const result = await Athena.systems.inventory.manager.add(storableItem, playerData.inventory, 'inventory');
         if (typeof result === 'undefined') {
             return false;
         }
+
+        alt.logWarning(`Storable Item: ${JSON.stringify(storableItem)}`);
 
         await Athena.document.character.set(player, 'inventory', result);
 

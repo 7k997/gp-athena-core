@@ -1,5 +1,42 @@
 import { CLOTHING_IDS, CLOTHING_STORE_PAGE, ORIENTATION, PROP_IDS } from './enums.js';
 
+export interface ComponentVariation {
+    NameHash: string;
+    ComponentType: null | any; // You might want to replace 'any' with the actual type
+    ComponentId: number;
+    RelativeCollectionDrawableId: number;
+    DrawableId: number;
+    TextureId: number;
+    TranslatedLabel: null | any; // Replace 'any' with the actual type
+    Price: number;
+    RestrictionTags: null | any[]; // Replace 'any' with the actual type if possible
+}
+
+export interface PropVariation {
+    NameHash: string;
+    AnchorPoint: null | any; // You might want to replace 'any' with the actual type
+    ComponentId: number;
+    RelativeCollectionDrawableId: number;
+    DrawableId: number;
+    TextureId: number;
+    TranslatedLabel: null | any; // Replace 'any' with the actual type
+    Price: number;
+    RestrictionTags: null | any[]; // Replace 'any' with the actual type if possible
+}
+
+export interface PedComponent {
+    LastUpdateDlcName: string;
+    DlcCollectionName: string;
+    PedName: string;
+    ComponentVariations: ComponentVariation[];
+    Props: PropVariation[];
+}
+
+export interface DlcInfo {
+    DlcCollectionName: string;
+    DlcCollectionHash: number;
+    RelativeCollectionDrawableId: number;
+}
 export interface IClothingStorePage {
     pageName: string;
     names?: Array<string>;

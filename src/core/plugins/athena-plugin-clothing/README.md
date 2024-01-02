@@ -27,3 +27,9 @@ git clone https://github.com/Stuyk/athena-plugin-clothing
 ```
 
 4. Start the Server
+
+
+## Helpfull tools:
+
+https://gtaclothes.zziger.me/
+https://raw.githubusercontent.com/DurtyFree/gta-v-data-dumps/master/pedComponentVariations_free.json
