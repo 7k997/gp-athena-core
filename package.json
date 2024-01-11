@@ -1,6 +1,6 @@
 {
     "name": "altv-athena",
-    "version": "5.3.1",
+    "version": "5.3.2",
     "description": "a roleplay framework for alt:V",
     "author": "stuyk",
     "type": "module",
@@ -22,6 +22,7 @@
         "fix-natives": "node ./scripts/natives-upgrade/index.js",
         "test": "",
         "gpitemsgenerate": "node ./scripts/gpitemsgenerate/index.js",
+        "gpitemsgenerateWheels": "node ./scripts/gpitemsgenerate/indexWheels.js",
         "gpitemsgenerateObject": "node ./scripts/gpitemsgenerate/indexObjects.js",
         "gpitemsgenerateClothes": "node ./scripts/gpitemsgenerate/indexClothes.js",
         "openAIGenerator": "node ./scripts/gpitemsgenerate/openAIGenerator.js"
@@ -60,8 +61,10 @@
         "@vitejs/plugin-vue": "^4.1.0",
         "axios": "1.5.1",
         "bip39": "^3.1.0",
+        "discord.js": "^14.14.1",
         "elliptic": "6.5.4",
         "fs": "^0.0.1-security",
+        "fs-extra": "^11.2.0",
         "gsap": "^3.11.5",
         "image-js": "^0.35.3",
         "jimp": "^0.22.8",
@@ -75,6 +78,9 @@
         "sjcl": "1.0.8",
         "sockjs": "0.3.21",
         "sockjs-client": "1.5.2",
+        "vue-advanced-chat": "^2.0.10",
+        "vue3-carousel": "^0.3.1",
+        "vue3-colorpicker": "^2.2.3",
         "youtube-player": "^5.6.0"
     },
     "prettier": {

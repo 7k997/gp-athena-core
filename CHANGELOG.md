@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.3.2
+
+```
+- Fix Object Detach
+```
+
 ## 5.3.1
 ```
 - Fix Object Entity Selection

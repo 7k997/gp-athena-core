@@ -22,6 +22,12 @@ Furthermore, the most free plugins are already added.
 
 ⚠️ The Gitignore is modified, see https://github.com/jonasesser/athena-pnp for more informations.
 
+⚠️ New Features included
+
+- Static Pages
+
+This is a new page type. Pages, Overlays and Persistent pages will updated frequently. Static pages not. They can be used for Phones, Walkietalkies or other pages which will be visible while the player interact this other pages. Currently up to 5 static pages at the same time are allowed.
+
 <img src="https://i.imgur.com/LhhWWET.png">
 
 <h2>Athena Framework for alt:V</h2>A Free Roleplay (Framework / Script / Tookit) for Developers for GTA:V <a href="https://discord.com/servers/athena-framework-790039623648542760">Support / Subscribe on Discord</a> <a href="https://typescriptlang.org"><img src="https://img.shields.io/badge/Typescript-Typescript-007acc?label=" alt="Language TypeScript"></a> <a href="https://vuejs.org"><img src="https://img.shields.io/badge/Framework-Vue%203-green.svg?label=" alt="Framework Vue 3"></a> <a href="https://nodejs.org"><img src="https://img.shields.io/badge/Using-NodeJS-darkgreen.svg?label=" alt="NodeJS"></a> <a href="https://vitejs.dev"><img src="https://img.shields.io/badge/Using-Vite-cyan.svg?label=" alt="Using Vite"></a> <a href="https://mongodb.com/"><img src="https://img.shields.io/badge/Using-MongoDB-green.svg?label=" alt="MongoDB"></a>
