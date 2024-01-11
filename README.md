@@ -38,11 +38,10 @@ Ever wanted to start your own GTA:V Roleplay Server? No idea where to start? Wel
 
 ## Important Links
 
--   [Guides / Installation](https://athenaframework.com)
--   [Discord & Forums](https://ares.stuyk.com/v1/get/discord)
--   [Discord Membership](https://discord.com/servers/athena-framework-790039623648542760)
--   [Issues](https://github.com/Stuyk/altv-athena/issues)
--   [alt:V Client](https://altv.mp)
+* [Guides / Installation](https://athenaframework.com)
+* [Discord](https://discord.com/servers/athena-framework-790039623648542760)
+* [Issues](https://github.com/Stuyk/altv-athena/issues)
+* [alt:V Client](https://altv.mp)
 
 ## Quick Start
 
@@ -78,5 +77,9 @@ npm run windows
 ## Contributors
 
 Special thank you to all these wonderful people who have helped move the Athena Framework forward.
-<a href="https://github.com/stuyk/altv-athena/graphs/contributors"><img src="https://contrib.rocks/image?repo=stuyk/altv-athena"></a>
+
+<a href = "https://github.com/stuyk/altv-athena/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=stuyk/altv-athena"/>
+</a>
+
 Made with [contributors-img](https://contrib.rocks).

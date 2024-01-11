@@ -108,7 +108,6 @@ const ClientAttachableSystem = {
                     continue;
                 }
 
-                alt.logWarning(`EntityID: ${attachable.entityID}`);
                 const foundObject = alt.LocalObject.all.find((x) => x.id === attachable.entityID);
                 if (typeof foundObject === 'undefined' || foundObject === null || foundObject.valid === false) {
                     continue;

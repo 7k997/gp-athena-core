@@ -7,11 +7,13 @@
 ```
 
 ## 5.3.1
+
 ```
 - Fix Object Entity Selection
 ```
 
 ## 5.3.0
+
 ```
 - Update configs, and resource builder to toml only
 - Upgrade item drops to use alt.Object
@@ -154,7 +156,7 @@ Athena.commands
 Equip Namespace
 - Used to listen to unequip / equip from specific item types
 Athena.systems.inventory.equip.on
-Athena.systems.invnetory.equip.invoke 
+Athena.systems.invnetory.equip.invoke
 
 Basic Authentication
 - username/password based login
