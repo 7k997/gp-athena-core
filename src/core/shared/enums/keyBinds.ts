@@ -99,8 +99,8 @@ export const KEY_BINDS = {
     RANGE: 220,
     //*
     MUTE: 187,
-    //F3
-    TABLET: 114,
+    //F3 - Free - Tablet moved to Toolkey
+    // TABLET: 114,
     //VueExample
     VUE: 120,
     //M

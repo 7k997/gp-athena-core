@@ -216,3 +216,36 @@ Athena.commands.register('hasitemcheck', '/hasitemcheck', ['admin'], async (play
     const result = await Athena.player.inventory.has(player, 'burger', 1);
     console.log(result);
 });
+
+Athena.commands.register(
+    'dox',
+    '/dox [discordNameID] - Unban player from the server.',
+    ['admin'],
+    (_player: alt.Player, discordNameID: string, reason: string) => {
+        if (discordNameID === undefined) {
+            alt.logWarning(`/dox <discord_id>`);
+            return;
+        }
+
+        let player: alt.Player = Athena.systems.identifier.getPlayer(discordNameID);
+
+        if (!player) {
+            alt.logWarning(`Could not find ${discordNameID}.`);
+            return;
+        }
+
+        const accountData = Athena.document.account.get(player);
+        const playerData = Athena.document.character.get(player);
+
+        alt.log(`=== Player Account (${accountData.id}) ===`);
+        alt.log(`Player Name: ${playerData.name}`);
+        alt.log(`Player Account:`);
+        Object.keys(accountData).forEach((key) => {
+            alt.log(`${key}: ${JSON.stringify(accountData[key])}`);
+        });
+        alt.log(`Player Data:`);
+        Object.keys(playerData).forEach((key) => {
+            alt.log(`${key}: ${JSON.stringify(playerData[key])}`);
+        });
+    },
+);

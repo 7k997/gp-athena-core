@@ -10,3 +10,16 @@ export const WebViewEventNames = {
     PLAY_SOUND: 'athena:Play:Sound',
     PLAY_SOUND_FRONTEND: 'athena:Play:Sound:Frontend',
 };
+
+// export const CinemaWebViewEventNames = {
+//     ON_SERVER: 'athena:cinemaview:on:server',
+//     ON_EMIT: 'athena:cinemaview:emit:on',
+//     EMIT_SERVER: 'athena:cinemaview:emit:server',
+//     EMIT_CLIENT: 'athena:cinemaview:emit:client',
+//     EMIT_READY: 'athena:cinemaview:emit:page:ready',
+//     SET_PAGES: 'athena:cinemaview:set:pages',
+//     CLOSE_PAGE: 'athena:cinemaview:Close:Page',
+//     CLOSE_PAGES: 'athena:cinemaview:Close:Pages',
+//     PLAY_SOUND: 'athena:cinemaview:Play:Sound',
+//     PLAY_SOUND_FRONTEND: 'athena:cinemaview:Play:Sound:Frontend',
+// };

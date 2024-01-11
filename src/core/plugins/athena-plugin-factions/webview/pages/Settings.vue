@@ -9,7 +9,6 @@
                 v-bind:rot="rot"
             />
         </Module>
-        <br />
         <Module name="Parking">
             <Parking
                 v-bind:faction="faction"
@@ -19,7 +18,6 @@
                 v-bind:rot="rot"
             />
         </Module>
-        <br />
         <Module v-for="(componentName, index) in getSettingsComponents()" :name="componentName">
             <component
                 :is="componentName"

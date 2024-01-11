@@ -16,6 +16,10 @@ import { InventoryView } from '@AthenaPlugins/core-inventory/server/src/view.js'
 export const FACTION_COLLECTION = 'factions';
 const factions: { [key: string]: Faction } = {};
 
+export type UpdateSettingsInjection = (faction: Faction) => void;
+
+const UpdateSettingsInjections: Array<UpdateSettingsInjection> = [];
+
 class InternalFunctions {
     /**
      * Create the faction and add cache it to memory.
@@ -368,6 +372,10 @@ export class FactionHandler {
     //     return faction;
     // }
 
+    static addUpdateSettingsInjection(callback: UpdateSettingsInjection) {
+        UpdateSettingsInjections.push(callback);
+    }
+
     /**
      * Reloads blips, markers, parking spots, etc.
      *
@@ -414,16 +422,7 @@ export class FactionHandler {
             Athena.controllers.blip.remove(faction._id.toString());
         }
 
-        Athena.controllers.interaction.remove(`${faction._id.toString()}-storage-0`);
-        Athena.controllers.interaction.remove(`${faction._id.toString()}-storage-1`);
-        Athena.controllers.interaction.remove(`${faction._id.toString()}-storage-2`);
-        Athena.controllers.interaction.remove(`${faction._id.toString()}-storage-3`);
-        Athena.controllers.marker.remove(`${faction._id.toString()}-storage-0`);
-        Athena.controllers.marker.remove(`${faction._id.toString()}-storage-1`);
-        Athena.controllers.marker.remove(`${faction._id.toString()}-storage-2`);
-        Athena.controllers.marker.remove(`${faction._id.toString()}-storage-3`);
-
-        //Add storages and parking spots
+        //Add parking spots
         // if (faction.settings && faction.settings.parkingSpots) {
         //     for (let i = 0; i < faction.settings.parkingSpots.length; i++) {
         //         let parkingSpot = faction.settings.parkingSpots[i];
@@ -447,71 +446,12 @@ export class FactionHandler {
         //     }
         // }
 
-        if (faction.storages) {
-            for (let i = 0; i < faction.storages.length; i++) {
-                let storage = faction.storages[i];
-                let storagePos = new alt.Vector3(storage.pos.x, storage.pos.y, storage.pos.z - 1);
-                Athena.controllers.interaction.append({
-                    description: `Access Faction Storage`,
-                    uid: storage.name,
-                    position: storagePos,
-                    data: [storage.name, storage.id],
-                    callback: FactionHandler.openStorage,
-                });
-
-                Athena.controllers.marker.append({
-                    uid: storage.name,
-                    pos: storagePos,
-                    type: 1,
-                    color: new alt.RGBA(255, 255, 255, 100),
-                });
-            }
+        //Execute Update Settings Injections - faction plugins
+        for (let i = 0; i < UpdateSettingsInjections.length; i++) {
+            UpdateSettingsInjections[i](faction);
         }
+
         alt.logWarning('Faction updateSettings...end');
-    }
-
-    /**
-     * External callable function for opening faction storages.
-     * @static
-     * @param {alt.Player} player
-     * @param {FACTION_STORAGE} storageName
-     * @memberof FactionSystem
-     */
-    static async openStorage(player: alt.Player, storageName: string, storageID: string): Promise<Boolean> {
-        const playerData = Athena.document.character.get(player);
-        if (!playerData.faction) {
-            Athena.player.emit.message(player, LocaleController.get(LOCALE_KEYS.FACTION_STORAGE_NO_ACCESS));
-            return false;
-        }
-
-        const faction = FactionHandler.get(playerData.faction);
-        if (!faction) {
-            Athena.player.emit.message(player, LocaleController.get(LOCALE_KEYS.FACTION_STORAGE_NO_ACCESS));
-            return false;
-        }
-
-        let rank = FactionPlayerFuncs.getPlayerFactionRank(player);
-        if (!rank || !rank.rankPermissions.canOpenStorages) {
-            if (!FactionPlayerFuncs.isOwner(player)) {
-                Athena.player.emit.notification(player, LocaleController.get(LOCALE_KEYS.FACTION_STORAGE_NO_ACCESS));
-                return false;
-            }
-        }
-
-        let storageIndex = faction.storages.findIndex((x) => x.name === storageName);
-        if (storageIndex < 0) {
-            Athena.player.emit.message(player, LocaleController.get(LOCALE_KEYS.FACTION_STORAGE_NO_ACCESS));
-            return false;
-        }
-
-        //TODO Check storage rank permissions based on individual storage
-        if (faction.storages[storageIndex].allowRanks.length > 0) {
-        }
-
-        const id = await Athena.systems.storage.create([]);
-        const storedItems = await Athena.systems.storage.get(id);
-        InventoryView.storage.open(player, storageID, storedItems, 256, true);
-        return true;
     }
 
     static async openFactionMenu(player: alt.Player, factionID: string): Promise<Boolean> {

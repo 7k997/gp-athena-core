@@ -103,7 +103,13 @@ function init() {
         callbacks: {
             onReady: async () => {
                 isOpen = true;
-                AthenaClient.webview.emit(INVENTORY_EVENTS.TO_WEBVIEW.SET_INVENTORY, inventory, toolbar, totalWeight);
+                AthenaClient.webview.emit(
+                    INVENTORY_EVENTS.TO_WEBVIEW.SET_INVENTORY,
+                    inventory,
+                    toolbar,
+                    totalWeight,
+                    maxWeight,
+                );
                 AthenaClient.webview.emit(INVENTORY_EVENTS.TO_WEBVIEW.SET_WEIGHT_STATE, isWeightEnabled);
                 AthenaClient.webview.emit(INVENTORY_EVENTS.TO_WEBVIEW.SET_SIZE, inventorySize);
                 AthenaClient.webview.emit(INVENTORY_EVENTS.TO_WEBVIEW.SET_MAX_WEIGHT, maxWeight);

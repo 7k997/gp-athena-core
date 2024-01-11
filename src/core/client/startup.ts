@@ -115,6 +115,11 @@ import './utility/scenarios.js';
 import './webview/index.js';
 import './webview/page.js';
 
+// Cinema Webview
+// import './webviewCinema/index.js';
+// import './webviewCinema/page.js';
+// import './views/cinemaAudio.js';
+
 // Views
 import './views/actions.js';
 import './views/audio.js';

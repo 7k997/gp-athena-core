@@ -1,5 +1,126 @@
 <template>
     <div class="inventory-split">
+        <div class="inventory-frame" v-if="machine && Array.isArray(machine)">
+               
+           
+            <div class="machine-slots">       
+                            
+                <div class="machine-options">   
+                    <div class="machine-header">{{recipe.recipeMachine}}
+                </div>         
+                    <Dropdown :options="recipe.options.recipeTypes"
+                        v-on:selected="onSelectRecipeType"
+                        placeholder="Type"
+                        :maxItem="10"
+                        v-if="recipe.recipeMode === 'Recipe'"/>
+                    <Dropdown :options="recipe.options.effects"
+                        v-on:selected="onSelectRecipeEffect"
+                        placeholder="Effect"
+                        :maxItem="10"
+                        v-if="recipe.recipeMode === 'Recipe' && recipe.recipeConsumable"/>
+                    <Dropdown :options="recipe.options.ammounts"
+                        v-on:selected="onSelectRecipeAmount"
+                        placeholder="Amount"
+                        :maxItem="10"
+                        v-if="recipe.recipeMode === 'Recipe'"/>              
+                    <Dropdown :options="recipe.options.ammountsPerCount"
+                        v-on:selected="onSelectRecipeAmountPerCount"
+                        placeholder="Amount per Use"
+                        :maxItem="10"
+                        v-if="recipe.recipeMode === 'Recipe' && recipe.recipeConsumable"
+                        :disabled="recipe.recipeMode != 'Recipe'"/>
+                    <Dropdown :options="recipe.options.productionTimes"
+                        v-on:selected="onSelectRecipeProductionTime"
+                        placeholder="Productiontime"
+                        :maxItem="10"
+                        v-if="recipe.recipeMode && recipe.recipeConsumable"
+                        :disabled="recipe.recipeMode != 'Recipe'"/>
+                    <Dropdown :options="recipe.options.status"
+                        v-on:selected="onSelectRecipeStatus"
+                        placeholder="Status"
+                        :maxItem="10"
+                        v-if="recipe.recipeMode && recipe.recipeConsumable"
+                        :disabled="recipe.recipeMode != 'Recipe'"/>
+                    <Dropdown :options="recipe.options.expirationTimes"
+                        v-on:selected="onSelectRecipeExpirationTime"
+                        placeholder="Expiration Time"
+                        :maxItem="10"
+                        v-if="recipe.recipeMode && recipe.recipeConsumable"
+                        :disabled="recipe.recipeMode != 'Recipe'"/>
+                    <Dropdown :options="recipe.options.tearandwears"
+                        v-on:selected="onSelectRecipeTearAndWear"
+                        placeholder="Tear & Wear"
+                        :maxItem="10"
+                        v-if="recipe.recipeMode && recipe.recipeConsumable"
+                        :disabled="recipe.recipeMode != 'Recipe'"/>                   
+                    <Dropdown :options="recipe.options.qualities"
+                        v-on:selected="onSelectRecipeQuality"
+                        placeholder="Quality"
+                        :maxItem="10"
+                        :disabled="recipe.recipeMode != 'Recipe'"/>
+                    <Dropdown :options="recipe.options.vehicles"
+                        v-on:selected="onSelectRecipeVehicle"
+                        placeholder="Vehicle"
+                        :maxItem="10"
+                        v-if="recipe.recipeMode && recipe.recipeConsumable"
+                        />
+                </div>
+              
+                <div class="machine-slots-max">
+                    
+                    <MachineSlot
+                        v-for="(slot, index) in slotLimits.machine"
+                        class="slot"
+                        :class="getSelectedItemClass('machine', index)"
+                        :key="index"
+                        :id="getID('machine', index)"
+                        :info="getSlotInfo('machine', index)"
+                        @mouseenter="updateDescriptor('machine', index)"
+                        @mouseleave="updateDescriptor(undefined, undefined)"
+                        @mousedown="
+                            (e) => drag(e, { endDrag, canBeDragged: hasItem('machine', index), singleClick, startDrag })
+                        "
+                    >
+                        <template v-slot:image v-if="hasItem('machine', index)">
+                            <img
+                                :src="getImagePath(getItem('machine', index))"
+                                :class="`outlined-image-${getItemSex('machine',index)}`"
+                            />
+                        </template>
+                        <template v-slot:index v-else>
+                            <template v-if="config.showGridNumbers">
+                                {{ slot }}
+                            </template>
+                        </template>
+                    </MachineSlot>
+                    <div class="machine-actions">
+                        <Button class="" :disable="recipe.recipeMode === 'Produce'" >
+                            Create recipe
+                        </Button>  
+                        <Button class="" :disable="recipe.recipeMode != 'Produce'">
+                            Produce
+                        </Button> 
+                    </div>
+                </div>   
+                        
+            </div>
+
+            <div class="production">
+                <p v-for="log in recipe.recipeLog">{{log.name}}</p>
+            </div>
+            
+            <div class="weight-frame" v-if="config.isWeightEnabled">
+                <div class="split">
+                    <div class="icon pr-2">
+                        <Icon class="grey--text text--lighten-1" :noSelect="true" :size="18" icon="icon-anvil"></Icon>
+                    </div>
+                    <span class="weight-text">
+                        {{ machineTotalWeight.toFixed(2) }} / {{ weightLimits.machine }} {{ config.units }}
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="spacer">&nbsp;</div>
         <div class="inventory-frame" v-if="custom && Array.isArray(custom)">
             <div class="inventory-slots-max">
                 <Slot
@@ -28,13 +149,23 @@
                     </template>
                 </Slot>
             </div>
+            <div class="weight-frame" v-if="config.isWeightEnabled">
+                <div class="split">
+                    <div class="icon pr-2">
+                        <Icon class="grey--text text--lighten-1" :noSelect="true" :size="18" icon="icon-anvil"></Icon>
+                    </div>
+                    <span class="weight-text">
+                        {{ customTotalWeight.toFixed(2) }} / {{ weightLimits.custom }} {{ config.units }}
+                    </span>
+                </div>
+            </div>
         </div>
         <div class="spacer">&nbsp;</div>
         <div class="inventory-frame">
             <Split
                 :name="splitData.name"
                 :slot="splitData.slot"
-                :inventoryType="giveData.inventoryType"
+                :inventoryType="splitData.inventoryType"
                 :quantity="splitData.quantity"
                 @cancel-split="cancelSplit"
                 v-if="splitData"
@@ -91,6 +222,7 @@
                             :src="getImagePath(getItem('inventory', index))"
                             :class="`outlined-image-${getItemSex('inventory', index)}`"
                             @error="handleImageError"
+                           
                         />
                     </template>
                     <template v-slot:index v-else>
@@ -100,13 +232,19 @@
                     </template>
                 </Slot>
             </div>
+            <div class="item-descriptor">
+                    <div class="item-descriptor-title" color="red">{{ itemName }}</div>
+                    <div class="item-descriptor-description">{{ itemDescription }}</div>    
+            </div>
             <div class="weight-frame" v-if="config.isWeightEnabled">
+                
+               
                 <div class="split">
                     <div class="icon pr-2">
                         <Icon class="grey--text text--lighten-1" :noSelect="true" :size="18" icon="icon-anvil"></Icon>
                     </div>
                     <span class="weight-text">
-                        {{ totalWeight.toFixed(2) }} / {{ config.maxWeight }} {{ config.units }}
+                        {{ totalWeight.toFixed(2) }} / {{ weightLimits.inventory }} {{ config.units }}
                     </span>
                 </div>
             </div>
@@ -115,7 +253,7 @@
                 <template v-for="customAction in context.customEvents">
                     <div @click="contextAction('custom', customAction.eventToCall)">{{ customAction.name }}</div>
                 </template>
-
+          
                 <!-- Hier beginnt die Hinzufügung der rekursiven Untermenüs -->
                 <template v-for="customSub in context.customSubMenus">
                     <ContextSub
@@ -141,7 +279,9 @@
                 <!-- <div @click="contextAction('cancel')">Cancel</div> -->
             </Context>
         </div>
+      
     </div>
+    
 </template>
 
 <script lang="ts">
@@ -155,16 +295,20 @@ import { INVENTORY_CONFIG } from '../../shared/config.js';
 import { debounceReady } from '../utility/debounce.js';
 import { DualSlotInfo, InventoryType } from '@AthenaPlugins/core-inventory/shared/interfaces.js';
 import { SlotInfo } from '../utility/slotInfo.js';
+import { on } from 'events';
 
 export default defineComponent({
     name: 'Inventory',
     components: {
         Slot: defineAsyncComponent(() => import('./Slot.vue')),
+        MachineSlot: defineAsyncComponent(() => import('./MachineSlot.vue')),
         Split: defineAsyncComponent(() => import('./Split.vue')),
         Give: defineAsyncComponent(() => import('./Give.vue')),
         Context: defineAsyncComponent(() => import('./ContextCustom.vue')),
         ContextSub: defineAsyncComponent(() => import('./ContextCustomSub.vue')),
         Icon: defineAsyncComponent(() => import('@ViewComponents/Icon.vue')),
+        Button: defineAsyncComponent(() => import('@components/Button.vue')),
+        Dropdown: defineAsyncComponent(() => import('@components/DropDown.vue')),
     },
     props: {
         offclick: {
@@ -177,11 +321,109 @@ export default defineComponent({
             toolbar: [] as Array<Item>,
             inventory: [] as Array<Item>,
             custom: [] as Array<Item>,
+            machine: [] as Array<Item>,
             slotLimits: {
                 inventory: 30,
                 toolbar: 5,
                 custom: 35,
+                machine: 12,
             },
+            weightLimits: {
+                inventory: 64,
+                toolbar: 64,
+                custom: 64,
+                machine: 5,
+            },
+            recipe: {
+                recipeMode: "Produce",
+                recipeMachine: "BBQ Grill",
+                recipeType: "consumable", // consumable, weapon, clothing, vehicle
+                recipeConsumable: true,
+                options: {                    
+                    recipeTypes: [
+                        { id: "consumable", name: "Consumable" },
+                        { id: "weapon", name: "Weapon" },
+                        { id: "clothing", name: "Clothing" },
+                        { id: "vehicle", name: "Vehicle" },
+                    ],
+                    effects: [
+                        { id: "effect1", name: "effect1" },
+                    ],
+                    ammounts: [
+                        { id: "1", name: "10" },
+                        { id: "2", name: "20" },
+                        { id: "4", name: "40" },
+                        { id: "6", name: "60" },
+                        { id: "8", name: "80" },
+                        { id: "8", name: "100" },
+                    ],
+                    ammountsPerCount: [
+                        { id: "1", name: "10" },
+                        { id: "2", name: "20" },
+                        { id: "4", name: "40" },
+                        { id: "6", name: "60" },
+                        { id: "8", name: "80" },
+                        { id: "8", name: "100" },
+                    ],
+                    productionTimes: [
+                        { id: "1", name: "10" },
+                        { id: "2", name: "20" },
+                        { id: "4", name: "40" },
+                        { id: "6", name: "60" },
+                        { id: "8", name: "80" },
+                        { id: "8", name: "100" },
+                    ],
+                    status: [
+                        { id: "1", name: "Hot" },
+                        { id: "2", name: "Cold" },
+                        { id: "4", name: "Frozen" },
+                        { id: "6", name: "Packed" },
+                    ],
+                    expirationTimes: [
+                        { id: "1", name: "7 days" },
+                        { id: "2", name: "14 days" },
+                        { id: "4", name: "28 days" },
+                        { id: "6", name: "56 days" },
+                        { id: "8", name: "112 days" },
+                        { id: "8", name: "224 days" },
+                        { id: "8", name: "unlimited" },
+                    ],
+                    tearandwears: [
+                        { id: "1", name: "10" },
+                        { id: "2", name: "20" },
+                        { id: "4", name: "40" },
+                        { id: "6", name: "60" },
+                        { id: "8", name: "80" },
+                        { id: "8", name: "100" },
+                    ],
+                    vehicles: [
+                        { id: "0", name: "None" },
+                        { id: "1", name: "Car" },
+                        { id: "2", name: "Bike" },
+                        { id: "4", name: "Truck" },
+                        { id: "6", name: "Helicopter" },
+                        { id: "8", name: "Plane" },
+                        { id: "8", name: "Boat" },
+                    ],
+                    qualities: [
+                        { id: "1", name: "10" },
+                        { id: "2", name: "20" },
+                        { id: "3", name: "30" },
+                        { id: "4", name: "40" },
+                        { id: "5", name: "50" },
+                        { id: "6", name: "60" },
+                        { id: "7", name: "70" },
+                        { id: "8", name: "80" },
+                        { id: "9", name: "90" },
+                        { id: "10", name: "100" },
+                    ],
+
+                },
+                recipeLog: [
+                    { id: "inreview", name: "In Review ..." },
+                    { id: "inproduction", name: "In Production ..." },
+                ],        
+            },           
             contextShow: false,
             context: undefined as
                 | {
@@ -199,6 +441,8 @@ export default defineComponent({
             itemName: '',
             itemDescription: '',
             totalWeight: 0,
+            customTotalWeight: 0,
+            machineTotalWeight: 0,
             splitData: undefined as { name: string; slot: number; quantity: number, inventoryType: InventoryType},
             giveData: undefined as { name: string; slot: number; quantity: number, inventoryType: InventoryType },
             config: {
@@ -206,7 +450,6 @@ export default defineComponent({
                 showGridNumbers: INVENTORY_CONFIG.WEBVIEW.GRID.SHOW_NUMBERS,
                 showToolbarNumbers: INVENTORY_CONFIG.WEBVIEW.TOOLBAR.SHOW_NUMBERS,
                 isWeightEnabled: true,
-                maxWeight: 64,
             },
         };
     },
@@ -263,6 +506,10 @@ export default defineComponent({
                     startIndex: this.itemSingleClick.index,
                     endType: type,
                     endIndex: index,
+                    startMaxWeight: this.weightLimits[this.itemSingleClick.type],
+                    startMaxSlots: this.weightLimits[this.itemSingleClick.type],
+                    endMaxWeight: this.weightLimits[type],
+                    endMaxSlots: this.weightLimits[type],
                 };
 
                 WebViewEvents.emitServer(INVENTORY_EVENTS.TO_SERVER.COMBINE, info);
@@ -292,6 +539,10 @@ export default defineComponent({
                 startIndex,
                 endType,
                 endIndex,
+                startMaxWeight: this.weightLimits[startType],
+                startMaxSlots: this.weightLimits[startType],
+                endMaxWeight: this.weightLimits[endType],
+                endMaxSlots: this.weightLimits[endType],
             };
 
             WebViewEvents.emitServer(INVENTORY_EVENTS.TO_SERVER.SWAP, info);
@@ -385,12 +636,18 @@ export default defineComponent({
         setMaxSlots(value: number) {
             this.maxSlots = value;
         },
-        setItems(inventory: Array<Item>, toolbar: Array<Item>, totalWeight: number) {
+        setItems(inventory: Array<Item>, toolbar: Array<Item>, totalWeight: number, maxWeight: number) {
             this.inventory = inventory;
             this.toolbar = toolbar;
             this.totalWeight = totalWeight;
+
+            if (typeof maxWeight !== 'undefined') {
+                const newWeightLimits = { ...this.slotLimits };
+                newWeightLimits.inventory = maxWeight;
+                this.weightLimits = newWeightLimits;
+            }
         },
-        setCustomItems(customItems: Array<Item>, maximumSize: number) {
+        setCustomItems(customItems: Array<Item>, maximumSize: number, totalWeight: number, maxWeight: number) {
             if (typeof customItems === 'undefined') {
                 customItems = [];
             }
@@ -401,6 +658,41 @@ export default defineComponent({
                 const newSlotLimits = { ...this.slotLimits };
                 newSlotLimits.custom = maximumSize;
                 this.slotLimits = newSlotLimits;
+            }
+            
+            if (typeof totalWeight !== 'undefined') {
+                this.customTotalWeight = totalWeight;
+            }            
+
+            if (typeof maxWeight !== 'undefined') {
+                const newWeightLimits = { ...this.slotLimits };
+                newWeightLimits.custom = maxWeight;
+                this.weightLimits = newWeightLimits;
+            }
+        },
+        setMachineItems(machineItems: Array<Item>, maximumSize: number, totalWeight: number, maxWeight: number) {
+            if (typeof machineItems === 'undefined') {
+                machineItems = [];
+            }
+
+            console.log('machineItems: ' + JSON.stringify(machineItems));
+            console.log('maximumSize: ' + maximumSize);
+            this.machine = machineItems;
+
+            if (typeof maximumSize !== 'undefined') {
+                const newSlotLimits = { ...this.slotLimits };
+                newSlotLimits.machine = maximumSize;
+                this.slotLimits = newSlotLimits;
+            }
+
+            if (typeof totalWeight !== 'undefined') {
+                this.machineTotalWeight = totalWeight;
+            }
+            
+            if (typeof maxWeight !== 'undefined') {
+                const newWeightLimits = { ...this.slotLimits };
+                newWeightLimits.machine = maxWeight;
+                this.weightLimits = newWeightLimits;
             }
         },
         contextMenuToolbar(e: MouseEvent, slot: number) {
@@ -482,9 +774,11 @@ export default defineComponent({
             eventToCall: string | string[] = undefined,
         ) {
             console.log('eventToCall: ' + eventToCall + ' type: ' + type);
+            console.log('this.context JSON: ' + JSON.stringify(this.context));
 
             const slot = this.context.slot;
             const inventoryType = this.context.inventoryType;
+            console.log('slot: ' + slot + ' inventoryType: ' + inventoryType);
             this.context = undefined;
 
             if (typeof slot === 'undefined') {
@@ -531,6 +825,8 @@ export default defineComponent({
                     slot: slot,
                 };
 
+                console.log('XXXXX eventToCall 4: ' + eventToCall + ' type: ' + type);
+
                 return;
             }
 
@@ -563,10 +859,10 @@ export default defineComponent({
             newConfig.isWeightEnabled = value;
             this.config = newConfig;
         },
-        setMaxWeight(value: number) {
-            const newConfig = { ...this.config };
-            newConfig.maxWeight = value;
-            this.config = newConfig;
+        setMaxWeight(value: number) {           
+            const newWeightLimits = { ...this.weightLimits };
+            newWeightLimits.inventory = value;
+            this.weightLimits = newWeightLimits;           
         },
         cancelSplit() {
             this.splitData = undefined;
@@ -580,12 +876,48 @@ export default defineComponent({
         closeSubMenuOnLeave(customSub) {
             customSub.isOpen = false;
         },
+        onSelectRecipeType(selected) {
+            this.recipe.recipeType = selected;
+            this.recipe.recipeConsumable = selected === 'consumable';
+        },
+        onSelectRecipeEffect(selected) {
+            this.recipe.recipeEffect = selected;
+        },
+        onSelectRecipeAmount(selected) {
+            this.recipe.recipeAmount = selected;
+        },
+        onSelectRecipeAmountPerCount(selected) {
+            this.recipe.recipeAmountPerCount = selected;
+        },
+        onSelectRecipeProductionTime(selected) {
+            this.recipe.recipeProductionTime = selected;
+        },
+        onSelectRecipeStatus(selected) {
+            this.recipe.recipeStatus = selected;
+        },
+        onSelectRecipeExpirationTime(selected) {
+            this.recipe.recipeExpirationTime = selected;
+        },
+        onSelectRecipeTearAndWear(selected) {
+            this.recipe.recipeTearAndWear = selected;
+        },
+        onSelectRecipeVehicle(selected) {
+            this.recipe.recipeVehicle = selected;
+        },
+        onSelectRecipeQuality(selected) {
+            this.recipe.recipeQuality = selected;
+        },
+        onSelectRecipeMode(selected) {
+            this.recipe.recipeMode = selected;
+        },
     },
     mounted() {
         this.custom = undefined;
+        this.machine = undefined;
 
         if ('alt' in window) {
             WebViewEvents.on(INVENTORY_EVENTS.TO_WEBVIEW.SET_CUSTOM, this.setCustomItems);
+            WebViewEvents.on(INVENTORY_EVENTS.TO_WEBVIEW.SET_MACHINE, this.setMachineItems)
             WebViewEvents.on(INVENTORY_EVENTS.TO_WEBVIEW.SET_INVENTORY, this.setItems);
             WebViewEvents.on(INVENTORY_EVENTS.TO_WEBVIEW.SET_SIZE, this.setSize);
             WebViewEvents.on(INVENTORY_EVENTS.TO_WEBVIEW.SET_WEIGHT_STATE, this.setWeightState);
@@ -605,6 +937,17 @@ export default defineComponent({
             icon: 'assets/icons/crate.png',
         };
 
+        const exampleItem2: Item = {
+            name: 'Big Box',
+            dbName: 'box',
+            quantity: 1,
+            slot: 0,
+            data: {},
+            version: 0,
+            weight: 1,
+            icon: 'assets/icons/crate.png',
+        };
+
         const exampleItems: Array<Item> = [
             exampleItem,
             { ...exampleItem, slot: 2, icon: 'burger', name: 'Burger', totalWeight: 2 },
@@ -613,15 +956,24 @@ export default defineComponent({
             { ...exampleItem, slot: 24, icon: 'pistol50', name: 'Pistol .50', totalWeight: 4, isEquipped: true },
         ];
 
+        const recipeItems: Array<Item> = [           
+            { ...exampleItem, slot: 4, icon: 'burger', quantity: 1, name: 'Burger', description:'Recipe for a realy good burger', totalWeight: 5 },
+            { ...exampleItem, slot: 0, icon: 'crate', quantity: 1, name: 'Bread', totalWeight: 1 },
+            { ...exampleItem, slot: 1, icon: 'crate', quantity: 1, name: 'Ketchup', totalWeight: 1 },
+            { ...exampleItem, slot: 3, icon: 'crate', quantity: 1, name: 'Meat', totalWeight: 1 },
+            { ...exampleItem, slot: 6, icon: 'crate', quantity: 1, name: 'Bread', totalWeight: 1 },
+            { ...exampleItem, slot: 5, icon: 'crate', quantity: 1, name: 'Salat', totalWeight: 1 },
+        ];
+
         this.setItems(
             exampleItems,
             [{ ...exampleItem, icon: 'assaultrifle', name: 'Assault Rifle', totalWeight: 10 }],
-            25,
-            true,
+            8,
             25,
         );
 
         this.setCustomItems([exampleItem]);
+        this.setMachineItems(recipeItems);
     },
     watch: {
         offclick() {
@@ -652,7 +1004,7 @@ export default defineComponent({
     border-radius: 6px;
     border: 2px solid rgba(255, 255, 255, 0.2);
     box-sizing: border-box;
-    height: 100%;
+    height: 110%;
     align-self: flex-end;
     position: relative;
 }
@@ -696,11 +1048,79 @@ export default defineComponent({
     justify-content: space-evenly;
     align-content: flex-start;
     height: 100%;
+    max-height: 660px;
     padding-top: 5px;
 }
 
 .inventory-slots .slot,
 .inventory-slots-max .slot {
+    margin-bottom: 5px;
+    background: rgba(0, 0, 0, 0.5);
+    box-sizing: border-box;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+}
+
+.machine-header {
+    margin: 10px;
+}
+
+.machine-slots {
+    /* display: flex;
+    justify-content: flex-end;
+    width: 60%;
+    margin-left: 10vw; */
+
+    display: flex;
+    flex-direction: row; /* Standard ist bereits "row", kann weggelassen werden */
+    justify-content: flex-end;
+    width: 100%;
+    /* height: 88%; */
+    /* margin-left: 10vw; */
+}
+
+.production {
+    overflow-y: auto;
+    height: 21vh;
+    padding-left: 10px;
+
+    min-height: 5.5vh;
+    margin-left: 10px;
+    margin-top: 10px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    /* padding: 15px; */
+    margin-right: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.machine-options {
+    /* display: flex; */
+    flex-direction: column; /* Elemente untereinander anordnen */
+    overflow-y: hidden;
+    width: 50%;
+    /* padding-top: 60px; */
+    padding-left: 10px;
+}
+
+.machine-options div {
+    margin-bottom: 10px;
+}
+
+.machine-slots-max {
+    display: flex;
+    flex-flow: row wrap;
+    box-sizing: border-box;
+    overflow-y: hidden;
+    justify-content: space-evenly;
+    align-content: flex-start;
+    height: 100%;  
+    width: 70%;
+    padding-top: 5px;   
+    padding-right: 5px;
+}
+
+.machine-slots-max .slot {
     margin-bottom: 5px;
     background: rgba(0, 0, 0, 0.5);
     box-sizing: border-box;
@@ -833,6 +1253,52 @@ export default defineComponent({
     transform: translate(-50%, -50%); /* Zentriert das Symbol */
     font-size: 20px; /* Passe die Größe des Symbols nach Bedarf an */
     color: rgba(0, 0, 0, 0.7); /* Farbe des Symbols */
+}
+
+.machine-slots .slot:nth-last-child(-n+4)::before {
+    content: "♻️"; /* Hier kannst du ein anderes Symbol verwenden, wenn du möchtest */
+    position: absolute;
+    top: 50%; /* Vertikal zentriert */
+    left: 50%; /* Horizontal zentriert */
+    transform: translate(-50%, -50%); /* Zentriert das Symbol */
+    font-size: 20px; /* Passe die Größe des Symbols nach Bedarf an */
+    color: rgba(0, 0, 0, 0.7); /* Farbe des Symbols */
+}
+
+.machine-actions {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: flex-end;
+    min-height: 60px;
+    max-height: 60px;
+
+}
+
+.item-descriptor {
+    min-height: 5.5vh;
+    margin-left: 10px;
+    margin-top: 10px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    /* padding: 15px; */
+    margin-right: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.item-descriptor-title {
+    font-size: 0.9em;
+    font-weight: bold;
+    margin: 5px;
+    margin-left: 8px;
+}
+
+.item-descriptor-description {
+    font-size: 0.8em;
+    line-height: 1.4;
+    
+    margin: 5px;
+    margin-left: 8px;
 }
 
 </style>

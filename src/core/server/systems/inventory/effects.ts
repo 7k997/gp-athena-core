@@ -1,8 +1,12 @@
 import * as alt from 'alt-server';
 import * as Athena from '@AthenaServer/api/index.js';
 
-export type InventoryType = 'inventory' | 'toolbar';
-export type EffectCallback = (player: alt.Player, slot: number, type: 'inventory' | 'toolbar') => void;
+export type InventoryType = 'inventory' | 'toolbar' | 'custom' | 'machine';
+export type EffectCallback = (
+    player: alt.Player,
+    slot: number,
+    type: 'inventory' | 'toolbar' | 'custom' | 'machine',
+) => void;
 
 const effects: Map<string, EffectCallback> = new Map();
 
@@ -58,6 +62,7 @@ export function invoke(
         return Overrides.invoke(player, slot, type);
     }
 
+    alt.logWarning(`Invoking Item Effect: ${slot} ${type} ${eventToCall}`);
     const data = Athena.document.character.get(player);
     if (typeof data === 'undefined') {
         return false;
@@ -80,11 +85,13 @@ export function invoke(
 
     if (typeof eventToCall === 'undefined' || eventToCall === null) {
         if (typeof baseItem.consumableEventToCall === 'string') {
+            alt.logWarning(`Invoking Item Effect 1: ${slot} ${type} ${baseItem.consumableEventToCall}`);
             const callback = effects.get(baseItem.consumableEventToCall);
             if (!callback || typeof callback !== 'function') {
                 return false;
             }
 
+            alt.logWarning(`Invoking Item Effect 2: ${slot} ${type} ${baseItem.consumableEventToCall}`);
             callback(player, item.slot, type);
             return true;
         }

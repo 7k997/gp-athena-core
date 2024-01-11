@@ -25,8 +25,14 @@ export interface ItemQuantityChange {
     remaining: number;
 }
 
-export type InventoryType = 'inventory' | 'toolbar' | 'custom';
-export type ComplexSwap = { slot: number; data: Array<StoredItem>; size: InventoryType | number; type: InventoryType };
+export type InventoryType = 'inventory' | 'toolbar' | 'custom' | 'machine';
+export type ComplexSwap = {
+    slot: number;
+    data: Array<StoredItem>;
+    size: InventoryType | number;
+    weight: InventoryType | number;
+    type: InventoryType;
+};
 export type ComplexSwapReturn = { from: Array<StoredItem>; to: Array<StoredItem> };
 
 /**
@@ -654,8 +660,16 @@ export async function combineAtComplex(
         from.size = Athena.systems.inventory.config.get()[from.size].size;
     }
 
+    if (typeof from.weight === 'string') {
+        from.weight = Athena.systems.inventory.config.get()[from.weight].weight;
+    }
+
     if (typeof to.size === 'string') {
         to.size = Athena.systems.inventory.config.get()[to.size].size;
+    }
+
+    if (typeof to.weight === 'string') {
+        to.weight = Athena.systems.inventory.config.get()[to.weight].weight;
     }
 
     const fromIndex = from.data.findIndex((x) => x.slot === from.slot);
@@ -715,13 +729,26 @@ export async function combineAtComplex(
         'afterSwap-2',
         player,
         toData[toIndex],
-        { startType: from.type, startIndex: fromIndex, endType: to.type, endIndex: toIndex },
+        {
+            startType: from.type,
+            startIndex: fromIndex,
+            endType: to.type,
+            endIndex: toIndex,
+            startMaxWeight: from.weight,
+            startMaxSlots: from.size,
+            endMaxWeight: to.weight,
+            endMaxSlots: to.size,
+        },
     );
     Athena.systems.inventory.swap.invoke('item-swap', 'swap2', player, toData[toIndex], {
         startType: from.type,
         startIndex: fromIndex,
+        startMaxSlots: from.size,
+        startMaxWeight: from.weight,
         endType: to.type,
         endIndex: toIndex,
+        endMaxSlots: to.size,
+        endMaxWeight: to.weight,
     });
     return {
         from: Athena.systems.inventory.weight.update(fromData),
@@ -803,6 +830,14 @@ export async function swapBetween(
         to.size = Athena.systems.inventory.config.get()[to.size].size as number;
     }
 
+    if (typeof from.weight === 'string') {
+        from.weight = Athena.systems.inventory.config.get()[from.weight].weight as number;
+    }
+
+    if (typeof to.weight === 'string') {
+        to.weight = Athena.systems.inventory.config.get()[to.weight].weight as number;
+    }
+
     const fromIndex = from.data.findIndex((x) => x.slot === from.slot);
     const toIndex = to.data.findIndex((x) => x.slot === to.slot);
 
@@ -853,6 +888,10 @@ export async function swapBetween(
             startIndex: fromIndex,
             endType: to.type,
             endIndex: toIndex,
+            startMaxWeight: from.weight,
+            startMaxSlots: from.size,
+            endMaxWeight: to.weight,
+            endMaxSlots: to.size,
         });
 
         // Move the 'to' item to the other data set.
@@ -868,9 +907,13 @@ export async function swapBetween(
 
     fromItem = await Athena.systems.inventory.swap.invokeInjection('after-swap', 'afterSwap-4', player, fromItem, {
         startType: from.type,
-        startIndex: fromIndex,
+        startIndex: from.slot,
         endType: to.type,
-        endIndex: toIndex,
+        endIndex: to.slot,
+        startMaxWeight: from.weight,
+        startMaxSlots: from.size,
+        endMaxWeight: to.weight,
+        endMaxSlots: to.size,
     });
     // Move the 'from' item to the other data set.
     toData.push(fromItem);
@@ -880,6 +923,10 @@ export async function swapBetween(
         startIndex: fromIndex,
         endType: to.type,
         endIndex: toIndex,
+        startMaxWeight: from.weight,
+        startMaxSlots: from.size,
+        endMaxWeight: to.weight,
+        endMaxSlots: to.size,
     });
     return {
         from: Athena.systems.inventory.weight.update(fromData),
@@ -898,7 +945,7 @@ export async function swapBetween(
 export async function useItem(
     player: alt.Player,
     slot: number,
-    type: 'inventory' | 'toolbar' = 'toolbar',
+    type: 'inventory' | 'toolbar' | 'custom' | 'machine' = 'toolbar',
     eventToCall: string | string[] = undefined,
 ) {
     if (Overrides.useItem) {

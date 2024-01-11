@@ -28,6 +28,14 @@ export interface CraftRecipe {
     combo: ItemCombo;
 
     /**
+     * Specific slots that must be used for the recipe.
+     *
+     * @type {number[]}
+     *
+     */
+    slots?: number[];
+
+    /**
      * The amount required to combine.
      *
      * @type {Quantities}
@@ -35,8 +43,7 @@ export interface CraftRecipe {
      */
     quantities: Quantities;
 
-
-     /**
+    /**
      * The dbname of the machine which must be used for the recipe.
      *
      * @type {Quantities}
@@ -122,14 +129,21 @@ export function addRecipe(recipe: CraftRecipe): boolean {
         return Overrides.addRecipe(recipe);
     }
 
-    if (recipe.combo.length !== 2 || recipe.quantities.length !== 2) {
-        alt.logWarning(`Aborted Recipe. Recipe ${recipe.uid} needs two items and two quantities given.`);
+    if (recipe.combo.length !== recipe.quantities.length) {
+        alt.logWarning(`Aborted Recipe. Recipe ${recipe.uid} needs matching items and quantities.`);
         return false;
     }
 
-    if (recipe.quantities[0] <= 0 && recipe.quantities[1] <= 0) {
-        alt.logWarning(`Aborted Recipe. Recipe ${recipe.uid} has two matching dbNames; this is invalid.`);
+    if (recipe.combo.length < 1) {
+        alt.logWarning(`Aborted Recipe. Recipe ${recipe.uid} needs at least one item.`);
         return false;
+    }
+
+    for (const quantity of recipe.quantities) {
+        if (quantity <= 0) {
+            alt.logWarning(`Aborted Recipe. Recipe ${recipe.uid} has invalid quantities.`);
+            return false;
+        }
     }
 
     alt.log(`~c~Recipe: ~lg~${recipe.uid}`);
@@ -138,46 +152,63 @@ export function addRecipe(recipe: CraftRecipe): boolean {
 }
 
 /**
- * Attempts to find a matching recipe.
- * If a matching recipe is found; it is returned.
- * Otherwise, returns undefined.
+ * Remove a recipe from in-memory storage.
  *
- * @param {ItemCombo} combo
- * @return {(Recipe | undefined)}
+ * @param {string} uid - The unique identifier of the recipe to be removed.
+ * @returns {boolean} - True if the recipe was found and removed, false otherwise.
  */
-export function findRecipe(combo: ItemCombo): CraftRecipe | undefined {
+export function removeRecipe(uid: string): boolean {
+    const index = recipes.findIndex((recipe) => recipe.uid === uid);
+
+    if (index !== -1) {
+        recipes.splice(index, 1);
+        alt.log(`~c~Removed Recipe: ~lr~${uid}`);
+        return true;
+    }
+
+    alt.logWarning(`Recipe with UID ${uid} not found.`);
+    return false;
+}
+
+export function findRecipe(combo: ItemCombo, machine?: string, slotNumbers?: number[]): CraftRecipe | undefined {
     if (Overrides.findRecipe) {
         return Overrides.findRecipe(combo);
     }
 
-    if (combo.length !== 2) {
+    if (combo.length < 1) {
         return undefined;
     }
 
-    const item1 = combo[0];
-    const item2 = combo[1];
-
-    for (let recipe of recipes) {
-        let foundItem1 = false;
-        let foundItem2 = false;
-
-        if (recipe.combo[0] === item1 || recipe.combo[0] === item2) {
-            foundItem1 = true;
-        }
-
-        if (recipe.combo[1] === item1 || recipe.combo[1] === item2) {
-            foundItem2 = true;
-        }
-
-        if (!foundItem1 || !foundItem2) {
+    for (const recipe of recipes) {
+        if (combo.length !== recipe.combo.length || (slotNumbers && slotNumbers.length !== recipe.combo.length)) {
             continue;
         }
 
-        return recipe;
+        let foundItems = 0;
+
+        for (let i = 0; i < combo.length; i++) {
+            const item = combo[i];
+            const slotNumber = slotNumbers && slotNumbers[i];
+
+            if (recipe.combo.includes(item)) {
+                if (!slotNumber || slotNumber === i) {
+                    foundItems += 1;
+                } else {
+                    // Wenn eine Slot-Nummer angegeben ist, aber nicht übereinstimmt, breche die Überprüfung ab
+                    foundItems = 0;
+                    break;
+                }
+            }
+        }
+
+        if (foundItems === combo.length && (!recipe.machine || recipe.machine === machine)) {
+            return recipe;
+        }
     }
 
     return undefined;
 }
+
 
 /**
  * Combine two slots given a data set.
@@ -299,6 +330,7 @@ export function combineItems(
 
     return { dataSet: newData, sound: recipe.sound };
 }
+
 
 interface CraftingFuncs {
     addRecipe: typeof addRecipe;

@@ -311,6 +311,36 @@ export interface FactionStorage {
      * @memberof FactionStorage
      */
     allowRanks: Array<string>;
+
+    maxSlots: number;
+    maxWeight: number;
+}
+
+export interface FactionStore {
+
+    /**
+     * The name of this store.
+     *
+     * @type {string}
+     * @memberof FactionStore
+     */
+    name: string;
+
+    /**
+     * Position of the store
+     *
+     * @type {Vector3}
+     * @memberof FactionStore
+     */
+    pos: alt.Vector3;
+
+     /**
+     * Storage of the store
+     *
+     * @type {FactionStorage}
+     * @memberof FactionStore
+     */
+    storage: FactionStorage;
 }
 
 export interface FactionVehicle {
@@ -462,6 +492,14 @@ export interface Faction extends FactionCore {
      * @memberof Faction
      */
     storages?: Array<FactionStorage>;
+
+    /**
+     * Storages that belong to this faction.
+     *
+     * @type {Array<FactionStorage>}
+     * @memberof Faction
+     */
+    stores?: Array<FactionStore>;
 
     /**
      * Expandable Faction Settings for Individual Settings

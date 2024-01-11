@@ -1,4 +1,5 @@
 import { GLOBAL_SYNCED } from '@AthenaShared/enums/globalSynced.js';
+import de from '@AthenaShared/locale/languages/de.js';
 import * as alt from 'alt-server';
 
 /**
@@ -10,16 +11,25 @@ import * as alt from 'alt-server';
 let DEFAULT_CONFIG = {
     inventory: {
         size: 30,
+        weight: 64,
     },
     toolbar: {
         size: 4,
+        weight: 64,
     },
     custom: {
         size: 256,
+        weight: 64,
     },
+    machine: {
+        size: 9,
+        weight: 5,
+    },
+    /**
+     * @deprecated Use `inventory.weight` instead. No disable for now - untested!
+     */
     weight: {
         enabled: true,
-        player: 64,
     },
 };
 
@@ -45,6 +55,7 @@ export function get(): typeof DEFAULT_CONFIG {
 
 /**
  * Use this function to disable weight restrictions on inventories.
+ * @deprecated Use `inventory.weight` instead. No disable for now!
  */
 export function disableWeight() {
     DEFAULT_CONFIG.weight.enabled = false;

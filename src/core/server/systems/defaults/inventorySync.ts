@@ -35,7 +35,7 @@ const Internal = {
             const config = Athena.systems.inventory.config.get();
             Athena.config.player.set(player, 'inventory-size', config.inventory.size);
             Athena.config.player.set(player, 'inventory-weight-enabled', config.weight.enabled);
-            Athena.config.player.set(player, 'inventory-max-weight', config.weight.player);
+            Athena.config.player.set(player, 'inventory-max-weight', config.inventory.weight);
         }
 
         const data = Athena.document.character.get(player);

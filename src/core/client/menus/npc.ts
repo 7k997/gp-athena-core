@@ -81,7 +81,7 @@ export function open(scriptID: number): void {
         return;
     }
 
-    AthenaClient.systems.wheelMenu.open('NPC', options);
+    AthenaClient.systems.wheelMenu.open('Citizen', options);
 }
 
 /**

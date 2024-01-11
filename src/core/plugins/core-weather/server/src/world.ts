@@ -211,6 +211,14 @@ export class World {
         return gridSpace === -1 ? 0 : gridSpace;
     }
 
+    static getGridSpaceByPosition(position: alt.Vector3): number {
+        const gridSpace = World.minMaxGroups.findIndex(
+            (pos) => position.y > pos.minY && position.y < pos.maxY,
+        );
+
+        return gridSpace === -1 ? 0 : gridSpace;
+    }
+
     /**
      * Get the weather for the current grid.
      * @param {number} gridIndex - The index of the grid in the grid array.

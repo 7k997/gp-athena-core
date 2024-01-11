@@ -2,7 +2,7 @@ import * as alt from 'alt-server';
 import * as Athena from '@AthenaServer/api/index.js';
 import { PLAYER_SYNCED_META } from '@AthenaShared/enums/playerSynced.js';
 
-export type IdentifierStrategy = 'account_id' | 'character_id' | 'server_id';
+export type IdentifierStrategy = 'account_id' | 'character_id' | 'server_id' | 'discord_id' | 'character_name';
 
 let strategy: IdentifierStrategy = 'server_id';
 
@@ -57,6 +57,12 @@ export function setPlayerIdentifier(player: alt.Player) {
 /**
  * Returns the player by the currently set identification strategy.
  *
+ * If not find search in the following order:
+ * 1. Discord ID
+ * 2. Server ID
+ * 3. Character ID
+ * 4. Account ID
+ * 5. Character Name
  * @param {(number | string)} id
  */
 export function getPlayer(id: number | string): alt.Player {
@@ -64,6 +70,7 @@ export function getPlayer(id: number | string): alt.Player {
         return Overrides.getPlayer(id);
     }
 
+    let idAsString = `${id}`;
     if (typeof id === 'string') {
         id = parseInt(id);
     }
@@ -75,27 +82,57 @@ export function getPlayer(id: number | string): alt.Player {
 
         if (strategy === 'account_id') {
             const accountData = Athena.document.account.get(target);
-            if (typeof accountData === 'undefined') {
-                return false;
+            if (typeof accountData != 'undefined' && accountData.id === id) {
+                return true;
             }
-
-            return accountData.id === id;
         }
 
         if (strategy === 'character_id') {
             const data = Athena.document.character.get(target);
-            if (typeof data === 'undefined') {
-                return false;
+            if (typeof data != 'undefined' && data.character_id === id) {
+                return true;
+            }
             }
 
-            return data.character_id === id;
+        if (strategy === 'server_id') {
+            if (target.id === id) {
+                return true;
+            }
         }
 
-        if (target.id !== id) {
-            return false;
+        if (strategy === 'discord_id') {
+            const data = Athena.document.account.get(target);
+            if (typeof data != 'undefined' && data.discord === idAsString) {
+                return true;
+            }
         }
 
+        if (strategy === 'character_name') {
+            const data = Athena.document.character.get(target);
+            if (typeof data != 'undefined' && data.name === idAsString) {
         return true;
+            }
+        }
+
+        //Nothing found with default strategy. Try other strategies in order.
+        // 1. Discord ID
+        const data = Athena.document.account.get(target);
+        if (data.discord === idAsString) return true;
+
+        // 2. Server ID
+        if (target.id === id) return true;
+
+        // 3. Character ID
+        const charData = Athena.document.character.get(target);
+        if (charData.character_id === id) return true;
+
+        // 4. Account ID
+        if (data.id === id) return true;
+
+        // 5. Character Name
+        if (charData.name === idAsString) return true;
+
+        return false;
     });
 }
 

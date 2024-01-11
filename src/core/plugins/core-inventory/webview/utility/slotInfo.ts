@@ -1,6 +1,6 @@
 export interface SlotInfo {
     slot: number;
-    location: 'inventory' | 'toolbar' | 'custom';
+    location: 'inventory' | 'toolbar' | 'custom' | 'machine';
     hasItem: boolean;
     quantity: number;
     name: string;

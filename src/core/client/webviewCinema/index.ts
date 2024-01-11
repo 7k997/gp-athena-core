@@ -4,8 +4,9 @@ import * as alt from 'alt-client';
 
 import { SYSTEM_EVENTS } from '@AthenaShared/enums/system.js';
 import { WebViewEventNames } from '@AthenaShared/enums/webViewEvents.js';
+// import { WebViewEventNames } from '@AthenaShared/enums/webViewEvents.js';
 import { OverlayPageType } from '@AthenaShared/interfaces/webview.js';
-import { AudioView } from '@AthenaClient/views/audio.js';
+// import { CinemaAudioView } from '@AthenaClient/views/cinemaAudio.js';
 
 export type AnyCallback = ((...args: any[]) => void) | ((...args: any[]) => Promise<void>) | Function;
 
@@ -239,7 +240,19 @@ export function create(url: string, model: string) {
     }
 
     if (_webview) {
-        //TODO: remove quickfix!
+        // Dirty hack. To place webview to a in game screen. Recreate it.
+        // _webview.off(WebViewEventNames.EMIT_CLIENT, InternalFunctions.handleClientEvent);
+        // _webview.off(WebViewEventNames.EMIT_SERVER, InternalFunctions.handleServerEvent);
+        // _webview.off(WebViewEventNames.EMIT_READY, InternalFunctions.handleReadyEvent);
+        // _webview.off('view:Ready', () => {});
+        // _webview.off('play:Sound', () => {});
+        // _webview.off('load', () => {});
+        // _webview.off(WebViewEventNames.CLOSE_PAGE, () => {});
+
+        // _webview.destroy();
+
+        // _webview.isVisible = false;
+        // _webview.destroy(); //Fixme: Crash on destroy
         _webview = null;
     }
 
@@ -262,7 +275,7 @@ export function create(url: string, model: string) {
         });
 
         _webview.on(WebViewEventNames.CLOSE_PAGE, InternalFunctions.closeNonOverlayPages);
-        AudioView.init();
+        // TODO: Readd and fix duplicate event registration -> CinemaAudioView.init();
     }
 }
 
@@ -616,7 +629,7 @@ export function ready(pageName: string, callback: AnyCallback) {
  */
 export function on<EventNames = string>(eventName: EventNames, callback: AnyCallback) {
     if (ClientEvents[String(eventName)]) {
-        console.warn(`[Client] Duplicate Event Name (${eventName}) for Athena.webview.on (WebViewController.onInvoke)`);
+        console.warn(`[Client] Duplicate Event Name (${eventName}) for Athena.cinemawebview.on (WebViewController.onInvoke)`);
 
         console.warn(`Did not register duplicate event.`);
         return;
@@ -709,15 +722,16 @@ export function isAnyMenuOpen(excludeDead = false): boolean {
     return false;
 }
 
-// alt.on('keyup', InternalFunctions.handleKeyDownEvent);
+alt.on('keyup', InternalFunctions.handleKeyDownEvent);
 alt.on('disconnect', dispose);
 // alt.onceServer(SYSTEM_EVENTS.WEBVIEW_INFO, create);
 alt.onServer(WebViewEventNames.ON_SERVER, InternalFunctions.onServer);
-// alt.onServer(WebViewEventNames.CLOSE_PAGES, (pages: Array<string>) => {
-//     if (pages.length <= 0) {
-//         InternalFunctions.closeNonOverlayPages();
-//         return;
-//     }
+alt.onServer(WebViewEventNames.CLOSE_PAGES, (pages: Array<string>) => {
+    if (pages.length <= 0) {
+        InternalFunctions.closeNonOverlayPages();
+        return;
+    }
+    
 
-//     closePages(pages);
-// });
+    closePages(pages);
+});

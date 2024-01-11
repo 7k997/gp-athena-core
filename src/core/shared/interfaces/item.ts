@@ -1,3 +1,4 @@
+import de from '@AthenaShared/locale/languages/de.js';
 import * as alt from 'alt-shared';
 // import { type } from 'os';
 
@@ -354,6 +355,16 @@ export interface StoredItem<CustomData = {}> extends SharedItem<CustomData> {
      * @memberof StoredItem
      */
     name?: string;
+
+    /**
+     * A new description to associate with this item.
+     *
+     * This is completely optional, and uses the base item description by default
+     *
+     * @type {string}
+     * @memberof StoredItem
+     */
+    description?: string;
 }
 
 /**

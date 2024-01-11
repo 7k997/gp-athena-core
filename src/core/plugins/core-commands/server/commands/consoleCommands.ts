@@ -1,39 +1,27 @@
 // import Database from '@stuyk/ezmongodb';
 // import * as alt from 'alt-server';
 // import fs from 'fs';
-// import * as Athena from '@AthenaServer/api/athena';
-// import { Account } from '@AthenaServer/interface/iAccount';
-// import { Collections } from '@AthenaServer/interface/iDatabaseCollections';
-// import { AdminController } from '@AthenaServer/systems/admin';
-// import ChatController from '@AthenaPlugins/core-chat/server/src/chat';
-// import { AthenaScreenshot } from '@AthenaServer/utility/screenshot';
-// import { ConsoleCommander } from '@AthenaShared/utility/consoleCommander';
+// import fsextra from 'fs-extra';
+// import * as Athena from '@AthenaServer/api/index.js';
 
 // async function handleSaveScreenshot(player: alt.Player, base64Image: string) {
 //     const path = `${process.cwd()}/screenshots/${player.data.name}.jpg`;
 //     const data = base64Image.replace(/^data:image\/\w+;base64,/, '');
 //     const buf = Buffer.from(data, 'base64');
-//     fs.fsextra.writeFileSync(path, buf);
+//     fsextra.writeFileSync(path, buf);
 //     alt.log(path);
 // }
 
 // export class ConsoleCommands {
 //     static init() {
-//         ConsoleCommander.registerConsoleCommand('/commands', ConsoleCommands.commands);
+    
+        
 //         ConsoleCommander.registerConsoleCommand('/setadmin', ConsoleCommands.setAdmin);
 //         ConsoleCommander.registerConsoleCommand('/kickall', ConsoleCommands.kickAll);
 //         ConsoleCommander.registerConsoleCommand('/kick', ConsoleCommands.kick);
 //         ConsoleCommander.registerConsoleCommand('/ban', ConsoleCommands.ban);
 //         ConsoleCommander.registerConsoleCommand('/screenshot', ConsoleCommands.screenshot);
 //         ConsoleCommander.registerConsoleCommand('/dox', ConsoleCommands.dox);
-//     }
-
-//     static commands() {
-//         const commands = ConsoleCommander.getCommands();
-//         alt.log(`=== Console Commands ===`);
-//         for (let i = 0; i < commands.length; i++) {
-//             alt.log(commands[i]);
-//         }
 //     }
 
 //     static async setAdmin(discord: string, permissionLevel: string | number) {
@@ -211,4 +199,4 @@
 //     }
 // }
 
-console.log('test');
+// console.log('test');
