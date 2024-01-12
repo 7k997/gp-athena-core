@@ -14,6 +14,7 @@ export interface InputOption {
     desc: string;
     type: InputOptionType;
     placeholder: string;
+    default?: string;
     error?: string;
     regex?: string;
     choices?: SelectOption[];

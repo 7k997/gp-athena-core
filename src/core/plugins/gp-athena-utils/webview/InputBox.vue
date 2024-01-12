@@ -15,6 +15,7 @@
                         v-if="item.type !== 'choice'"
                         :label="item.desc"
                         :stack="true"
+                        :value="item.default"
                         :onInput="(text) => inputChange(item.id, text)"
                         :validateCallback="(valid) => validateCallback(item.id, valid)"
                         :placeholder="item.placeholder.toString()"
@@ -31,6 +32,7 @@
                         v-if="item.type === 'choice'"
                         :label="item.desc"
                         :stack="true"
+                        :value="item.default"
                         :onInput="(text) => inputChange(item.id, text)"
                         :validateCallback="(valid) => validateCallback(item.id, valid)"
                         :placeholder="item.placeholder.toString()"
@@ -76,8 +78,9 @@
 <script lang="ts">
 import WebViewEvents from '@ViewUtility/webViewEvents.js';
 import { defineComponent, defineAsyncComponent } from 'vue';
-import TestData from './utility/testData';
+import TestData from './utility/testData.js';
 import { View_Events_Input_Menu } from '../shared/events.js';
+import { InputGeneralOptions, InputMenu, InputOption, InputOptionType } from '../shared/interfaces/inputMenus.js';
 
 export const ComponentName = View_Events_Input_Menu.InputBoxPageName;
 export default defineComponent({
@@ -96,7 +99,7 @@ export default defineComponent({
     data() {
         return {
             title: 'Input Menu',
-            menu: [],
+            menu: [] as InputOption[],
             model: {},
             valid: {},
             options: {
@@ -106,6 +109,7 @@ export default defineComponent({
                 skipChecks: false,
             },
             allValid: false,
+            menuOptions: {} as InputGeneralOptions,
         };
     },
     computed: {
@@ -133,26 +137,21 @@ export default defineComponent({
 
             this.allValid = allValidData;
         },
-        setMenu(title: string, menuData: Array<{ id: string }>, menuOptions: Object) {
+        setMenu(title: string, menuData: InputOption[], menuOptions: InputGeneralOptions) {
             this.title = title;
 
             for (let i = 0; i < menuData.length; i++) {
-                this.model[menuData[i].id] = '';
-                this.valid[menuData[i].id] = false;
+                if(menuData[i].default){
+                    this.model[menuData[i].id] = menuData[i].default;
+                    this.valid[menuData[i].id] = true;
+                } else {
+                    this.model[menuData[i].id] = '';
+                    this.valid[menuData[i].id] = false;
+                }                
             }
 
-            const oldModel = { ...this.model };
-            const oldValid = { ...this.valid };
-
-            this.valid = oldValid;
-            this.oldModel = oldModel;
             this.menu = menuData;
-
-            if (menuOptions && typeof menuOptions === 'object') {
-                Object.keys(menuOptions).forEach((key) => {
-                    this.options[key] = menuOptions[key];
-                });
-            }
+            this.menuOptions = menuOptions;           
         },
         handleExit() {
             WebViewEvents.emitClose();
