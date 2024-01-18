@@ -28,7 +28,7 @@ export const Config = {
     DISABLE_OBJECT_DROP_EXPIRATION: false, //Disable the object drop expiration, for all droped items in database. Leave it false normally!
     DISABLE_OBJECT_DROP_BYPLAYER_EXPIRATION: true, //Disable the object drop expiration for dropped items by player.
     ITEM_MAX_STACK: -1, //Max stack size for items. (Athena Default is 512, set it to -1 for endless stack if item not provide a max size.)
-
+    ITEM_MAX_STACK_DISABLED: true, //Disable the max stack size for items. (Athena Default is false, if set to true the ITEM MAXSTACK will be ignored.)
     DEFAULT_STREAMING_DISTANCE: 500, //Default streaming distance for objects. (Athena Core Default is 100 or lower)
     DEFAULT_PICKUP_DISTANCE: 2, //Default pickup distance for objects. (Athena Core Default is 2)
 

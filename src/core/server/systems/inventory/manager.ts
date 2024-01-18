@@ -92,7 +92,7 @@ export function modifyItemQuantity(
     }
 
     // Prevent stacking / modifying quantity if adding to the item.
-    if (!isRemoving && baseItem.behavior && !baseItem.behavior.canStack) {
+    if (!isRemoving && baseItem.behavior && !baseItem.behavior.canStack && !Config.ITEM_MAX_STACK_DISABLED) {
         return undefined;
     }
 
@@ -395,7 +395,7 @@ export function add<CustomData = {}>(
         itemClone.slot = openSlot;
 
         // Use quantity to subtract from max stack size or use amount left
-        if (baseItem.behavior.canStack) {
+        if (baseItem.behavior.canStack || Config.ITEM_MAX_STACK_DISABLED) {
             if (actualMaxStack === -1) {
                 //Corechange: Allow endless stack if item not provide a max size.
                 itemClone.quantity = item.quantity;
@@ -448,6 +448,7 @@ export function add<CustomData = {}>(
 export function sub<CustomData = {}>(
     item: Omit<StoredItem<CustomData>, 'data'>,
     data: Array<StoredItem>,
+    doNotRemove: boolean = false,
 ): Array<StoredItem> | undefined {
     if (Overrides.sub) {
         return Overrides.sub(item, data);
@@ -504,8 +505,13 @@ export function sub<CustomData = {}>(
     // Recursively repeat removing until all are removed.
     if (copyOfData[existingItemIndex].quantity <= item.quantity) {
         item.quantity -= copyOfData[existingItemIndex].quantity;
+        if (doNotRemove && item.quantity === 0) {
+            //Keep one item with quantity 
+            copyOfData[existingItemIndex].quantity = 0;
+        } else {
         copyOfData.splice(existingItemIndex, 1);
         return sub(item, copyOfData);
+    }
     }
 
     // If the quantity of the found item is greater than; subtract necessary amount.
@@ -617,7 +623,7 @@ export function combineAt<CustomData = {}>(
         return undefined;
     }
 
-    if (baseItem.behavior && !baseItem.behavior.canStack) {
+    if (baseItem.behavior && !baseItem.behavior.canStack && !Config.ITEM_MAX_STACK_DISABLED) {
         return undefined;
     }
 
@@ -627,7 +633,11 @@ export function combineAt<CustomData = {}>(
     }
 
     //Corechange: baseItem.maxStack can be undefined -> check max stack config / -1 for endless stack
-    const maxStack = baseItem.maxStack ? baseItem.maxStack : Config.ITEM_MAX_STACK;
+    let maxStack = baseItem.maxStack ? baseItem.maxStack : Config.ITEM_MAX_STACK;
+    if (Config.ITEM_MAX_STACK_DISABLED) {
+        maxStack = Number.MAX_SAFE_INTEGER;
+    }
+
     if (maxStack === -1) {
         copyOfData[toIndex].quantity += copyOfData[fromIndex].quantity;
         copyOfData.splice(fromIndex, 1);
@@ -690,11 +700,15 @@ export async function combineAtComplex(
         return undefined;
     }
 
-    if (baseItem.behavior && !baseItem.behavior.canStack) {
+    if (baseItem.behavior && !baseItem.behavior.canStack && !Config.ITEM_MAX_STACK_DISABLED) {
         return undefined;
     }
 
-    const maxStackSize = typeof baseItem.maxStack === 'number' ? baseItem.maxStack : Number.MAX_SAFE_INTEGER;
+    let maxStackSize = typeof baseItem.maxStack === 'number' ? baseItem.maxStack : Number.MAX_SAFE_INTEGER;
+    if (Config.ITEM_MAX_STACK_DISABLED) {
+        maxStackSize = Number.MAX_SAFE_INTEGER;
+    }
+
     const spaceAvailable = maxStackSize - toData[toIndex].quantity;
 
     if (spaceAvailable <= 0) {
