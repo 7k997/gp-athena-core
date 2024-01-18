@@ -31,6 +31,19 @@ export class ItemUtil {
         return data;
     }
 
+    /**
+     * Returns the first item that matches the given item.
+     * 
+     * Attention: Only copies attributes thate are not present (undefined) in the target item.
+     * Example. If u use it to transfert Item Data from StoredItem to BaseItem: The slot is -1 for a BaseItem from DB.
+     * So the slot will not be copied. Set it manually if needed after deepTransferObject.
+     * 
+     * @param {alt.Player} playerRef
+     * @param {Partial<Item>} item
+     * @param {InventoryType} type
+     * @return {Item | null}
+     * @memberof ItemUtil
+     **/
     static deepTransferObject<T>(target: object, source: object): T {
         const target_json = JSON.parse(JSON.stringify(target));
         const source_json = JSON.parse(JSON.stringify(source));

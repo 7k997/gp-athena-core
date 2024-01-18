@@ -50,7 +50,14 @@ export async function toggleLock(player: alt.Player, vehicle: alt.Vehicle) {
 
     const isLocked = await Athena.vehicle.controls.toggleLock(vehicle);
     const soundName = isLocked ? 'car_unlock' : 'car_lock';
-    Athena.player.emit.animation(player, 'anim@heists@keycard@', 'idle_a', ANIMATION_FLAGS.NORMAL, 1000);
+
+    //Corechange: 
+    // 1. Different animations for car lock/unlock inside/outside vehicle
+    // 2. TODO: No sound for player. React on doors-locked/doors-unlocked events to play sound.
+
+    if (!player.vehicle) Athena.player.emit.animation(player, 'anim@heists@keycard@', 'idle_a', ANIMATION_FLAGS.NORMAL, 1000);
+    if (player.vehicle) Athena.player.emit.animation(player, 'anim@heists@keycard@', 'idle_a', ANIMATION_FLAGS.NORMAL, 1000); //TODO: Use another animation if in car!
+
     Athena.player.emit.sound2D(player, soundName);
 
     const eventToEmit = isLocked ? 'doors-locked' : 'doors-unlocked';
