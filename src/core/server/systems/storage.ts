@@ -209,45 +209,54 @@ export async function addItem<CustomData = {}>(id: string, item: StoredItem<Cust
 }
 
 export async function takeItem<CustomData = {}>(
-    id: string,
+    storageID: string,
     item: StoredItem<CustomData>,
+    doNotRemove: boolean = false,
 ): Promise<StoredItem<CustomData> | null> {
     if (Overrides.takeItem) {
-        return Overrides.takeItem(id, item);
+        return Overrides.takeItem(storageID, item);
     }
 
     // Check if the storage is in exclusive mode
-    if (!isOpen(id)) {
+    if (isOpen(storageID)) {
+        alt.logWarning(`Storage ${storageID} is in exclusive mode, cannot take item`);
         return null; // Storage is in exclusive mode, cannot take item
     }
 
-    const itemSemaphore = getItemSemaphore(id, item.slot);
-    const canAccess = await itemSemaphore.acquire(id, item.slot);
+    const itemSemaphore = getItemSemaphore(storageID, item.slot);
+    const canAccess = await itemSemaphore.acquire(storageID, item.slot);
 
+    alt.logWarning(`Storage ${storageID} canAccess: ${canAccess}`);
     if (!canAccess) {
         // Failed to acquire semaphore (item is being accessed by another operation)
         return null;
     }
 
     try {
-        const storage = await get<CustomData>(id);
+        const storage = await get<CustomData>(storageID);
 
         const index = storage.findIndex((storedItem) => storedItem.slot === item.slot);
 
+        alt.logWarning(`Storage ${storageID} index: ${index}`);
         if (index !== -1) {
             // Item exists in storage, remove it
-            const takenItem = storage.splice(index, 1)[0];
+            const storageNew = Athena.systems.inventory.manager.sub(item, storage, doNotRemove);
 
+            if (storageNew) {
             // Update the storage with the modified items
-            await set(id, storage);
+                await set(storageID, storageNew);
+            } else {
+                // Item not found in storage
+                return null;
+            }
 
-            return takenItem;
+            return item;
         } else {
             // Item not found in storage
             return null;
         }
     } finally {
-        itemSemaphore.release(id, item.slot);
+        itemSemaphore.release(storageID, item.slot);
     }
 }
 
