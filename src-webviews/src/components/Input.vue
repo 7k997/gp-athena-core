@@ -15,6 +15,7 @@
                 :type="numberOnly ? 'number' : 'text'"
                 :placeholder="placeholder"
                 @keyup="handleInput"
+                @blur="handleBlur"
             />
             <div v-if="errorMessage && stack" class="red--text text--lighten-2 text--subtitle-2 pt-2">
                 {{ errorMessage }}
@@ -76,6 +77,10 @@ export default defineComponent({
             type: Function,
             required: false,
         },
+        onBlur: {
+            type: Function,
+            required: false,
+        },
         swapIconSide: {
             type: Boolean,
             required: false,
@@ -83,6 +88,11 @@ export default defineComponent({
         value: [String, Number] as PropType<string | number>,
     },
     methods: {
+        handleBlur() {
+            if (this.onBlur && typeof this.onBlur === 'function') {
+                this.onBlur(this.text);
+            }
+        },
         handleInput() {
             if (!this.onInput) {
                 return;

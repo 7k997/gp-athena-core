@@ -330,6 +330,26 @@ export async function updateItem(player: alt.Player, slot: number, item: StoredI
     return true;
 }
 
+export async function updateItemPartial(player: alt.Player, slot: number, updatedItemData: Partial<StoredItem>): Promise<boolean> {
+    const data = document.character.get(player);
+    if (typeof data === 'undefined' || typeof data.inventory === 'undefined') {
+        return false;
+    }
+
+    const inventoryRef = deepCloneArray<StoredItem>(data.inventory);
+    const index = inventoryRef.findIndex((x) => x.slot === slot);
+
+    if (index <= -1) {
+        return false;
+    }
+
+    // Aktualisiere nur die übergebenen Eigenschaften des Items
+    inventoryRef[index] = { ...inventoryRef[index], ...updatedItemData };
+
+    await document.character.set(player, 'inventory', inventoryRef);
+    return true;
+}
+
 interface InventoryFunctions {
     add: typeof add;
     has: typeof has;

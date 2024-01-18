@@ -24,7 +24,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { INVENTORY_CONFIG } from '../../shared/config.js';
-import { SlotInfo } from '../utility/slotInfo.js';
+import { SlotInfo } from '@AthenaPlugins/core-inventory/shared/interfaces.js';
 
 export default defineComponent({
     name: 'MachineSlot',

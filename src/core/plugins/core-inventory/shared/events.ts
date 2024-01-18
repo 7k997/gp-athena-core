@@ -4,6 +4,8 @@ export const INVENTORY_EVENTS = {
         USE: 'inventory:event:server:use',
         DROP: 'inventory:event:server:drop',
         SPLIT: 'inventory:event:server:split',
+        UPDATE: 'inventory:event:server:update',
+        UPDATE_PRICE: 'inventory:event:server:update:price',
         SWAP: 'inventory:event:server:swap',
         UNEQUIP: 'inventory:event:server:unequip',
         OPEN: 'inventory:event:server:open',

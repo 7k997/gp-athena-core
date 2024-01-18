@@ -130,6 +130,7 @@
                     :key="index"
                     :id="getID('custom', index)"
                     :info="getSlotInfo('custom', index)"
+                    :showPrice="showCustomPrices"
                     @mouseenter="updateDescriptor('custom', index)"
                     @mouseleave="updateDescriptor(undefined, undefined)"
                     @mousedown="
@@ -293,8 +294,7 @@ import { INVENTORY_EVENTS } from '../../shared/events.js';
 import { getImagePath } from '../utility/inventoryIcon.js';
 import { INVENTORY_CONFIG } from '../../shared/config.js';
 import { debounceReady } from '../utility/debounce.js';
-import { DualSlotInfo, InventoryType } from '@AthenaPlugins/core-inventory/shared/interfaces.js';
-import { SlotInfo } from '../utility/slotInfo.js';
+import { DualSlotInfo, InventoryType, SlotInfo } from '@AthenaPlugins/core-inventory/shared/interfaces.js';
 import { on } from 'events';
 
 export default defineComponent({
@@ -334,6 +334,7 @@ export default defineComponent({
                 custom: 64,
                 machine: 5,
             },
+            showCustomPrices: false,
             recipe: {
                 recipeMode: "Produce",
                 recipeMachine: "BBQ Grill",
@@ -555,6 +556,7 @@ export default defineComponent({
                 quantity: 0,
                 totalWeight: 0,
                 highlight: false,
+                price: 0,
                 slot,
             };
 
@@ -578,9 +580,10 @@ export default defineComponent({
             defaultTemplate.highlight = item.isEquipped;
             defaultTemplate.name = item.name;
             defaultTemplate.quantity = item.quantity;
+            defaultTemplate.price = typeof item.price === 'number' ? item.price : 0;
             defaultTemplate.totalWeight = typeof item.totalWeight === 'number' ? item.totalWeight : 0;
             return defaultTemplate;
-        },
+        },       
         /**
          * Determines if a specific data type has a matching slot item.
          * @param type
@@ -647,12 +650,13 @@ export default defineComponent({
                 this.weightLimits = newWeightLimits;
             }
         },
-        setCustomItems(customItems: Array<Item>, maximumSize: number, totalWeight: number, maxWeight: number) {
+        setCustomItems(customItems: Array<Item>, maximumSize: number, totalWeight: number, maxWeight: number, showPrices: boolean = true) {
             if (typeof customItems === 'undefined') {
                 customItems = [];
             }
 
             this.custom = customItems;
+            this.showCustomPrices = showPrices;
 
             if (typeof maximumSize !== 'undefined') {
                 const newSlotLimits = { ...this.slotLimits };

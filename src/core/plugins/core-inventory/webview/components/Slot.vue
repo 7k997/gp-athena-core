@@ -12,11 +12,28 @@
         <div class="index">
             <slot name="index"></slot>
         </div>
-        <div class="quantity" v-if="info.quantity !== 0">{{ info.quantity }}x</div>
+        <div class="quantity" v-if="info.name">{{ info.quantity }}x</div>
+        <div class="priceContainer" v-if="info.name && showPrice">
+            <span>$</span>
+            <Input :value="info.price" 
+                    :readonly="false" 
+                    :disable="false" 
+                    :numberOnly="true"
+                    :rules="[
+                        (value) => {
+                            return value >= 0 ? null : 'Minimum is 0$';
+                        },
+                    ]"
+                    :swapIconSide="true"    
+                    @blur="onPriceInputBlur"       
+                    class="priceInput"
+            />            
+        </div>        
         <div class="weight" v-if="info.totalWeight !== 0">{{ info.totalWeight.toFixed(2) }}{{ units }}</div>
         <div class="name" v-if="info.name !== '' && showName">
             {{ info.name }}
         </div>
+        
         <slot></slot>
     </div>
 </template>
@@ -24,7 +41,10 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { INVENTORY_CONFIG } from '../../shared/config.js';
-import { SlotInfo } from '../utility/slotInfo.js';
+import WebViewEvents from '@ViewUtility/webViewEvents.js';
+import Input from '@components/Input.vue';
+import { INVENTORY_EVENTS } from '@AthenaPlugins/core-inventory/shared/events.js';
+import { SlotInfo } from '@AthenaPlugins/core-inventory/shared/interfaces.js';
 
 export default defineComponent({
     name: 'Slot',
@@ -33,6 +53,9 @@ export default defineComponent({
             showName: false,
             units: INVENTORY_CONFIG.WEBVIEW.WEIGHT.UNITS,
         };
+    },
+    components: {
+        Input,
     },
     props: {
         width: {
@@ -49,8 +72,20 @@ export default defineComponent({
             type: Object as () => SlotInfo,
             required: true,
         },
+        showPrice: {
+            type: Boolean,
+            required: false,
+            default: false,
+        },
     },
-    computed: {
+    methods: {
+        onPriceInputBlur(value: number) {
+            console.log('onPriceInputBlur', value);
+            this.info.price = value ;
+            WebViewEvents.emitServer(INVENTORY_EVENTS.TO_SERVER.UPDATE_PRICE, this.info);            
+        },
+    },
+    computed: {        
         getDimensions() {
             let style = '';
 
@@ -159,6 +194,48 @@ export default defineComponent({
     text-shadow: 1px 1px 1px black, -1px 1px 1px black, 1px -1px 1px black, -1px -1px 1px black;
     text-align: center;
 }
+
+.priceContainer {
+    position: absolute;
+    pointer-events: none !important;
+    z-index: 99;    
+    text-shadow: 1px 1px 1px black;
+    right: 0vh;
+    top: 1.4vh;
+    bottom: 4px;
+    padding-right: 4px;
+}
+
+.priceInput {
+    padding-left: 15px !important;
+    padding-top: 2px !important;
+    background: rgba(0, 0, 0, 0.5) !important; 
+}
+
+.priceContainer span{
+    position: absolute;
+    color: #66ff66 !important;
+    font-size: small;
+    font-family: 'consolas';
+    left: 0.8vh;
+    top: 0.2vh;
+    bottom: 4px;
+    padding-right: 4px;
+}
+
+.priceInput .pa-2{
+    padding: 0px !important;
+}
+
+.priceInput .textbox{
+    font-family: 'consolas' !important;
+    color: #66ff66 !important; 
+    background: none !important;
+    border: none !important;    
+    font-size: small !important;
+    text-align: right;
+}
+
 
 .weight {
     position: absolute;

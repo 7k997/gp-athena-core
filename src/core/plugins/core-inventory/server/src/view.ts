@@ -2,9 +2,9 @@ import * as alt from 'alt-server';
 
 import * as Athena from '@AthenaServer/api/index.js';
 import { INVENTORY_EVENTS } from '@AthenaPlugins/core-inventory/shared/events.js';
-import { DualSlotInfo, InventoryType } from '@AthenaPlugins/core-inventory/shared/interfaces.js';
+import { DualSlotInfo, InventoryType, SlotInfo } from '@AthenaPlugins/core-inventory/shared/interfaces.js';
 import { deepCloneArray, deepCloneObject } from '@AthenaShared/utility/deepCopy.js';
-import { ItemDrop, StoredItem } from '@AthenaShared/interfaces/item.js';
+import { Item, ItemDrop, StoredItem } from '@AthenaShared/interfaces/item.js';
 import { INVENTORY_CONFIG } from '@AthenaPlugins/core-inventory/shared/config.js';
 import { ComplexSwapReturn } from '@AthenaServer/systems/inventory/manager.js';
 import { Config } from '@AthenaPlugins/gp-athena-overrides/shared/config.js';
@@ -190,6 +190,21 @@ const Internal = {
         );
 
         Athena.systems.inventory.drop.invoke('item-drop', player, clonedItem, type);
+    },
+    async update(player: alt.Player, type: InventoryType, slot: number, item: Item) {
+        //TODO: Not Implemented
+    },
+    async updatePrice(player: alt.Player, info: SlotInfo) {
+        if (info.location === 'custom') {
+            openStorages[player.id].find((item) => item.slot === info.slot).price = info.price;
+            InventoryView.storage.resync(player);
+        } else if (info.location === 'machine') {
+            openMachineStorages[player.id].find((item) => item.slot === info.slot).price = info.price;
+            openMachineStorages[player.id][info.slot].price = info.price;
+            InventoryView.machineStorage.resync(player);
+        } else if (info.location === 'inventory') {
+            Athena.player.inventory.updateItemPartial(player, info.slot, { price: info.price });
+        }
     },
     /**
      * Using the split interface; the result will try to push this.
@@ -810,6 +825,8 @@ export const InventoryView = {
         alt.onClient(INVENTORY_EVENTS.TO_SERVER.USE, Internal.use);
         alt.onClient(INVENTORY_EVENTS.TO_SERVER.DROP, Internal.drop);
         alt.onClient(INVENTORY_EVENTS.TO_SERVER.SPLIT, Internal.split);
+        alt.onClient(INVENTORY_EVENTS.TO_SERVER.UPDATE, Internal.update);
+        alt.onClient(INVENTORY_EVENTS.TO_SERVER.UPDATE_PRICE, Internal.updatePrice);
         alt.onClient(INVENTORY_EVENTS.TO_SERVER.SWAP, Internal.swap);
         alt.onClient(INVENTORY_EVENTS.TO_SERVER.UNEQUIP, Internal.unequip);
         alt.onClient(INVENTORY_EVENTS.TO_SERVER.COMBINE, Internal.combine);
@@ -858,6 +875,7 @@ export const InventoryView = {
             storageSize: number,
             forceOpenInventory = false,
             maxWeight: number = Number.MAX_SAFE_INTEGER,
+            showPrices: boolean = false,
         ) {
             if (forceOpenInventory) {
                 player.emit(INVENTORY_EVENTS.TO_CLIENT.OPEN);
@@ -878,7 +896,7 @@ export const InventoryView = {
             openStoragesWeight[player.id] = maxWeight;
             const fullStorageList = Athena.systems.inventory.manager.convertFromStored(openStorages[player.id]);
             //TODO: Calculate weight
-            Athena.webview.emit(player, INVENTORY_EVENTS.TO_WEBVIEW.SET_CUSTOM, fullStorageList, storageSize, 0, maxWeight);
+            Athena.webview.emit(player, INVENTORY_EVENTS.TO_WEBVIEW.SET_CUSTOM, fullStorageList, storageSize, 0, maxWeight, showPrices);
         },
         /**
          * Updates a storage session with new data.

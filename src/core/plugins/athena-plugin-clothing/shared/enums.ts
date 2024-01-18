@@ -1,6 +1,7 @@
 export enum ORIENTATION {
     FEMALE = 0,
     MALE = 1,
+    UNISEX = 2,
 }
 
 export enum CLOTHING_STORE_PAGE {

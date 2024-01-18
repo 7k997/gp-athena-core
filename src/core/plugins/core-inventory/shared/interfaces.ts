@@ -1,5 +1,16 @@
 export type InventoryType = 'inventory' | 'toolbar' | 'custom' | 'machine';
 
+export interface SlotInfo {
+    slot: number;
+    location: 'inventory' | 'toolbar' | 'custom' | 'machine';
+    hasItem: boolean;
+    quantity: number;
+    name: string;
+    totalWeight: number;
+    highlight?: boolean;
+    price?: number;
+}
+
 export interface DualSlotInfo {
     startType: InventoryType;
     startIndex: number;
