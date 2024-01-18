@@ -151,6 +151,8 @@ export async function add(
     expiration?: number,
     maxDistance: number = Config.DEFAULT_STREAMING_DISTANCE,
     maxDistancePickup: number = Config.DEFAULT_PICKUP_DISTANCE,
+    pedModel?: string,
+    usePedModel?: boolean,
 ): Promise<string> {
     if (Overrides.add) {
         return await Overrides.add(item, pos, rot, dimension, player);
@@ -193,6 +195,8 @@ export async function add(
         frozen: frozen,
         maxDistance: maxDistance,
         maxDistancePickup: maxDistancePickup,
+        pedModel: pedModel,
+        usePedModel: usePedModel,
     });
 
     Athena.controllers.itemDrops.append(document);
@@ -213,6 +217,10 @@ export async function add(
  * @return {Promise<string>}
  */
 export async function update(itemDrop: ItemDrop, item: UnpushedItemDrop): Promise<boolean> {
+
+    //QUICKFIX: Update itemDrop with new item data
+    itemDrop.data = item.data;
+
     for (const callback of UpdateInjections) {
         try {
             itemDrop = await callback(itemDrop);

@@ -1,10 +1,12 @@
 import * as alt from 'alt-server';
 import { ItemDrop } from '@AthenaShared/interfaces/item.js';
-import { ITEM_SYNCED_META } from '@AthenaShared/enums/syncedMeta.js';
+import * as Athena from '@AthenaServer/api/index.js';
+import { ITEM_SYNCED_META, ITEM_SYNCED_META_TYPES } from '@AthenaShared/enums/syncedMeta.js';
 import { deepCloneObject } from '@AthenaShared/utility/deepCopy.js';
 import { ControllerFuncs } from './shared.js';
+import { IPed } from '@AthenaShared/interfaces/iPed.js';
 
-const drops: { [uid: string]: alt.Object } = {};
+const drops: { [uid: string]: alt.Object | alt.Ped} = {};
 
 let defaultModel = 'prop_cs_cardbox_01';
 
@@ -26,6 +28,25 @@ export function append(itemDrop: ItemDrop): string {
     }
 
     //Corechange: added properties like frozen, collision, maxDistance
+    if(itemDrop.pedModel && itemDrop.usePedModel) {
+
+        const ped: IPed = {
+            model: itemDrop.pedModel,
+            pos: itemDrop.pos,
+            rotation: itemDrop.rot ? itemDrop.rot : alt.Vector3.zero,
+            maxDistance: itemDrop.maxDistance,
+            frozen: itemDrop.frozen,
+            collision: itemDrop.collision,
+            dimension: itemDrop.dimension ? itemDrop.dimension : 0,
+        };
+
+        const pedID = Athena.controllers.staticPed.append(ped);
+        const staticPed = Athena.controllers.staticPed.getPed(pedID);
+        const pedEntity = staticPed.entity.ped;
+
+        pedEntity.setStreamSyncedMeta(ITEM_SYNCED_META.ITEM_DROP_INFO, deepCloneObject(itemDrop));
+        drops[String(itemDrop._id)] = pedEntity;
+    } else {
     const object = new alt.Object(
         itemDrop.model ? itemDrop.model : defaultModel,
         itemDrop.pos,
@@ -34,8 +55,13 @@ export function append(itemDrop: ItemDrop): string {
     object.streamingDistance = itemDrop.maxDistance;
     object.frozen = itemDrop.frozen;
     object.collision = itemDrop.collision;
+        object.dimension = itemDrop.dimension ? itemDrop.dimension : 0;
+        object.setStreamSyncedMeta(ITEM_SYNCED_META.TYPE, ITEM_SYNCED_META_TYPES.OBJECT);
     object.setStreamSyncedMeta(ITEM_SYNCED_META.ITEM_DROP_INFO, deepCloneObject(itemDrop));
     drops[String(itemDrop._id)] = object;
+    }
+
+    
     return String(itemDrop._id);
 }
 

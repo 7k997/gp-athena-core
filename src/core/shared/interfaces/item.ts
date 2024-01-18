@@ -16,6 +16,8 @@ export type ItemDrop = {
     rot?: alt.IVector3;
     expiration: number;
     model?: string;
+    pedModel?: string;
+    usePedModel?: boolean;
     name: string;
     hash?: number;
     dimension: number;
@@ -268,6 +270,33 @@ export interface SharedItem<CustomData = {}> {
      *
      */
     version?: number;
+
+    /**
+    * The Price of this item.
+    *
+    * @type {number}
+    */
+    price?: number;
+
+    /**
+    * The Slot from the source storage/inventory
+    * This is normally undefined, if the item is not from a storage/inventory
+    * 
+    * Needed to get the original source of the ShareItem/BasedItem
+    *
+    * @type {number}
+    */
+    slot?: number;
+
+    /**
+    * The Quantity from the source storage/inventory
+    * This is normally undefined, if the item is not from a storage/inventory
+    * 
+    * Needed to get the original quantity of the ShareItem/BasedItem
+    *
+    * @type {number}
+    */
+    quantity?: number;
 }
 
 /**
@@ -467,6 +496,23 @@ export interface BaseItem<Behavior = DefaultItemBehavior, CustomData = {}> exten
      *
      */
     model?: string;
+
+    /**
+     * The drop ped model of this item when it will be placed as Ped.
+     * If not defined it will placed as object, see model.
+     *
+     * @type {string}
+     *
+     */
+    pedModel?: string;
+
+     /**
+     * Place the item always as ped, if pedModel is defined.
+     * Normally undefined or false.
+     * @type {string}
+     *
+     */
+    usePedModel?: boolean;
 
     /**
      * An expiration time in milliseconds before the item drop is cleared.

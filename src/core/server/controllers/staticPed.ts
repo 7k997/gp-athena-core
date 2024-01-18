@@ -5,6 +5,7 @@ import { IPed } from '../../shared/interfaces/iPed.js';
 import { Animation } from '../../shared/interfaces/animation.js';
 import { NET_OWNER_PED } from '@AthenaShared/enums/netOwner.js';
 import { ControllerFuncs } from './shared.js';
+import { ITEM_SYNCED_META, ITEM_SYNCED_META_TYPES } from '@AthenaShared/enums/syncedMeta.js';
 
 const globalPeds: Array<IPed & { ped: alt.Ped }> = [];
 
@@ -45,8 +46,8 @@ export function append(pedData: IPed): string {
     ped.frozen = pedData.frozen ? true : false;
     ped.collision = pedData.collision ? true : false;
     ped.dimension = pedData.dimension ? pedData.dimension : 0;
-    ped.setStreamSyncedMeta('type', 'ped');
-    ped.setStreamSyncedMeta('ped', pedData);
+    ped.setStreamSyncedMeta(ITEM_SYNCED_META.TYPE, ITEM_SYNCED_META_TYPES.PED);
+    ped.setStreamSyncedMeta(ITEM_SYNCED_META.PED, pedData);
 
     globalPeds.push({ ...pedData, ped });
     return pedData.uid;

@@ -27,7 +27,7 @@ export interface IPed {
      * @type {number}
      *
      */
-    rotation?: alt.Vector3;
+    rotation?: alt.IVector3;
 
     /**
      * Freeze this ped
