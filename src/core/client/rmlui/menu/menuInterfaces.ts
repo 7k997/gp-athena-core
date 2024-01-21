@@ -118,11 +118,11 @@ export interface Range extends MenuOptionBase<(value: number) => void> {
     onlyUpdateOnEnter?: boolean;
 }
 
-export interface Input extends MenuOptionBase<() => void> {
+export interface Invoke extends MenuOptionBase<() => void> {
     type: 'Invoke';
 }
 
-export interface Invoke extends MenuOptionBase<(result: string) => void> {
+export interface Input extends MenuOptionBase<(result: string) => void> {
     type: 'Input';
 
     /**
@@ -132,6 +132,11 @@ export interface Invoke extends MenuOptionBase<(result: string) => void> {
      * @memberof Invoke
      */
     placeholder: string;
+
+    /**
+     * The default value for this menu.
+     */
+    value: string;
 }
 
 export interface MenuInfo {
