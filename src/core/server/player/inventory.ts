@@ -343,7 +343,7 @@ export async function updateItemPartial(player: alt.Player, slot: number, update
         return false;
     }
 
-    // Aktualisiere nur die übergebenen Eigenschaften des Items
+    // Aktualisiere nur die Ã¼bergebenen Eigenschaften des Items
     inventoryRef[index] = { ...inventoryRef[index], ...updatedItemData };
 
     await document.character.set(player, 'inventory', inventoryRef);

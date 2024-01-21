@@ -4,6 +4,7 @@ import * as Athena from '@AthenaServer/api/index.js';
 import { ItemDrop, StoredItem } from '@AthenaShared/interfaces/item.js';
 import { deepCloneObject } from '@AthenaShared/utility/deepCopy.js';
 import { Config } from '@AthenaPlugins/gp-athena-overrides/shared/config.js';
+import { distance2d } from '@AthenaShared/utility/vector.js';
 
 type UnpushedItemDrop = Omit<ItemDrop, '_id'>;
 
@@ -231,6 +232,7 @@ export async function update(itemDrop: ItemDrop, item: UnpushedItemDrop): Promis
     }
 
     drops.set(itemDrop._id, itemDrop);
+    
     return updateToDatabase(itemDrop, item);
 }
 
@@ -301,6 +303,19 @@ export async function sub(id: string): Promise<StoredItem | undefined> {
     itemClone = newItem;
 
     return itemClone;
+}
+
+export function getClosestDrops(pos: alt.Vector3, distance: number): [ItemDrop, number][] {
+    const dropsInRange: [ItemDrop, number][] = [];
+
+    for (const drop of drops.values()) {
+        const dropDistance = distance2d(drop.pos, pos);
+        if (drop && drop.pos && dropDistance <= distance) {
+            dropsInRange.push([drop, dropDistance]);
+        }
+    }
+
+    return dropsInRange;
 }
 
 /**

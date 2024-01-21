@@ -55,7 +55,7 @@ export function setPlayerIdentifier(player: alt.Player) {
 }
 
 /**
- * Returns the player by the currently set identification strategy.
+ * Returns the player by the currently set identification strategy. Finds only online players!
  *
  * If not find search in the following order:
  * 1. Discord ID

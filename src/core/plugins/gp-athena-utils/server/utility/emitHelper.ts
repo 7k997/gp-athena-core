@@ -15,6 +15,7 @@ export function emitAll(players: Array<alt.Player>, eventName: string, ...args: 
             continue;
         }
 
+        alt.logWarning(`Emitting to ${player.name} ${eventName} ${JSON.stringify(args)}`);
         alt.emitClient(player, eventName, ...args);
     }
 }
