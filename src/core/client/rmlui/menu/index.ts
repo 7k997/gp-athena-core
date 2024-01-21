@@ -17,8 +17,11 @@ let menu: MenuInfo;
 let optionIndex: number = 0;
 let document: alt.RmlDocument;
 let pauseControl = false;
-let nextDebounce = Date.now() + 0;
+let nextDebounce = Date.now() + 200;
 let everyTick: number;
+
+//Corechange 1/4, better key handling
+// const keyIntervalTime = 200;
 
 const InternalFunctions = {
     init(info: MenuInfo) {
@@ -133,6 +136,9 @@ const InternalFunctions = {
 
         alt.Player.local.isMenuOpen = false;
         alt.clearEveryTick(everyTick);
+        //Corechange 2/4, better key handling
+        // alt.off('keyup', InternalFunctions.handleKeyUp);
+        // alt.off('keydown', InternalFunctions.handleKeyDown);
     },
     /**
      * Called when pressing enter.
@@ -208,7 +214,7 @@ const InternalFunctions = {
                 pauseControls();
                 await alt.Utils.wait(250);
 
-                const result = await AthenaClient.rmlui.input.create({ placeholder: option.placeholder }, true);
+                const result = await AthenaClient.rmlui.input.create({ placeholder: option.placeholder, value: option.value }, true);
 
                 if (option.callback) {
                     option.callback(result);
@@ -383,10 +389,10 @@ const InternalFunctions = {
                 return;
             }
 
-            let debounceTime = 150;
-            if (key === KEYS.RIGHT_KEY || key === KEYS.LEFT_KEY) {
-                debounceTime = 75;
-            }
+            let debounceTime = 200;
+            // if (key === KEYS.RIGHT_KEY || key === KEYS.LEFT_KEY) {
+            //     debounceTime = 75;
+            // }
 
             nextDebounce = Date.now() + debounceTime;
             FUNCTION_BINDS[keycode]();
@@ -425,6 +431,9 @@ export function create(info: MenuInfo): void {
     pauseControl = false;
     alt.Player.local.isMenuOpen = true;
     everyTick = alt.everyTick(InternalFunctions.handleKeyHeld);
+    //Corechange: better key handling
+    // alt.on('keyup', InternalFunctions.handleKeyUp);
+    // alt.on('keydown', InternalFunctions.handleKeyDown);
     InternalFunctions.init(info);
 }
 /**

@@ -16,6 +16,14 @@ export interface InputBoxInfo {
     placeholder: string;
 
     /**
+     * The default value of the input box.
+     *
+     * @type {string}
+     *
+     */
+    value?: string;
+
+    /**
      * If set to true, it will blur the background while responding.
      *
      * @type {boolean}
@@ -53,6 +61,10 @@ const InternalFunctions = {
         const placeholderElement = document.getElementByID('placeholder');
         placeholderElement.innerRML = inputInfo.placeholder;
 
+        if(inputInfo.value) {
+            element.setAttribute('value', inputInfo.value);
+        }
+
         if (inputInfo.blur) {
             native.triggerScreenblurFadeIn(250);
         }
@@ -69,13 +81,21 @@ const InternalFunctions = {
     },
     handleKeyUp(keycode: number) {
         if (keycode === ESCAPE_KEY) {
-            cancel();
+            InternalFunctions.abort();
             return;
         }
 
         if (keycode === ENTER_KEY) {
             InternalFunctions.submit();
             return;
+        }
+    },
+    async abort() {
+        const callbackRef = internalCallback;
+        await cancel();
+
+        if (typeof callbackRef === 'function') {
+            callbackRef(undefined);
         }
     },
     async submit() {
