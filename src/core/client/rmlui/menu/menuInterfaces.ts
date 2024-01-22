@@ -136,7 +136,7 @@ export interface Input extends MenuOptionBase<(result: string) => void> {
     /**
      * The default value for this menu.
      */
-    value: string;
+    value?: string;
 }
 
 export interface MenuInfo {
