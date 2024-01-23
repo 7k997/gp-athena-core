@@ -13,6 +13,7 @@ const KEYS = {
     DOWN_KEY: 40,
 };
 
+
 let menu: MenuInfo;
 let optionIndex: number = 0;
 let document: alt.RmlDocument;
@@ -414,10 +415,11 @@ export function create(info: MenuInfo): void {
         return undefined;
     }
 
-    if (info.options.length > 11) {
-        alt.logWarning(`Menu Options exceeded 11 entries. Trimmed off excess menu entries.`);
-        info.options = info.options.slice(0, 11);
-    }
+    //Corechange: allow as much options as you want
+    // if (info.options.length > 11) {
+    //     alt.logWarning(`Menu Options exceeded 11 entries. Trimmed off excess menu entries.`);
+    //     info.options = info.options.slice(0, 11);
+    // }
 
     if (typeof info.header.color !== 'string') {
         info.header.color = rgbaToHexAlpha(info.header.color);
