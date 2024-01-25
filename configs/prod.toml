@@ -13,6 +13,7 @@ useCdn = false
 useEarlyAuth = false
 streamingDistance = 400
 migrationDistance = 150
+newSync=true
 modules = ["js-module"]
 resources = ["webviews", "core"]
 tags = ["athena","framework","version","5"]

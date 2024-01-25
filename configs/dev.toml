@@ -11,6 +11,7 @@ description = "With Reconnect On - Vue Debug - 1 Player Only"
 debug = true
 streamingDistance = 400
 migrationDistance = 150
+newSync=true
 modules = ["js-module"]
 resources = ["core"]
 tags = ["athena","framework","version",""]
