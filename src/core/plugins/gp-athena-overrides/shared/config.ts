@@ -5,6 +5,11 @@ export const Config = {
     DEBUG_WARNING: true,
     DEVTOOLS: true, //Enable dev tools, in test set to false for test and production!
 
+    //Notification Settings
+    ACTIVATE_NOTIFICATION_REPLACEMENT: true, //Activate the notification replacement from Lord, see plugin-notifications.
+    DEFAULT_NOTIFICATION_DURATION: 5000, //Default notification duration in ms.
+    DEFAULT_NOTIFICATION_SOUND: 'notification.ogg', //Default notification sound file. Set to null for none.
+
     MAX_INTERACTION_DISTANCE: 5, //Max interaction distance for interaction with objects, items, players and NPCs. Athena Default is 25
     NPC_MENU_DISTANCE: 5, //Max interaction distance for the NPC menu. Athena Default is 5
     ENTITY_SELECTOR_MARKER_OFF: true, //Turn the marker off
