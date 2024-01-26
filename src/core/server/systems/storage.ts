@@ -174,13 +174,34 @@ export async function get<CustomData = {}>(id: string): Promise<Array<StoredItem
         return Overrides.get<CustomData>(id);
     }
 
-    const document = await Database.fetchData<StorageInstance<CustomData>>(
-        '_id',
-        id,
-        Athena.database.collections.Storage,
-    );
-
+    const document = await getStorageInstance<CustomData>(id);
     return document.items;
+}
+
+export async function has(id: string, dbName: string, quantity: number, version?: number): Promise<boolean> {
+    const storage = await get(id);
+    let count = 0;
+    if (!version) {
+        //count any items quantity in storage with dbName and ignore version        
+        storage.forEach((item) => {
+            if (item.dbName === dbName) {
+                count += item.quantity;
+            }
+        });
+    } else {
+        //count only items with dbName and version
+        storage.forEach((item) => {
+            if (item.dbName === dbName && item.version === version) {
+                count += item.quantity;
+            }
+        });
+    }
+
+    return count >= quantity;
+}
+
+export async function getStorageInstance<CustomData = {}>(id: string): Promise<StorageInstance<CustomData>> {
+    return await Database.fetchData<StorageInstance<CustomData>>('_id', id, Athena.database.collections.Storage);
 }
 
 export async function addItem<CustomData = {}>(id: string, item: StoredItem<CustomData>): Promise<boolean> {
@@ -189,6 +210,29 @@ export async function addItem<CustomData = {}>(id: string, item: StoredItem<Cust
     }
 
     const storage = await get(id);
+
+    if (!item.slot || item.slot === -1) {
+        // Find stackable item
+        // TODO: Implement stacking limit if needed!
+        const stackableItem = storage.find((existingItem) => existingItem.dbName === item.dbName);
+        if (stackableItem) {
+            stackableItem.quantity += item.quantity;
+            await set(id, storage);
+            return true;
+        }
+
+        // Find free slot 
+        const storageInstance = await getStorageInstance(id);
+        const maxSlots = storageInstance.maxSlots || 0;
+
+        for (let i = 0; i < maxSlots; i++) {
+            const slotOccupied = storage.some((existingItem) => existingItem.slot === i);
+            if (!slotOccupied) {
+                item.slot = i;
+                break;
+            }
+        }
+    }
 
     // Prüfen, ob das Slot bereits belegt ist
     const slotOccupied = storage.some((existingItem) => existingItem.slot === item.slot);
@@ -212,6 +256,9 @@ export async function takeItem<CustomData = {}>(
     storageID: string,
     item: StoredItem<CustomData>,
     doNotRemove: boolean = false,
+    ignoreVersion: boolean = false,
+    ignoreID: boolean = false,
+    ignoreSlot: boolean = false,
 ): Promise<StoredItem<CustomData> | null> {
     if (Overrides.takeItem) {
         return Overrides.takeItem(storageID, item);
@@ -235,12 +282,12 @@ export async function takeItem<CustomData = {}>(
     try {
         const storage = await get<CustomData>(storageID);
 
+        if (!ignoreSlot) {
         const index = storage.findIndex((storedItem) => storedItem.slot === item.slot);
-
-        alt.logWarning(`Storage ${storageID} index: ${index}`);
         if (index !== -1) {
+                // Remove item from specified slot
             // Item exists in storage, remove it
-            const storageNew = Athena.systems.inventory.manager.sub(item, storage, doNotRemove);
+                const storageNew = Athena.systems.inventory.manager.sub(item, storage, doNotRemove, ignoreVersion, ignoreID);
 
             if (storageNew) {
             // Update the storage with the modified items
@@ -252,8 +299,18 @@ export async function takeItem<CustomData = {}>(
 
             return item;
         } else {
+                return null;
+            }
+        } else {
+            const storageNew = Athena.systems.inventory.manager.sub(item, storage, doNotRemove, ignoreVersion, ignoreID);
+            if (storageNew) {
+                // Update the storage with the modified items
+                await set(storageID, storageNew);
+            } else {
             // Item not found in storage
             return null;
+        }
+            return item;
         }
     } finally {
         itemSemaphore.release(storageID, item.slot);

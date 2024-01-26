@@ -82,7 +82,8 @@ export async function add(player: alt.Player, item: Omit<StoredItem, 'slot'>, re
  * @param {Omit<StoredItem, 'slot'>} item
  * @return {Promise<boolean>}
  */
-export async function sub(player: alt.Player, item: Omit<StoredItem, 'data'>): Promise<boolean> {
+export async function sub(player: alt.Player, item: Omit<StoredItem, 'data'>, doNotRemove: boolean = false,
+    ignoreVersion: boolean = false, ignoreID: boolean = false): Promise<boolean> {
     if (Overrides.sub) {
         return Overrides.sub(player, item);
     }
@@ -96,7 +97,7 @@ export async function sub(player: alt.Player, item: Omit<StoredItem, 'data'>): P
         return false;
     }
 
-    const newInventoryData = Athena.systems.inventory.manager.sub(item, data.inventory);
+    const newInventoryData = Athena.systems.inventory.manager.sub(item, data.inventory, doNotRemove, ignoreVersion, ignoreID);
     if (typeof newInventoryData === 'undefined') {
         return false;
     }
@@ -155,7 +156,7 @@ export async function remove(player: alt.Player, slot: number): Promise<boolean>
  * @param {string} baseItem
  * @return {void}
  */
-export async function has(player: alt.Player, dbName: string, quantity: number, version = undefined) {
+export function has(player: alt.Player, dbName: string, quantity: number, version: number = undefined): boolean {
     if (Overrides.has) {
         return Overrides.has(player, dbName, quantity, version);
     }

@@ -13,12 +13,14 @@ const drops: Map<unknown, ItemDrop> = new Map();
 const markAsTaken: { [key: string]: boolean } = {};
 
 export type ItemDropInit = (itemDrop: ItemDrop) => Promise<ItemDrop>;
-export type ItemDropAppendInjection = (itemDrop: StoredItem) => Promise<StoredItem>;
+export type ItemDropBeforeAppendInjection = (itemDrop: StoredItem) => Promise<StoredItem>;
+export type ItemDropAppendInjection = (itemDrop: ItemDrop) => Promise<ItemDrop>;
 export type ItemDropRemoveInjection = (itemDrop: ItemDrop) => Promise<boolean>;
 export type ItemDropUpdateInjection = (itemDrop: ItemDrop) => Promise<ItemDrop>;
 
 const InitInjections: Array<ItemDropInit> = [];
 const AppendInjections: Array<ItemDropAppendInjection> = [];
+const AppendBeforeInjections: Array<ItemDropBeforeAppendInjection> = [];
 const RemoveInjections: Array<ItemDropRemoveInjection> = [];
 const UpdateInjections: Array<ItemDropUpdateInjection> = [];
 
@@ -28,6 +30,10 @@ export function addInitInjection(callback: ItemDropInit) {
 
 export function addAppendInjection(callback: ItemDropAppendInjection) {
     AppendInjections.push(callback);
+}
+
+export function AddBeforeAppendInjection(callback: ItemDropBeforeAppendInjection) {
+    AppendBeforeInjections.push(callback);
 }
 
 export function addRemoveInjection(callback: ItemDropRemoveInjection) {
@@ -175,7 +181,7 @@ export async function add(
 
     item.isEquipped = false;
 
-    for (const callback of AppendInjections) {
+    for (const callback of AppendBeforeInjections) {
         try {
             item = await callback(item);
         } catch (err) {
@@ -184,7 +190,7 @@ export async function add(
         }
     }
 
-    const document = await addToDatabase({
+    let document = await addToDatabase({
         ...item,
         name: baseItem.name,
         pos: pos,
@@ -199,6 +205,15 @@ export async function add(
         pedModel: pedModel,
         usePedModel: usePedModel,
     });
+
+    for (const callback of AppendInjections) {
+        try {
+            document = await callback(document);
+        } catch (err) {
+            console.warn(`Got Itemdrop Append Injection Error: ${err}`);
+            continue;
+        }
+    }
 
     Athena.controllers.itemDrops.append(document);
 

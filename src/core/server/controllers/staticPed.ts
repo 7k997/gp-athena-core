@@ -6,6 +6,7 @@ import { Animation } from '../../shared/interfaces/animation.js';
 import { NET_OWNER_PED } from '@AthenaShared/enums/netOwner.js';
 import { ControllerFuncs } from './shared.js';
 import { ITEM_SYNCED_META, ITEM_SYNCED_META_TYPES } from '@AthenaShared/enums/syncedMeta.js';
+import { Config } from '@AthenaPlugins/gp-athena-overrides/shared/config.js';
 
 const globalPeds: Array<IPed & { ped: alt.Ped }> = [];
 
@@ -39,7 +40,7 @@ export function append(pedData: IPed): string {
         pedData.model,
         new alt.Vector3(pedData.pos),
         pedData.rotation ? new alt.Vector3(pedData.rotation) : alt.Vector3.zero,
-        50,
+        pedData.maxDistance ? pedData.maxDistance : Config.DEFAULT_STREAMING_DISTANCE,
     );
 
     ped.dimension = pedData.dimension ? pedData.dimension : 0;

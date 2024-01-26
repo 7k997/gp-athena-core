@@ -216,7 +216,8 @@ export function hasItem(
             continue;
         }
 
-        if (version && item.version !== version) {
+        //Corechange: If version is undefined ignore version and count all items with the same dbName.
+        if (version && item.version !== version && version !== undefined) {
             continue;
         }
 
@@ -449,6 +450,8 @@ export function sub<CustomData = {}>(
     item: Omit<StoredItem<CustomData>, 'data'>,
     data: Array<StoredItem>,
     doNotRemove: boolean = false,
+    ignoreVersion: boolean = false,
+    ignoreID: boolean = false,
 ): Array<StoredItem> | undefined {
     if (Overrides.sub) {
         return Overrides.sub(item, data);
@@ -473,11 +476,23 @@ export function sub<CustomData = {}>(
     const copyOfData = deepCloneArray<StoredItem>(data);
 
     let existingItemIndex = -1;
-    if (item.id) {
+    if (!ignoreID && item.id) {
+        alt.logWarning(`ItemManager1: Item has an ID, but is being removed by slot.`);
         //Corechange - If Item has an unique ID, we need to find the item by ID
         existingItemIndex = copyOfData.findIndex(
             (x) => x.dbName === item.dbName && x.id === item.id && x.version === item.version,
         );
+
+    } else if (ignoreVersion) {
+        //Corechange - Try to find the item first in the inventory by slot.
+        existingItemIndex = copyOfData.findIndex(
+            (x) => x.dbName === item.dbName && x.slot === item.slot,
+        );
+
+        if (existingItemIndex <= -1) {
+            //Corechange - if the item is not in the specified slot then try to find it in another slot.
+            existingItemIndex = copyOfData.findIndex((x) => x.dbName === item.dbName);
+        }
     } else {
         //Corechange - Try to find the item first in the inventory by slot.
         existingItemIndex = copyOfData.findIndex(
@@ -510,7 +525,7 @@ export function sub<CustomData = {}>(
             copyOfData[existingItemIndex].quantity = 0;
         } else {
         copyOfData.splice(existingItemIndex, 1);
-        return sub(item, copyOfData);
+            return sub(item, copyOfData, false, ignoreVersion, ignoreID);
     }
     }
 

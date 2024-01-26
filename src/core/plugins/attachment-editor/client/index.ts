@@ -56,7 +56,7 @@ async function createMenu() {
 
     attachObject(currentModel, alt.Player.local.pos, new alt.Vector3(0, 0, 0));
 
-    await AthenaClient.rmlui.menu.create({
+    AthenaClient.rmlui.menu.create({
         header: {
             title: 'Attachment Editor',
             color: new alt.RGBA(0, 175, 250, 255),
