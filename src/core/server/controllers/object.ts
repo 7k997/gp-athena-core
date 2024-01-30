@@ -5,6 +5,7 @@ import { IObject } from '../../shared/interfaces/iObject.js';
 import { sha256Random } from '../utility/hash.js';
 import { ControllerFuncs } from './shared.js';
 import { deepCloneObject } from '@AthenaShared/utility/deepCopy.js';
+import { Config } from '@AthenaPlugins/gp-athena-overrides/shared/config.js';
 
 const globalObjects: Array<IObject & { object: alt.Object }> = [];
 
@@ -53,8 +54,9 @@ export function append(objectData: IObject): string {
         object: new alt.Object(objectData.model, objectData.pos, objectData.rot ? objectData.rot : alt.Vector3.zero),
     };
 
-    newObject.object.collision = objectData.noCollision ? false : true;
-    newObject.object.frozen = objectData.noFreeze ? false : true;
+    newObject.object.collision = (objectData.noCollision !== undefined) ? !objectData.noCollision : Config.DEFAULT_OBJECT_DROP_COLLISSION;
+    newObject.object.frozen = (objectData.noFreeze !== undefined) ? !objectData.noFreeze : Config.DEFAULT_OBJECT_DROP_FROZEN;
+
     newObject.object.dimension = objectData.dimension ? objectData.dimension : 0;
 
     newObject.object.setStreamSyncedMeta('object', objectData);

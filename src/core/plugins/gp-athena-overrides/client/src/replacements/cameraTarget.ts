@@ -5,6 +5,7 @@ import { KEY_BINDS } from '@AthenaShared/enums/keyBinds.js';
 import { drawText3D } from '@AthenaClient/screen/text.js';
 import { SYSTEM_EVENTS } from '@AthenaShared/enums/system.js';
 import Raycast from '@AthenaPlugins/gp-athena-utils/client/src/utility/raycast.js';
+import { Config } from '@AthenaPlugins/gp-athena-overrides/shared/config.js';
 
 interface ClosestTarget {
     scriptID: number;
@@ -14,7 +15,7 @@ interface ClosestTarget {
 }
 
 //config
-const renderDisplayLabel = true;
+const renderDisplayLabel = Config.INTERACTION_DISPLAY_NAME_ENABLED;
 
 const ignoredEntities: Array<number> = [];
 let displayLabel = `[~b~${String.fromCharCode(KEY_BINDS.INTERACT)}~w~]~n~.`;

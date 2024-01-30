@@ -5,6 +5,7 @@ import { ITEM_SYNCED_META, ITEM_SYNCED_META_TYPES } from '@AthenaShared/enums/sy
 import { deepCloneObject } from '@AthenaShared/utility/deepCopy.js';
 import { ControllerFuncs } from './shared.js';
 import { IPed } from '@AthenaShared/interfaces/iPed.js';
+import { Config } from '@AthenaPlugins/gp-athena-overrides/shared/config.js';
 
 const drops: { [uid: string]: alt.Object | alt.Ped} = {};
 
@@ -34,7 +35,7 @@ export function append(itemDrop: ItemDrop): string {
             model: itemDrop.pedModel,
             pos: itemDrop.pos,
             rotation: itemDrop.rot ? itemDrop.rot : alt.Vector3.zero,
-            maxDistance: itemDrop.maxDistance,
+            maxDistance: itemDrop.maxDistance ? itemDrop.maxDistance : Config.DEFAULT_STREAMING_DISTANCE,
             frozen: itemDrop.frozen,
             collision: itemDrop.collision,
             dimension: itemDrop.dimension ? itemDrop.dimension : 0,
@@ -52,7 +53,8 @@ export function append(itemDrop: ItemDrop): string {
         itemDrop.pos,
         itemDrop.rot ? itemDrop.rot : alt.Vector3.zero,
     );
-    object.streamingDistance = itemDrop.maxDistance;
+
+        object.streamingDistance = itemDrop.maxDistance ? itemDrop.maxDistance : Config.DEFAULT_STREAMING_DISTANCE;
     object.frozen = itemDrop.frozen;
     object.collision = itemDrop.collision;
         object.dimension = itemDrop.dimension ? itemDrop.dimension : 0;

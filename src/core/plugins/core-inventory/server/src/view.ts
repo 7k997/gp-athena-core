@@ -184,8 +184,8 @@ const Internal = {
             rotation,
             player.dimension,
             player,
-            !baseItem.noCollision,
-            !baseItem.noFreeze,
+            (baseItem.noCollision !== undefined) ? !baseItem.noCollision : Config.DEFAULT_OBJECT_DROP_COLLISSION,
+            (baseItem.noFreeze !== undefined) ? !baseItem.noFreeze : Config.DEFAULT_OBJECT_DROP_FROZEN,
             expiration,
         );
 

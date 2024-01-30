@@ -14,7 +14,7 @@ export interface ClosestTarget {
     type?: 'npc' | 'player' | 'object' | 'vehicle';
 }
 
-let renderDisplayLabel = true;
+let renderDisplayLabel = Config.INTERACTION_DISPLAY_NAME_ENABLED;;
 
 const ignoredEntities: Array<number> = [];
 let displayLabel = `[~b~${String.fromCharCode(KEY_BINDS.INTERACT)}~w~]~n~.`;

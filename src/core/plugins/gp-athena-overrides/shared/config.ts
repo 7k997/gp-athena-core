@@ -36,6 +36,9 @@ export const Config = {
     ITEM_MAX_STACK_DISABLED: true, //Disable the max stack size for items. (Athena Default is false, if set to true the ITEM MAXSTACK will be ignored.)
     DEFAULT_STREAMING_DISTANCE: 500, //Default streaming distance for objects. (Athena Core Default is 100 or lower)
     DEFAULT_PICKUP_DISTANCE: 2, //Default pickup distance for objects. (Athena Core Default is 2)
+    DEFAULT_OBJECT_DROP_COLLISSION: true, //If not specified in item, the default collision state for dropped objects.
+    DEFAULT_OBJECT_DROP_FROZEN: false, //If not specified in item, the default frozen state for dropped objects.
+    INTERACTION_DISPLAY_NAME_ENABLED: true, //Display the interaction display name. (Default is true)
 
     //TODO: Configuration for Corechanges. These are quickly added and only working with some changes in core. These changes should
     //be moved into this plugin and not be in core.
