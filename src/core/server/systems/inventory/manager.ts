@@ -103,9 +103,17 @@ export function modifyItemQuantity(
         amount = item.quantity; // Set the amount to the item quantity since we are removing it all.
     }
 
-    if (!isRemoving && typeof baseItem.maxStack === 'number' && item.quantity + amount > baseItem.maxStack) {
-        remaining = item.quantity + amount - baseItem.maxStack;
-        amount = baseItem.maxStack - item.quantity; // Set the amount to the total necessary to fulfill the maximum stack size.
+    let baseItemMaxStack = baseItem.maxStack ? baseItem.maxStack : Config.ITEM_MAX_STACK;
+    //Corechange: if maxStack is -1 then the item has endless stack
+    if (baseItemMaxStack === -1) {
+        baseItemMaxStack = Number.MAX_SAFE_INTEGER;
+    } else if (Config.ITEM_MAX_STACK_DISABLED) {
+        baseItemMaxStack = Number.MAX_SAFE_INTEGER;
+    }
+
+    if (!isRemoving && item.quantity + amount > baseItemMaxStack) {
+        remaining = item.quantity + amount - baseItemMaxStack;
+        amount = baseItemMaxStack - item.quantity; // Set the amount to the total necessary to fulfill the maximum stack size.
     }
 
     // Add or remove quantity from the item
@@ -365,10 +373,14 @@ export function add<CustomData = {}>(
         return undefined;
     }
 
-    const actualMaxStack = baseItem.maxStack ? baseItem.maxStack : Config.ITEM_MAX_STACK;
+    let actualMaxStack = baseItem.maxStack ? baseItem.maxStack : Config.ITEM_MAX_STACK;
+    if (Config.ITEM_MAX_STACK_DISABLED) {
+        actualMaxStack = -1;
+    }
+
     const copyOfData = deepCloneArray<StoredItem<CustomData>>(data);
     let availableStackIndex = -1;
-    if (baseItem.behavior.canStack && (actualMaxStack > 1 || actualMaxStack === -1)) {
+    if (Config.ITEM_MAX_STACK_DISABLED || (baseItem.behavior.canStack && (actualMaxStack > 1 || actualMaxStack === -1))) {
         availableStackIndex = copyOfData.findIndex(
             (x) => x.dbName === item.dbName && x.version === item.version && x.quantity !== actualMaxStack && !x.id,
         );
@@ -379,7 +391,7 @@ export function add<CustomData = {}>(
     // - Adds an item with a max stack of 1
     // - Adds stackable items, and automatically tries to fill item quantity.
     // - Corechange, if a ID is set then the item is unstackable.
-    if (!baseItem.behavior.canStack || actualMaxStack === 1 || availableStackIndex === -1 || item.id) {
+    if ((!baseItem.behavior.canStack && !Config.ITEM_MAX_STACK_DISABLED) || actualMaxStack === 1 || availableStackIndex === -1 || item.id) {
         // Ensure there is enough room to add items.
 
         if (copyOfData.length >= parseFloat(String(size))) {
@@ -397,7 +409,7 @@ export function add<CustomData = {}>(
 
         // Use quantity to subtract from max stack size or use amount left
         if (baseItem.behavior.canStack || Config.ITEM_MAX_STACK_DISABLED) {
-            if (actualMaxStack === -1) {
+            if (actualMaxStack === -1 || Config.ITEM_MAX_STACK_DISABLED) {
                 //Corechange: Allow endless stack if item not provide a max size.
                 itemClone.quantity = item.quantity;
                 item.quantity = 0;
@@ -643,7 +655,7 @@ export function combineAt<CustomData = {}>(
     }
 
     let copyOfData = deepCloneArray<StoredItem<CustomData>>(data);
-    if (copyOfData[toIndex].quantity === baseItem.maxStack) {
+    if (copyOfData[toIndex].quantity === baseItem.maxStack && !Config.ITEM_MAX_STACK_DISABLED) {
         return undefined;
     }
 
