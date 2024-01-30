@@ -50,7 +50,20 @@ const Internal = {
             key: KEY_BINDS.INTERACT,
             description: 'Interact',
             identifier: 'interact-hotkey',
+            restrictions: {
+                isVehicleDriver: false,
+            },
+            keyDown: Internal.invokeSelection,
+        });
+
+        AthenaClient.systems.hotkeys.add({
+            key: KEY_BINDS.INTERACT_KEY_FOR_VEHICLE,
+            description: 'Interact',
+            identifier: 'interact-hotkey-vehicle',
             modifier: 'shift',
+            restrictions: {
+                isVehicleDriver: true,
+            },
             keyDown: Internal.invokeSelection,
         });
 

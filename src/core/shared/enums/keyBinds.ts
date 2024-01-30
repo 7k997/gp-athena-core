@@ -8,7 +8,7 @@
  */
 export const KEY_BINDS = {
     // ------------------------------Default Keys------------------------------
-    INTERACT_ALT: 13, // Enter
+    INTERACT_ALT: 13, // Interaction Alternative - Enter
     INTERACT_CYCLE: 9, // TAB
 
     //------------------------------GP Keys---------------------------------
@@ -33,7 +33,7 @@ export const KEY_BINDS = {
 
     // E - Interact outside of vehicle
     INTERACT: 69,
-    // X - Interact in vehicle
+    // X - Interact in vehicle //Shift + X (Interact) or Alternative Key -> INTERACT_ALT
     INTERACT_KEY_FOR_VEHICLE: 88,
     // F
     VEHICLE_FUNCS: 70, // Driver
