@@ -98,7 +98,7 @@ class InternalFunctions {
             FACTION_EVENTS.WEBVIEW.UPDATE_DATA,
             faction,
             alt.Player.local.getSyncedMeta(PLAYER_SYNCED_META.DATABASE_ID),
-            alt.Player.local.meta.cash + alt.Player.local.meta.bank,
+            alt.Player.local.meta.bank,
             alt.Player.local.pos,
             alt.Player.local.rot,
             vehicleList,

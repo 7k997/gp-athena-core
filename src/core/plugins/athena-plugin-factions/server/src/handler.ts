@@ -324,11 +324,9 @@ export class FactionHandler {
      * @memberof FactionCore
      */
     static find(nameOrPartialName: string): Faction | null {
-        let faction: Faction;
-
         nameOrPartialName = nameOrPartialName.replace(/ /g, '').toLowerCase();
 
-        const factionsList = Object.values(faction) as Array<Faction>;
+        const factionsList = Object.values(factions) as Array<Faction>;
         const index = factionsList.findIndex((f) => {
             const adjustedName = f.name.replace(/ /g, '').toLowerCase();
             if (adjustedName.includes(nameOrPartialName)) {
@@ -338,7 +336,7 @@ export class FactionHandler {
             return false;
         });
 
-        if (index <= -1) {
+        if (index === -1) {
             return null;
         }
 
