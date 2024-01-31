@@ -4,6 +4,7 @@ import { BaseItem, StoredItem, Item, DefaultItemBehavior } from '@AthenaShared/i
 import { deepCloneArray, deepCloneObject } from '@AthenaShared/utility/deepCopy.js';
 import { GLOBAL_SYNCED } from '@AthenaShared/enums/globalSynced.js';
 import { Config } from '@AthenaPlugins/gp-athena-overrides/shared/config.js';
+import { ORIENTATION } from '@AthenaPlugins/athena-plugin-clothing/shared/enums.js';
 
 alt.setSyncedMeta(GLOBAL_SYNCED.INVENTORY_WEIGHT_ENABLED, true);
 
@@ -1097,7 +1098,7 @@ export async function toggleItem(player: alt.Player, slot: number, type: Invento
     // Verify player model locked items
     let shouldUpdateClothing = false;
     if (dataCopy[index].data && typeof dataCopy[index].data.sex !== 'undefined') {
-        if (dataCopy[index].data.sex !== data.appearance.sex) {
+        if (dataCopy[index].data.sex !== data.appearance.sex && dataCopy[index].data.sex !== ORIENTATION.UNISEX) {
             return false;
         }
 

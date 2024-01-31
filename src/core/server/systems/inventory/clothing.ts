@@ -288,6 +288,7 @@ export function update(player: alt.Player, document: Character = undefined) {
         // We look at the equipped item data sets; and find compatible clothing information in the 'data' field.
         // Check if the data property is the correct format for the item.
         for (let component of item.data.components) {
+            if (component.sex === undefined || component.sex === data.appearance.sex) {
             if (component.isProp) {
                 player.setDlcProp(component.dlc, component.id, component.drawable, component.texture);
             } else {
@@ -295,6 +296,7 @@ export function update(player: alt.Player, document: Character = undefined) {
                 player.setDlcClothes(component.dlc, component.id, component.drawable, component.texture, palette);
             }
         }
+    }
     }
 
     if (!Array.isArray(data.uniform)) {
@@ -306,11 +308,13 @@ export function update(player: alt.Player, document: Character = undefined) {
 
         // We look at the equipped item data sets; and find compatible clothing information in the 'data' field.
         // Check if the data property is the correct format for the item.
+        if (component.sex === undefined || component.sex === data.appearance.sex) {
         if (component.isProp) {
             player.setDlcProp(component.dlc, component.id, component.drawable, component.texture);
         } else {
             const palette = typeof component.palette === 'number' ? component.palette : 0;
             player.setDlcClothes(component.dlc, component.id, component.drawable, component.texture, palette);
+            }
         }
     }
 }
