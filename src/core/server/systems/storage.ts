@@ -72,7 +72,7 @@ export interface StorageInstance<CustomData = {}> {
 
     maxWeight?: number;
     maxSlots?: number;
-    supportedItemTypes?: string[];
+    supportedItemTypes?: number;
 }
 
 export function subscribe(player: alt.Player, storage: string): void {
@@ -126,15 +126,17 @@ export async function create(
     items: Array<StoredItem>,
     maxSlots?: number,
     maxWeight?: number,
-    supportedItemTypes?: string[],
+    type?: string,
+    supportedItemTypes?: number,
 ): Promise<string> {
     if (Overrides.create) {
-        return Overrides.create(items, maxSlots, maxWeight, supportedItemTypes);
+        return Overrides.create(items, maxSlots, maxWeight, type, supportedItemTypes);
     }
 
     const document = await Database.insertData<StorageInstance>(
         {
             items,
+            type: type,
             lastUsed: Date.now(),
             maxSlots: maxSlots,
             maxWeight: maxWeight,

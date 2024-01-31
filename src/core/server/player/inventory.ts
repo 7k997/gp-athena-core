@@ -333,6 +333,20 @@ export async function updateItem(player: alt.Player, slot: number, item: StoredI
         return false;
     }
 
+    //Cleanup item
+    delete item['_id'];
+    delete item['pos'];
+    delete item['expiration'];
+    delete item.name;
+    delete item['frozen'];
+    delete item['collision'];
+    delete item['maxDistance'];
+    delete item['maxDistancePickup'];
+    delete item['customEventsToCall'];
+    delete item['behavior'];
+    delete item.icon;
+    delete item.description;
+
     inventoryRef[index] = item;
     await document.character.set(player, 'inventory', inventoryRef);
     return true;

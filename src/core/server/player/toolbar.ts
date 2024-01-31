@@ -261,6 +261,20 @@ export async function updateItem<CustomData = {}>(
         return false;
     }
 
+    //Cleanup item
+    delete item['_id'];
+    delete item['pos'];
+    delete item['expiration'];
+    delete item.name;
+    delete item['frozen'];
+    delete item['collision'];
+    delete item['maxDistance'];
+    delete item['maxDistancePickup'];
+    delete item['customEventsToCall'];
+    delete item['behavior'];
+    delete item.icon;
+    delete item.description;
+
     toolbarRef[index] = item;
     await document.character.set(player, 'toolbar', toolbarRef);
     return true;

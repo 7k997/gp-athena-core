@@ -190,6 +190,15 @@ export async function add(
         }
     }
 
+    //Cleanup item
+    delete item['_id'];
+    delete item.name;
+    delete item.slot;
+    delete item['customEventsToCall'];
+    delete item['behavior'];
+    delete item.icon;
+    delete item.description;
+
     let document = await addToDatabase({
         ...item,
         name: baseItem.name,
