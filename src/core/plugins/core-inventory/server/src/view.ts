@@ -932,6 +932,12 @@ export const InventoryView = {
         isSessionInUse(uid: string) {
             return Object.values(openStorageSessions).includes(uid);
         },
+
+        /** Returns current open storage id */
+        getOpenStorageId(player: alt.Player) {
+            return openStorageSessions[player.id];
+        }
+
     },
     machineStorage: {
         /**
@@ -1024,5 +1030,9 @@ export const InventoryView = {
         isSessionInUse(uid: string) {
             return Object.values(openMachineStorageSessions).includes(uid);
         },
+        /** Returns current open machine storage id */
+        getOpenMachineStorageId(player: alt.Player) {
+            return openMachineStorageSessions[player.id];
+        }
     },
 };

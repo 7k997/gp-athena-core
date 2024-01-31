@@ -15,8 +15,15 @@ export async function addUnique(
     item: Omit<StoredItem, 'slot'>,
     reservedSlot?: number,
 ): Promise<boolean> {
-    item.id = sha256Random(JSON.stringify(item));
+    item.id = createUniqueItemID(item);
     return Athena.player.inventory.add(player, item, reservedSlot);
+}
+
+/**
+ * Corechange - creates a unique identifier, not saved in the database
+ */
+export function createUniqueItemID(item: Omit<StoredItem, 'slot'>): string {
+    return sha256Random(JSON.stringify(item));
 }
 
 /**

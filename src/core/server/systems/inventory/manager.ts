@@ -91,8 +91,21 @@ export function modifyItemQuantity(
         return undefined;
     }
 
+    let canStack = true;
+    if (baseItem.behavior && baseItem.behavior.canStack) {
+        canStack = baseItem.behavior.canStack;
+    }
+
+    if (Config.ITEM_MAX_STACK_DISABLED) {
+        canStack = true;
+    }
+
+    if (Config.ITEM_PREVENT_UNIQUE_STACK && item.id) {
+        canStack = false;
+    }
+
     // Prevent stacking / modifying quantity if adding to the item.
-    if (!isRemoving && baseItem.behavior && !baseItem.behavior.canStack && !Config.ITEM_MAX_STACK_DISABLED) {
+    if (!isRemoving && !canStack) {
         return undefined;
     }
 
@@ -375,12 +388,25 @@ export function add<CustomData = {}>(
 
     let actualMaxStack = baseItem.maxStack ? baseItem.maxStack : Config.ITEM_MAX_STACK;
     if (Config.ITEM_MAX_STACK_DISABLED) {
-        actualMaxStack = -1;
+        actualMaxStack = Number.MAX_SAFE_INTEGER;
+    }
+
+    let canStack = true;
+    if (baseItem.behavior && baseItem.behavior.canStack) {
+        canStack = baseItem.behavior.canStack;
+    }
+
+    if (Config.ITEM_MAX_STACK_DISABLED) {
+        canStack = true;
+    }
+
+    if (Config.ITEM_PREVENT_UNIQUE_STACK && item.id) {
+        canStack = false;
     }
 
     const copyOfData = deepCloneArray<StoredItem<CustomData>>(data);
     let availableStackIndex = -1;
-    if (Config.ITEM_MAX_STACK_DISABLED || (baseItem.behavior.canStack && (actualMaxStack > 1 || actualMaxStack === -1))) {
+    if (canStack && (actualMaxStack > 1)) {
         availableStackIndex = copyOfData.findIndex(
             (x) => x.dbName === item.dbName && x.version === item.version && x.quantity !== actualMaxStack && !x.id,
         );
@@ -391,7 +417,7 @@ export function add<CustomData = {}>(
     // - Adds an item with a max stack of 1
     // - Adds stackable items, and automatically tries to fill item quantity.
     // - Corechange, if a ID is set then the item is unstackable.
-    if ((!baseItem.behavior.canStack && !Config.ITEM_MAX_STACK_DISABLED) || actualMaxStack === 1 || availableStackIndex === -1 || item.id) {
+    if (!canStack || actualMaxStack === 1 || availableStackIndex === -1) {
         // Ensure there is enough room to add items.
 
         if (copyOfData.length >= parseFloat(String(size))) {
@@ -408,15 +434,9 @@ export function add<CustomData = {}>(
         itemClone.slot = openSlot;
 
         // Use quantity to subtract from max stack size or use amount left
-        if (baseItem.behavior.canStack || Config.ITEM_MAX_STACK_DISABLED) {
-            if (actualMaxStack === -1 || Config.ITEM_MAX_STACK_DISABLED) {
-                //Corechange: Allow endless stack if item not provide a max size.
-                itemClone.quantity = item.quantity;
-                item.quantity = 0;
-            } else {
+        if (canStack) {
             itemClone.quantity = item.quantity < actualMaxStack ? item.quantity : actualMaxStack;
             item.quantity -= itemClone.quantity;
-            }
         } else {
             itemClone.quantity = 1;
             item.quantity -= 1;
@@ -650,7 +670,20 @@ export function combineAt<CustomData = {}>(
         return undefined;
     }
 
-    if (baseItem.behavior && !baseItem.behavior.canStack && !Config.ITEM_MAX_STACK_DISABLED) {
+    let canStack = true;
+    if (baseItem.behavior && baseItem.behavior.canStack) {
+        canStack = baseItem.behavior.canStack;
+    }
+
+    if (Config.ITEM_MAX_STACK_DISABLED) {
+        canStack = true;
+    }
+
+    if (Config.ITEM_PREVENT_UNIQUE_STACK && (data[fromIndex].id || data[toIndex].id)) {
+        canStack = false;
+    }
+
+    if (!canStack) {
         return undefined;
     }
 
@@ -663,12 +696,6 @@ export function combineAt<CustomData = {}>(
     let maxStack = baseItem.maxStack ? baseItem.maxStack : Config.ITEM_MAX_STACK;
     if (Config.ITEM_MAX_STACK_DISABLED) {
         maxStack = Number.MAX_SAFE_INTEGER;
-    }
-
-    if (maxStack === -1) {
-        copyOfData[toIndex].quantity += copyOfData[fromIndex].quantity;
-        copyOfData.splice(fromIndex, 1);
-        return Athena.systems.inventory.weight.update<CustomData>(copyOfData);
     }
 
     if (copyOfData[fromIndex].quantity + copyOfData[toIndex].quantity <= maxStack) {

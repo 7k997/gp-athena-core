@@ -52,6 +52,8 @@ function init() {
 export interface StorageInstance<CustomData = {}> {
     _id?: unknown;
 
+    type?: string;
+
     /**
      * The date which this storage was last accessed.
      *
