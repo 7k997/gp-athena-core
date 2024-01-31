@@ -1,6 +1,5 @@
 import * as alt from 'alt-shared';
 import { VEHICLE_TYPE } from '@AthenaShared/enums/vehicleTypeFlags.js';
-import { types } from 'sass';
 
 export default interface IGarage {
     position: alt.IVector3;

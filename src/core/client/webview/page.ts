@@ -213,8 +213,8 @@ export class Page {
      * @return {Promise<boolean>}
      *
      */
-    async open(): Promise<boolean> {
-        if (this.info.keybind && this.info.keybind.useSameKeyToClose) {
+    async open(forceOpen: boolean = false): Promise<boolean> {
+        if (!forceOpen && this.info.keybind && this.info.keybind.useSameKeyToClose) {
             if (AthenaClient.webview.isPageOpen(this.info.name)) {
                 this.close(true);
                 return false;

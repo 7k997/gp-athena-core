@@ -14,6 +14,7 @@ export const INVENTORY_EVENTS = {
         GIVE: 'inventory:event:server:give',
     },
     TO_CLIENT: {
+        FORCEOPEN: 'inventory:event:client:forceopen',
         OPEN: 'inventory:event:client:open',
         CLOSE: 'inventory:event:client:close',
     },

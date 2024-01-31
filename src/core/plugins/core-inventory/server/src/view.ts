@@ -878,7 +878,9 @@ export const InventoryView = {
             showPrices: boolean = false,
         ) {
             if (forceOpenInventory) {
-                player.emit(INVENTORY_EVENTS.TO_CLIENT.OPEN);
+
+                player.emit(INVENTORY_EVENTS.TO_CLIENT.FORCEOPEN);
+
                 await alt.Utils.wait(250);
             }
 
