@@ -9,15 +9,16 @@ import { ItemUtil } from '@AthenaPlugins/gp-athena-utils/server/utility/itemUtil
 export class RegisterItems {
     static async init() {
         alt.logWarning('Registering items...');
-        const items = await SharedItemCache.getItems();
-        alt.logWarning(`${items.length} items loaded`);
-        for (let i = 0; i < items.length; i++) {
-            if (i % 1000 === 0) {
-                alt.log(i + '/' + items.length);
+        SharedItemCache.getItems().then(async items => {
+            alt.logWarning(`${items.length} items loaded`);
+            for (let i = 0; i < items.length; i++) {
+                if (i % 1000 === 0) {
+                    alt.log(i + '/' + items.length);
+                }
+                alt.logWarning("Added item: " + items[i].name);
+                await Athena.systems.inventory.factory.upsertAsync(RegisterItems.updateFromTemplate(items[i]));
             }
-            alt.logWarning("Added item: " + items[i].name);
-            await Athena.systems.inventory.factory.upsertAsync(RegisterItems.updateFromTemplate(items[i]));
-        }        
+        });
     }
 
     static updateFromTemplate(item: BaseItemEx<ISharedItem>): BaseItemEx<ISharedItem> {
