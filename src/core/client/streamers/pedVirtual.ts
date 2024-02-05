@@ -5,6 +5,7 @@ import { playPedAnimation } from '@AthenaClient/systems/animations.js';
 import { NET_OWNER_PED } from '@AthenaShared/enums/netOwner.js';
 import { Animation } from '@AthenaShared/interfaces/animation.js';
 import { IPed } from '@AthenaShared/interfaces/iPed.js';
+import { ITEM_SYNCED_META, ITEM_SYNCED_META_TYPES } from '@AthenaShared/enums/syncedMeta.js';
 
 enum eRagdollBlockingFlags {
     RBF_ALL = 262143,
@@ -41,7 +42,7 @@ function gameEntityCreate(entity: alt.Entity) {
         return;
     }
 
-    if (entity.getStreamSyncedMeta('type') === 'ped') {
+    if (entity.getStreamSyncedMeta(ITEM_SYNCED_META.TYPE) === ITEM_SYNCED_META_TYPES.PED) {
         const data = getData(entity);
         if (!data) {
             return;
@@ -56,13 +57,13 @@ function onStreamSyncedMetaChanged(entity: alt.Entity, key: string, value: any) 
         return;
     }
 
-    if (entity.getStreamSyncedMeta('type') === 'ped') {
+    if (entity.getStreamSyncedMeta(ITEM_SYNCED_META.TYPE) === ITEM_SYNCED_META_TYPES.PED) {
         const data = getData(entity);
         if (!data) {
             return;
         }
 
-        // initPed(entity, data); // on create! To verify!
+        initPed(entity, data); // on create! To verify!
     }
 }
 
@@ -114,41 +115,41 @@ function initPed(ped: alt.Ped, pedData: IPed) {
         }
     });
 
-    // if (pedData.isPeaceful) {
-    //     if (ped) setupPeacefulPed(ped);
-    // }
+    if (pedData.isPeaceful) {
+        if (ped) setupPeacefulPed(ped);
+    }
 }
 
-// function setupPeacefulPed(ped: alt.Ped) {
-//     alt.logWarning(`Ped: ${ped.scriptID} is peaceful`);
-//     native.stopPedSpeaking(ped.scriptID, true);
-//     // native.taskSetBlockingOfNonTemporaryEvents(ped.scriptID, true); already done above
-//     native.setEntityProofs(
-//         ped.scriptID,
-//         true, // bullet
-//         true, // fire
-//         true, // explosion
-//         true, // collision
-//         true, // melee
-//         true, // steam
-//         true, // DontResetDamageFlagsOnCleanupMissionState (?)
-//         true, // water
-//     );
-//     native.setPedTreatedAsFriendly(ped.scriptID, 1, 0);
+function setupPeacefulPed(ped: alt.Ped) {
+    alt.logWarning(`Ped: ${ped.scriptID} is peaceful`);
+    native.stopPedSpeaking(ped.scriptID, true);
+    // native.taskSetBlockingOfNonTemporaryEvents(ped.scriptID, true); already done above
+    native.setEntityProofs(
+        ped.scriptID,
+        true, // bullet
+        true, // fire
+        true, // explosion
+        true, // collision
+        true, // melee
+        true, // steam
+        true, // DontResetDamageFlagsOnCleanupMissionState (?)
+        true, // water
+    );
+    native.setPedTreatedAsFriendly(ped.scriptID, 1, 0);
 
-//     native.setRagdollBlockingFlags(ped.scriptID, eRagdollBlockingFlags.RBF_ALL);
+    native.setRagdollBlockingFlags(ped.scriptID, eRagdollBlockingFlags.RBF_ALL);
 
-//     // everyTickWhile(
-//     //     () => ped.valid,
-//     //     () => {
-//     //         // native.setPedResetFlag(alt.Player.local, PED_RESET_FLAG.PreventLockonToFriendlyPlayers, true);
-//     //         native.setPedResetFlag(ped.scriptID, PED_RESET_FLAG.BlockFallTaskFromExplosionDamage, true);
-//     //         native.setPedResetFlag(ped.scriptID, PED_RESET_FLAG.BlockWeaponReactionsUnlessDead, true);
-//     //         native.setPedResetFlag(ped.scriptID, PED_RESET_FLAG.DisablePotentialBlastReactions, true);
-//     //         native.setPedResetFlag(ped.scriptID, PED_RESET_FLAG.DisableVehicleDamageReactions, true);
-//     //     },
-//     // );
-// }
+    everyTickWhile(
+        () => ped.valid,
+        () => {
+            // native.setPedResetFlag(alt.Player.local, PED_RESET_FLAG.PreventLockonToFriendlyPlayers, true);
+            native.setPedResetFlag(ped.scriptID, PED_RESET_FLAG.BlockFallTaskFromExplosionDamage, true);
+            native.setPedResetFlag(ped.scriptID, PED_RESET_FLAG.BlockWeaponReactionsUnlessDead, true);
+            native.setPedResetFlag(ped.scriptID, PED_RESET_FLAG.DisablePotentialBlastReactions, true);
+            native.setPedResetFlag(ped.scriptID, PED_RESET_FLAG.DisableVehicleDamageReactions, true);
+        },
+    );
+}
 
 function everyTickWhile(whileFunc: () => boolean, doFunc: () => void) {
     alt.everyTick(() => {

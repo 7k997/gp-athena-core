@@ -25,6 +25,7 @@ export type ItemDrop = {
     frozen?: boolean;
     maxDistance?: number;
     maxDistancePickup?: number;
+    isPeaceful?: boolean;
 } & StoredItem;
 
 /**

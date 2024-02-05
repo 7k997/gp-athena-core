@@ -39,6 +39,7 @@ export function append(itemDrop: ItemDrop): string {
             frozen: itemDrop.frozen,
             collision: itemDrop.collision,
             dimension: itemDrop.dimension ? itemDrop.dimension : 0,
+            isPeaceful: itemDrop.isPeaceful ? itemDrop.isPeaceful : true,
         };
 
         const pedID = Athena.controllers.staticPed.append(ped);
