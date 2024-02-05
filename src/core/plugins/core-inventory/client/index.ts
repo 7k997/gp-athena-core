@@ -216,6 +216,10 @@ function init() {
         page.open();
     });
 
+    alt.onServer(INVENTORY_EVENTS.TO_CLIENT.FORCEOPEN, () => {
+        page.open(true);
+    });
+
     alt.onServer(INVENTORY_EVENTS.TO_CLIENT.CLOSE, () => {
         page.close(true);
     });
