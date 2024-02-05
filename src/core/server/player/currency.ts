@@ -70,7 +70,7 @@ export function sub<CustomCurrency>(
     type: DefaultCurrency | CustomCurrency,
     amount: number,
 ): boolean {
-    if (typeof Overrides.add === 'function') {
+    if (typeof Overrides.sub === 'function') {
         return Overrides.sub(player, type, amount);
     }
 

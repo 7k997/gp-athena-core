@@ -3,6 +3,7 @@ import * as native from 'natives';
 
 import * as AthenaClient from '@AthenaClient/api/index.js';
 import { Door } from '@AthenaShared/interfaces/door.js';
+import { Config } from '@AthenaPlugins/gp-athena-overrides/shared/config.js';
 
 let doors: Array<Door & { entity }> = [];
 let interval: number;
@@ -21,7 +22,7 @@ function draw() {
     }
 
     for (let door of doors) {
-        if (alt.debug) {
+        if (alt.debug && !Config.ALT_DEBUG_OVERRIDE) {
             const dist = AthenaClient.utility.vector.distance2d(alt.Player.local.pos, door.pos);
             if (dist > 5) {
                 continue;

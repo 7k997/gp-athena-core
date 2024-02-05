@@ -584,4 +584,8 @@ export function setToAutoMode() {
     autoMode = true;
 }
 
+export function getClosestNearby(dataSet: Array<alt.Entity>, distance?: number) {
+    return Internal.getClosestNearby(dataSet, distance);
+}
+
 alt.onServer(SYSTEM_EVENTS.TICKS_START, Internal.init);
