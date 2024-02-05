@@ -2,6 +2,8 @@ import { WEATHER_CONFIG } from '@AthenaPlugins/core-weather/shared/config.js';
 import { WORLD_WEATHER } from '@AthenaPlugins/core-weather/shared/weather.js';
 import * as alt from 'alt-server';
 import { WEATHER_EVENTS } from '@AthenaPlugins/core-weather/shared/events.js';
+import { Config } from '@AthenaPlugins/gp-athena-overrides/shared/config.js';
+import { SYSTEM_EVENTS } from '@AthenaShared/enums/system.js';
 
 let weatherRotation = [
     'EXTRASUNNY',
@@ -34,7 +36,7 @@ export class World {
     static minute: number = WEATHER_CONFIG.BOOTUP_MINUTE;
 
     static init() {
-        alt.setInterval(World.updateWorldTime, 60000);
+        alt.setInterval(World.updateWorldTime, Config.UPDATE_WORLD_TIME_INTERVAL);
         World.generateGrid(worldDivision);
         World.updateWorldTime();
 
@@ -44,6 +46,11 @@ export class World {
     static getWeatherUpdate(player: alt.Player) {
         const gridspace = World.getGridSpace(player);
         const weather = World.getWeatherByGrid(gridspace);
+
+        if (World.getWeatherOverride()[0]) {
+            alt.emitClient(player, WEATHER_EVENTS.UPDATE_WEATHER, World.getWeatherOverride()[1]);
+            return;
+        }
 
         alt.emitClient(player, WEATHER_EVENTS.UPDATE_WEATHER, weather);
     }
@@ -141,9 +148,14 @@ export class World {
         World.minMaxGroups = groups;
     }
 
+    static getWeatherOverride(): [boolean, string] {
+        return [weatherOverride, weatherOverrideName];
+    }
+
     static updateWorldWeather(): void {
         if (weatherOverride) {
-            alt.emitAllClients('weather:Update', weatherOverrideName);
+            alt.emitAllClients(SYSTEM_EVENTS.WORLD_UPDATE_WEATHER, weatherOverrideName);
+
             return;
         }
     }
@@ -153,6 +165,8 @@ export class World {
         if (timeRule) {
             const result = timeRule();
             if (result) {
+
+                if (Config.DEBUG_INFO) alt.logWarning(`World Time Update Override was Correct. Updating Time: ${result.hour}:${result.minute}`);
                 World.hour = result.hour;
                 World.minute = result.minute;
 

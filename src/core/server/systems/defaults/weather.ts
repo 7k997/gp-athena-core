@@ -1,6 +1,7 @@
 import * as alt from 'alt-server';
 import { getWeatherFromString, WEATHER_KEY } from '@AthenaShared/utility/weather.js';
 import * as Athena from '@AthenaServer/api/index.js';
+import { World } from '@AthenaPlugins/core-weather/server/src/world.js';
 
 /**
  * THIS IS A DEFAULT SYSTEM.
@@ -74,6 +75,12 @@ export function updatePlayer(player: alt.Player) {
         return;
     }
 
+    // if (World.getWeatherOverride()[0]) {
+    //     const weatherOverride = World.getWeatherOverride()[1];
+        
+    //     Athena.player.emit.setWeather(player, WEATHER_TYPE[weatherOverride], 30);
+    //     return;
+    // }
     // Athena.player.emit.message(player, `Weather is now ${weathers[0]}.`);
     Athena.player.emit.setWeather(player, weathers[0], 30);
 }

@@ -41,10 +41,6 @@ export class World {
         if (!Config.DISABLE_CORE_WEATHER_SYNC_INTERVAL) {
         alt.setInterval(World.getWeatherUpdate, Config.WEATHER_SYNC_INTERVAL);
         }
-
-        if (!Config.DISABLE_CORE_WEATHER_UPDATE_TIME) {
-        // alt.onServer(SYSTEM_EVENTS.WORLD_UPDATE_TIME, World.updateTime);
-    }
     }
 
     static getWeatherUpdate() {

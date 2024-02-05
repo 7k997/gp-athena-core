@@ -1,9 +1,10 @@
 export const Config = {
     //DEBUG SETTINGS
-    DEBUG: true,
-    DEBUG_INFO: true,
+    DEBUG: false,
+    DEBUG_INFO: false,
     DEBUG_WARNING: true,
     DEVTOOLS: true, //Enable dev tools, in test set to false for test and production!
+    ALT_DEBUG_OVERRIDE: true, //Override some places where alt.debug is used, just to remove somethings in Debug mode. (Default is false)
 
     //Notification Settings
     ACTIVATE_NOTIFICATION_REPLACEMENT: true, //Activate the notification replacement from Lord, see plugin-notifications.
@@ -13,7 +14,7 @@ export const Config = {
     MAX_INTERACTION_DISTANCE: 5, //Max interaction distance for interaction with objects, items, players and NPCs. Athena Default is 25
     NPC_MENU_DISTANCE: 5, //Max interaction distance for the NPC menu. Athena Default is 5
     ENTITY_SELECTOR_MARKER_OFF: true, //Turn the marker off
-    MAPOBJECT_SELECTOR_MARKER_OFF: false, //Turn the marker off
+    MAPOBJECT_SELECTOR_MARKER_OFF: true, //Turn the marker off [E]
     ENTITY_SELECTOR_AUTOMODE: true, //Find the closest entity and not allow cycling targets.
     DISABLE_VEHICLE_SPAWN_DESPAWN: true, //Disable the ability to spawn/despawn vehicles on disconnect or connect. Instead all vehicles which are not in garage will spawn on server start.
     DISABLE_VEHICLE_DESPAWN_ON_DESTROY: true, //Disable the vehicle despawn on destroy. (Default is 60 seconds)
@@ -22,11 +23,13 @@ export const Config = {
     DISABLE_DEFAULT_WEAPON_ITEMS: true, //Disable the default weapon items.
     DISABLE_WEAPON_REMOVE_ON_DEATH: true, //Disable the weapon remove on death.
     DISABLE_DEFAULT_AMMO: true, //Disable the default ammo.
-    DISABLE_DEFAULT_TIME_SYNC: false, //Disable the default time sync.
+    DISABLE_DEFAULT_TIME_SYNC: true, //Disable the default time sync. Only set to true if you have implemented your own time logic (Default is false)
     DISABLE_HOSPITAL_BLIPS: false, //Disable the hospital blips.
     DISABLE_CORE_WEATHER_UPDATE_METHOD: true, //Disable the core-weather plugin system. (Default is false)
     DISABLE_CORE_WEATHER_SYNC_INTERVAL: false, //Disable the core-weather sync interval. (Default is false)
-    DISABLE_CORE_WEATHER_UPDATE_TIME: true, //Disable the core-weather update time. (Default is false) TODO: Maybe can be removed.
+    DISABLE_CORE_WEATHER_UPDATE_TIME_CLIENT: true, //Disable the core-weather update time. (Default is false) TODO: Maybe can be removed.
+    DISABLE_CORE_WEATHER_UPDATE_TIME_SERVER: false, //Disable the core-weather update time. (Default is false) TODO: Maybe can be removed.
+    UPDATE_WORLD_TIME_INTERVAL: 60000, //Default 60000. 1 minutes, DO NOT SET IT BELOW 1 MINUTE.
     WEATHER_SYNC_INTERVAL: 1000 * 60 * 1, //1 minutes, DO NOT SET IT BELOW 1 MINUTE.
     DROP_DEFAULT_EXPIRATION: 1000 * 60 * 5, //5 minutes, DO NOT SET IT BELOW 1 MINUTE.
     DROP_EXPIRATION_INTERVAL: 1000 * 60 * 5, //5 minutes, DO NOT SET IT BELOW 1 MINUTE.
