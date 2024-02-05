@@ -16,6 +16,9 @@ export const KEY_BINDS = {
     // Stern Special Key
     NOCLIP: 106,
 
+    // / (Numpad)
+    ORBITCAMERA: 111,
+
     //5: 53,
     INTERACTION_EFFECT: 53,
 
@@ -144,6 +147,9 @@ export const KEY_BINDS = {
     TURNRIGHT_SIGNAL: 39,
     INTERNAL_LIGHTS: 38,
     WARNING_LIGHTS: 40,
+
+    //Arrow up
+    ACCEPT_DECLINE_EVENT_PROMPT: 38,
 
     //WINDOWS Just for test, later in Interaction wheel menu
     //-, + am Numpad

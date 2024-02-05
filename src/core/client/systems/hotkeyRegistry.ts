@@ -7,12 +7,15 @@ import { KeyBindRestrictions, KeyInfo } from '@AthenaClient/interface/hotkeys.js
 
 export type KeyInfoDefault = KeyInfo & { default: number };
 
-const singlePressDelay = 200;
+const singlePressDelay = 0; //No delay for single press
 const longPressDelay = 1000;
+const doublePressDelay = 0; //No delay for double press
+const doublePressTime = 200; //Time to press the key twice
 
 const keyMappings: Array<KeyInfoDefault> = [];
 
 const singlePressKeyDownTime: { [identifier: string]: number } = {};
+const doublePressKeyDownTime: { [identifier: string]: [number, number] } = {}; //time, count
 const longPressKeyDownTime: { [identifier: string]: number } = {};
 
 const keyDownTime: { [identifier: string]: number } = {};
@@ -175,6 +178,15 @@ const Internal = {
                 singlePressKeyDownTime[keyInfo.identifier] = Date.now() + singlePressDelay;
             }
 
+            if (keyInfo.doublePress) {
+                //Count the double press
+                if (doublePressKeyDownTime[keyInfo.identifier]) {
+                    doublePressKeyDownTime[keyInfo.identifier][1]++;
+                } else {
+                    doublePressKeyDownTime[keyInfo.identifier] = [Date.now() + doublePressDelay, 1];
+                }
+            }
+
             if (keyInfo.longPress) {
                 longPressKeyDownTime[keyInfo.identifier] = Date.now() + longPressDelay;
             }
@@ -193,7 +205,6 @@ const Internal = {
             }
 
             delete keyDownTime[keyInfo.identifier];
-            delete singlePressKeyDownTime[keyInfo.identifier];
             delete longPressKeyDownTime[keyInfo.identifier];
 
             if (keyInfo.disabled) {
@@ -251,11 +262,40 @@ const Internal = {
             keyInfo.delayedKeyDown.callback();
         });
 
+        // Check matching keys in doublePress
+        Object.keys(doublePressKeyDownTime).forEach((identifier) => {
+            const timeToExceed = doublePressKeyDownTime[identifier];
+            if (Date.now() < timeToExceed[0]) {
+                return;
+            }
+
+            if (Date.now() > timeToExceed[0] + doublePressTime) {
+                delete doublePressKeyDownTime[identifier];
+                return;
+            }
+
+            if (timeToExceed[1] > 1) {
+                delete singlePressKeyDownTime[identifier];
+                delete doublePressKeyDownTime[identifier];
+                const keyInfo = Internal.getKeyInfo(identifier);
+                if (keyInfo.doublePress) {
+                    keyInfo.doublePress();
+                }
+            }
+        });
+
         // Check matching keys in singlePressKeyDownTime
         Object.keys(singlePressKeyDownTime).forEach((identifier) => {
             const timeToExceed = singlePressKeyDownTime[identifier];
             if (Date.now() < timeToExceed) {
                 return;
+            }
+
+            if (doublePressKeyDownTime[identifier]) {
+                //Delay key to wait for double press
+                if (Date.now() < timeToExceed + doublePressTime) {
+                    return;
+                }
             }
 
             delete singlePressKeyDownTime[identifier];
@@ -278,8 +318,6 @@ const Internal = {
                 keyInfo.longPress();
             }
         });
-
-        // keyInfo.doublePress();
 
         // Check for whilePressed functions, and execute
         for (let keyInfo of keyMappings) {

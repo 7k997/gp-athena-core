@@ -4,6 +4,7 @@ import * as AthenaClient from '@AthenaClient/api/index.js';
 import { onTicksStart } from '@AthenaClient/events/onTicksStart.js';
 import { SYSTEM_EVENTS } from '@AthenaShared/enums/system.js';
 import { AcceptDeclineEvent } from '@AthenaShared/interfaces/acceptDeclineEvent.js';
+import { KEY_BINDS } from '@AthenaShared/enums/keyBinds.js';
 
 let lastEvent: AcceptDeclineEvent;
 
@@ -28,7 +29,7 @@ function setAcceptDeclineEvent(event: AcceptDeclineEvent) {
 
 function init() {
     AthenaClient.systems.hotkeys.add({
-        key: 38,
+        key: KEY_BINDS.ACCEPT_DECLINE_EVENT_PROMPT,
         description: 'Accept / Decline Event Prompt',
         identifier: 'accept-decline-event-prompt',
         keyDown: handleOpen,
