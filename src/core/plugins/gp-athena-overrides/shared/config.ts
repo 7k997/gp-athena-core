@@ -6,13 +6,17 @@ export const Config = {
     DEVTOOLS: true, //Enable dev tools, in test set to false for test and production!
     ALT_DEBUG_OVERRIDE: true, //Override some places where alt.debug is used, just to remove somethings in Debug mode. (Default is false)
 
+    HIDE_WHEEL_MENU_FOR_OBJECTS_WITHOUT_OPTIONS: true, //Hide the wheel menu for objects without options. (Default is false, if true -> high performance impact)
+
     //Notification Settings
     ACTIVATE_NOTIFICATION_REPLACEMENT: true, //Activate the notification replacement from Lord, see plugin-notifications.
     DEFAULT_NOTIFICATION_DURATION: 5000, //Default notification duration in ms.
     DEFAULT_NOTIFICATION_SOUND: 'notification.ogg', //Default notification sound file. Set to null for none.
 
-    MAX_INTERACTION_DISTANCE: 5, //Max interaction distance for interaction with objects, items, players and NPCs. Athena Default is 25
+    MAX_INTERACTION_DISTANCE: 3, //Max interaction distance for interaction with objects, items, players and NPCs. Athena Default is 25
+    MAX_INTERACTION_TARGETS: 50, //Max interaction targets for interaction with objects, items, players and NPCs. Athena Default is 50
     NPC_MENU_DISTANCE: 5, //Max interaction distance for the NPC menu. Athena Default is 5
+    ENTITY_SELECTOR_HINT: "seehash", //The hint for the entity selector. If the model of an object is unknown, seehash means look into the hash attribute to get the model hash. (Default is "seehash")
     ENTITY_SELECTOR_MARKER_OFF: true, //Turn the marker off
     MAPOBJECT_SELECTOR_MARKER_OFF: true, //Turn the marker off [E]
     ENTITY_SELECTOR_AUTOMODE: true, //Find the closest entity and not allow cycling targets.

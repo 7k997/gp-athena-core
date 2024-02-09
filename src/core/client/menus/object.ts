@@ -5,6 +5,7 @@ import * as AthenaClient from '@AthenaClient/api/index.js';
 import { IWheelOptionExt } from '../../shared/interfaces/wheelMenu.js';
 import { CreatedObject } from '@AthenaClient/streamers/object.js';
 import { CreatedDrop } from '@AthenaClient/streamers/item.js';
+import { Config } from '@AthenaPlugins/gp-athena-overrides/shared/config.js';
 
 export type ObjectMenuInjection = (
     existingObject: CreatedObject | CreatedDrop,
@@ -66,28 +67,11 @@ export function open(object: CreatedObject | CreatedDrop): void {
 
     const coords = native.getEntityCoords(object.createdObject.scriptID, false);
     const dist = AthenaClient.utility.vector.distance(alt.Player.local.pos, coords);
-    if (dist >= 3) {
+    if (dist >= Config.MAX_INTERACTION_DISTANCE) {
         return;
     }
 
-    let options: Array<IWheelOptionExt> = [];
-
-    for (const callback of Injections) {
-        try {
-            options = callback(object, options);
-        } catch (err) {
-            console.warn(`Got Object Menu Injection Error: ${err}`);
-            continue;
-        }
-    }
-
-    // Used to debug if the item showed up correctly
-    // options.push({ name: `${object.model}` });
-
-    if (options.length <= 0) {
-        return;
-    }
-
+    let options: Array<IWheelOptionExt> = getOptions(object);
     // If only one option, execute it. No need for another dialog.
     // Force Single Option Invoke
     if (options.length === 1) {
@@ -115,6 +99,26 @@ export function open(object: CreatedObject | CreatedDrop): void {
     }
 
     AthenaClient.systems.wheelMenu.open('Object', options);
+}
+
+export function getOptions(object: CreatedObject | CreatedDrop): Array<IWheelOptionExt> {
+
+    let options: Array<IWheelOptionExt> = [];
+
+    for (const callback of Injections) {
+        try {
+            options = callback(object, options);
+        } catch (err) {
+            console.warn(`Got Object Menu Injection Error: ${err}`);
+            continue;
+        }
+    }
+
+    if (options.length <= 0) {
+        return null;
+    }
+
+    return options;
 }
 
 /**

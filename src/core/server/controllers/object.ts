@@ -6,6 +6,7 @@ import { sha256Random } from '../utility/hash.js';
 import { ControllerFuncs } from './shared.js';
 import { deepCloneObject } from '@AthenaShared/utility/deepCopy.js';
 import { Config } from '@AthenaPlugins/gp-athena-overrides/shared/config.js';
+import { ITEM_SYNCED_META, ITEM_SYNCED_META_TYPES } from '@AthenaShared/enums/syncedMeta.js';
 
 const globalObjects: Array<IObject & { object: alt.Object }> = [];
 
@@ -59,7 +60,7 @@ export function append(objectData: IObject): string {
 
     newObject.object.dimension = objectData.dimension ? objectData.dimension : 0;
 
-    newObject.object.setStreamSyncedMeta('object', objectData);
+    newObject.object.setStreamSyncedMeta(ITEM_SYNCED_META_TYPES.OBJECT, objectData);
     globalObjects.push(newObject);
     return objectData.uid;
 }
@@ -201,7 +202,7 @@ export function updatePosition(uid: string, pos: alt.IVector3, player: alt.Playe
 
         globalObjects[index].pos = pos;
         globalObjects[index].object.pos = new alt.Vector3(pos);
-        globalObjects[index].object.setStreamSyncedMeta('object', deepCloneObject(globalObjects[index]));
+        globalObjects[index].object.setStreamSyncedMeta(ITEM_SYNCED_META_TYPES.OBJECT, deepCloneObject(globalObjects[index]));
         return true;
     }
 
@@ -218,7 +219,7 @@ export function updateModel(uid: string, model: string, player: alt.Player = und
 
         globalObjects[index].model = model;
         globalObjects[index].object.model = model;
-        globalObjects[index].object.setStreamSyncedMeta('object', deepCloneObject(globalObjects[index]));
+        globalObjects[index].object.setStreamSyncedMeta(ITEM_SYNCED_META_TYPES.OBJECT, deepCloneObject(globalObjects[index]));
         return true;
     }
 
