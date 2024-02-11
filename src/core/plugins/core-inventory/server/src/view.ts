@@ -35,7 +35,12 @@ const openStorages: { [player_id: string]: Array<StoredItem> } = {};
 const openStorageSessions: { [player_id: string]: string } = {};
 const openStoragesWeight: { [player_id: string]: number } = {};
 
-// Second Storages for machines
+// Second Storage
+const openSecondStorages: { [player_id: string]: Array<StoredItem> } = {};
+const openSecondStorageSessions: { [player_id: string]: string } = {};
+const openSecondStoragesWeight: { [player_id: string]: number } = {};
+
+// Third special Storage for machines
 const openMachineStorages: { [player_id: string]: Array<StoredItem> } = {};
 const openMachineStorageSessions: { [player_id: string]: string } = {};
 const openMachineStoragesWeight: { [player_id: string]: number } = {};
@@ -43,6 +48,8 @@ const openMachineStoragesWeight: { [player_id: string]: number } = {};
 // Callbacks
 const openCallbacks: Array<PlayerCallback> = [];
 const closeCallbacks: Array<PlayerCloseCallback> = [];
+const openSecondCallbacks: Array<PlayerCallback> = [];
+const closeSecondCallbacks: Array<PlayerCloseCallback> = [];
 const openMachineCallbacks: Array<PlayerCallback> = [];
 const closeMachineCallbacks: Array<PlayerCloseCallback> = [];
 
@@ -63,12 +70,14 @@ const Internal = {
         },
         close(player: alt.Player | number) {
             let id = -1;
+            let playerOrUndefined = undefined;
             if (typeof player !== 'number') {
                 if (!player || !player.valid) {
                     return;
                 }
 
                 id = player.id;
+                playerOrUndefined = player;
             } else {
                 id = player;
             }
@@ -77,28 +86,48 @@ const Internal = {
                 return;
             }
 
+            Internal.closeAllStorages(id, playerOrUndefined);
+
+        },
+
+    },
+    closeAllStorages(id: number, player: alt.Player) {
+        Internal.closeStorage(id, player);
+        Internal.closeSecondStorage(id, player);
+        Internal.closeMachineStorage(id, player);
+    },
+    closeStorage(id: number, player: alt.Player) {
             if(openStorageSessions[id]) {
                 for (let cb of closeCallbacks) {
-                    cb(openStorageSessions[id], openStorages[id], typeof player === 'number' ? undefined : player);
+                cb(openStorageSessions[id], openStorages[id], player);
                 }
 
                 delete openStorageSessions[id];
                 delete openStorages[id];
                 delete openStoragesWeight[id];
             }
+    },
+    closeSecondStorage(id: number, player: alt.Player) {
+        if (openSecondStorageSessions[id]) {
+            for (let cb of closeSecondCallbacks) {
+                cb(openSecondStorageSessions[id], openSecondStorages[id], player);
+            }
 
+            delete openSecondStorageSessions[id];
+            delete openSecondStorages[id];
+            delete openSecondStoragesWeight[id];
+        }
+    },
+    closeMachineStorage(id: number, player: alt.Player) {
             if(openMachineStorageSessions[id]) {
                 for (let cb of closeMachineCallbacks) {
-                    cb(openMachineStorageSessions[id], openMachineStorages[id], typeof player === 'number' ? undefined : player);
+                cb(openMachineStorageSessions[id], openMachineStorages[id], player);
                 }
 
                 delete openMachineStorageSessions[id];
                 delete openMachineStorages[id];
                 delete openMachineStoragesWeight[id];
             }
-
-           
-        },
     },
     disconnect(player: alt.Player) {
         const id = player.id;
@@ -198,8 +227,12 @@ const Internal = {
         if (info.location === 'custom') {
             openStorages[player.id].find((item) => item.slot === info.slot).price = info.price;
             InventoryView.storage.resync(player);
+        } else if (info.location === 'second') {
+            openSecondStorages[player.id].find((item) => item.slot === info.slot).price = info.price;
+            InventoryView.secondStorage.resync(player);
         } else if (info.location === 'machine') {
             openMachineStorages[player.id].find((item) => item.slot === info.slot).price = info.price;
+            //TODO: Why this?
             openMachineStorages[player.id][info.slot].price = info.price;
             InventoryView.machineStorage.resync(player);
         } else if (info.location === 'inventory') {
@@ -319,6 +352,14 @@ const Internal = {
             endData = openStorages[player.id];
         }
 
+        if (info.startType === 'second') {
+            startData = openSecondStorages[player.id];
+        }
+
+        if (info.endType === 'second') {
+            endData = openSecondStorages[player.id];
+        }
+
         if (info.startType === 'machine') {
             startData = openMachineStorages[player.id];
         }
@@ -357,6 +398,14 @@ const Internal = {
 
         if (info.endType === 'custom') {
             endData = openStorages[player.id];
+        }
+
+        if (info.startType === 'second') {
+            startData = openSecondStorages[player.id];
+        }
+
+        if (info.endType === 'second') {
+            endData = openSecondStorages[player.id];
         }
 
         if (info.startType === 'machine') {
@@ -458,7 +507,8 @@ const Internal = {
             return;
         }
 
-        if (info.startType !== 'custom' && info.endType !== 'custom' && info.startType !== 'machine' && info.endType !== 'machine') {
+        if (info.startType !== 'custom' && info.endType !== 'custom' && info.startType !== 'machine' && info.endType !== 'machine'
+            && info.startType !== 'second' && info.endType !== 'second') {
             await Athena.document.character.setBulk(player, {
                 [info.startType]: complexSwap.from,
                 [info.endType]: complexSwap.to,
@@ -477,6 +527,10 @@ const Internal = {
                 maxWeight = openStoragesWeight[player.id];
             }
          
+            if (info.endType === 'second') {
+                maxWeight = openSecondStoragesWeight[player.id];
+            }
+
             if(info.endType === 'machine') {
                 maxWeight = openMachineStoragesWeight[player.id];
             }
@@ -491,6 +545,8 @@ const Internal = {
         // Assign Data
         if (info.startType === 'custom') {
             openStorages[player.id] = complexSwap.from;
+        } else if (info.startType === 'second') {
+            openSecondStorages[player.id] = complexSwap.from;
         } else if (info.startType === 'machine') {
             openMachineStorages[player.id] = complexSwap.from;  
         } else {
@@ -499,6 +555,8 @@ const Internal = {
 
         if (info.endType === 'custom') {
             openStorages[player.id] = complexSwap.to;
+        } else if (info.endType === 'second') {
+            openSecondStorages[player.id] = complexSwap.to;
         } else if(info.endType === 'machine') {
             openMachineStorages[player.id] = complexSwap.to;        
         } else {
@@ -791,13 +849,23 @@ const Internal = {
 
         Athena.systems.inventory.drop.invoke('item-pickup', player, item, 'inventory');
     },
+    isStorageOpen(uid: string) {
+        if (Object.values(openStorageSessions).includes(uid)
+            || Object.values(openSecondStorageSessions).includes(uid)
+            || Object.values(openMachineStorageSessions).includes(uid)) {
+            return true;
+        }
+        return false;
+    },
 };
 
 function addCallback(type: 'close', callback: PlayerCloseCallback);
+function addCallback(type: 'secondClose', callback: PlayerCloseCallback);
 function addCallback(type: 'machineClose', callback: PlayerCloseCallback);
 function addCallback(type: 'open', callback: PlayerCallback);
+function addCallback(type: 'secondOpen', callback: PlayerCallback);
 function addCallback(type: 'machineOpen', callback: PlayerCallback);
-function addCallback(type: 'open' | 'close' | 'machineClose' | 'machineOpen', callback: PlayerCallback | PlayerCloseCallback) {
+function addCallback(type: 'open' | 'close' | 'secondClose' | 'secondOpen' | 'machineClose' | 'machineOpen', callback: PlayerCallback | PlayerCloseCallback) {
     if (type === 'open') {
         openCallbacks.push(callback as PlayerCallback);
         return;
@@ -815,6 +883,16 @@ function addCallback(type: 'open' | 'close' | 'machineClose' | 'machineOpen', ca
 
     if (type === 'machineClose') {
         closeMachineCallbacks.push(callback as PlayerCloseCallback);
+        return;
+    }
+
+    if (type === 'secondOpen') {
+        openSecondCallbacks.push(callback as PlayerCallback);
+        return;
+    }
+
+    if (type === 'secondClose') {
+        closeSecondCallbacks.push(callback as PlayerCloseCallback);
         return;
     }
 }
@@ -865,6 +943,9 @@ export const InventoryView = {
          * Utilize the callback system to obtain the modified storage data.
          *
          * @param {alt.Player} player An alt:V Player Entity
+        * @param {
+        string
+    } storageName Displays the storage name like Wallet, Trash, Store, etc./ leave null for default
          * @param {string} uid A unique string
          * @param {Array<StoredItem>} items
          */
@@ -876,7 +957,11 @@ export const InventoryView = {
             forceOpenInventory = false,
             maxWeight: number = Number.MAX_SAFE_INTEGER,
             showPrices: boolean = false,
+            storageName: string = undefined,
         ) {
+            // Before opening a storage make sure all other storages of same type are closed.
+            Internal.closeStorage(player.id, player);
+
             if (forceOpenInventory) {
 
                 player.emit(INVENTORY_EVENTS.TO_CLIENT.FORCEOPEN);
@@ -885,7 +970,7 @@ export const InventoryView = {
             }
 
             // If the matching uid is already open; we do not open it for others.
-            if (Object.values(openStorageSessions).includes(uid)) {
+            if (Internal.isStorageOpen(uid)) {
                 return;
             }
 
@@ -898,7 +983,7 @@ export const InventoryView = {
             openStoragesWeight[player.id] = maxWeight;
             const fullStorageList = Athena.systems.inventory.manager.convertFromStored(openStorages[player.id]);
             //TODO: Calculate weight
-            Athena.webview.emit(player, INVENTORY_EVENTS.TO_WEBVIEW.SET_CUSTOM, fullStorageList, storageSize, 0, maxWeight, showPrices);
+            Athena.webview.emit(player, INVENTORY_EVENTS.TO_WEBVIEW.SET_CUSTOM, fullStorageList, storageName, storageSize, 0, maxWeight, showPrices);
         },
         /**
          * Updates a storage session with new data.
@@ -932,7 +1017,7 @@ export const InventoryView = {
          * @return {void}
          */
         isSessionInUse(uid: string) {
-            return Object.values(openStorageSessions).includes(uid);
+            return Internal.isStorageOpen(uid);
         },
 
         /** Returns current open storage id */
@@ -962,7 +1047,12 @@ export const InventoryView = {
             storageSize: number,
             forceOpenInventory = false,
             maxWeight: number = Number.MAX_SAFE_INTEGER,
+            machineName: string = undefined,
+            storageName: string = undefined,
         ) {
+            // Before opening a storage make sure all other storages of same type are closed.
+            Internal.closeMachineStorage(player.id, player);
+
             if (forceOpenInventory) {
                 player.emit(INVENTORY_EVENTS.TO_CLIENT.OPEN);
                 await alt.Utils.wait(250);
@@ -994,8 +1084,8 @@ export const InventoryView = {
             const fullMachineStorageList = Athena.systems.inventory.manager.convertFromStored(openMachineStorages[player.id]);
 
             //TODO: Calculate weight
-            Athena.webview.emit(player, INVENTORY_EVENTS.TO_WEBVIEW.SET_CUSTOM, fullStorageList, storageSize, 0, maxWeight );
-            Athena.webview.emit(player, INVENTORY_EVENTS.TO_WEBVIEW.SET_MACHINE, fullMachineStorageList, machineStorageSize, 0, machineMaxWeight);
+            Athena.webview.emit(player, INVENTORY_EVENTS.TO_WEBVIEW.SET_CUSTOM, fullStorageList, storageName, storageSize, 0, maxWeight);
+            Athena.webview.emit(player, INVENTORY_EVENTS.TO_WEBVIEW.SET_MACHINE, fullMachineStorageList, machineName, machineStorageSize, 0, machineMaxWeight);
         },
         /**
          * Updates a storage session with new data.
@@ -1030,11 +1120,97 @@ export const InventoryView = {
          * @return {void}
          */
         isSessionInUse(uid: string) {
-            return Object.values(openMachineStorageSessions).includes(uid);
+            return Internal.isStorageOpen(uid);
         },
         /** Returns current open machine storage id */
         getOpenMachineStorageId(player: alt.Player) {
             return openMachineStorageSessions[player.id];
+        }
+
+    },
+    secondStorage: {
+        /**
+         * Allows opening a side-panel with an array of items next to the inventory.
+         * The array of items will be returned through a callback.
+         * Utilize the callback system to obtain the modified storage data.
+         *
+         * @param {alt.Player} player An alt:V Player Entity
+         * @param {string} uid A unique string
+         * @param {Array<StoredItem>} items
+         */
+        async open(
+            player: alt.Player,
+            secondStorageUid: string,
+            secondStorageItems: Array<StoredItem>,
+            secondStorageSize: number,
+            secondStorageMaxWeight: number = Number.MAX_SAFE_INTEGER,
+            forceOpenInventory = false,
+            storageName: string = undefined,
+        ) {
+            // Before opening a storage make sure all other storages of same type are closed.
+            Internal.closeSecondStorage(player.id, player);
+
+            if (forceOpenInventory) {
+                player.emit(INVENTORY_EVENTS.TO_CLIENT.OPEN);
+                await alt.Utils.wait(250);
+            }
+
+            // If the matching uid is already open; we do not open it for others.
+            if (Internal.isStorageOpen(secondStorageUid)) {
+                return;
+            }
+
+            if (secondStorageSize < secondStorageItems.length) {
+                secondStorageSize = secondStorageItems.length;
+            }
+
+            openSecondStorages[player.id] = deepCloneArray<StoredItem>(secondStorageItems);
+            openSecondStorageSessions[player.id] = secondStorageUid;
+            openMachineStoragesWeight[player.id] = secondStorageMaxWeight;
+
+            const fullSecondStorageList = Athena.systems.inventory.manager.convertFromStored(openSecondStorages[player.id]);
+
+            //TODO: Calculate weight
+            Athena.webview.emit(player, INVENTORY_EVENTS.TO_WEBVIEW.SET_SECOND, fullSecondStorageList, storageName, secondStorageSize, 0, secondStorageMaxWeight);
+        },
+        /**
+         * Updates a storage session with new data.
+         *
+         * @param {alt.Player} player An alt:V Player Entity
+         * @param {Array<StoredItem>} items
+         */
+        resync(player: alt.Player) {
+            if (!openSecondStorages[player.id]) {
+                return;
+            }
+
+            const fullStorageList = Athena.systems.inventory.manager.convertFromStored(openSecondStorages[player.id]);
+            //TODO: Calculate weight
+            // alt.logWarning('resync machine storage, JSON: ' + JSON.stringify(fullStorageList));
+            Athena.webview.emit(player, INVENTORY_EVENTS.TO_WEBVIEW.SET_SECOND, fullStorageList);
+        },
+        /**
+         * Returns true if a player is using the matching session uid.
+         *
+         * @param {alt.Player} player An alt:V Player Entity
+         * @param {string} uid A unique string
+         * @return {void}
+         */
+        isUsingSession(player: alt.Player, uid: string) {
+            return openSecondStorageSessions[player.id] === uid;
+        },
+        /**
+         * Returns true if the session with a specific uid is in use.
+         *
+         * @param {string} uid A unique string
+         * @return {void}
+         */
+        isSessionInUse(uid: string) {
+            return Internal.isStorageOpen(uid);
+        },
+        /** Returns current open second storage id */
+        getOpenSecondStorageId(player: alt.Player) {
+            return openSecondStorageSessions[player.id];
         }
     },
 };

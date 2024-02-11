@@ -1,8 +1,8 @@
-export type InventoryType = 'inventory' | 'toolbar' | 'custom' | 'machine';
+export type InventoryType = 'inventory' | 'toolbar' | 'custom' | 'second' | 'machine';
 
 export interface SlotInfo {
     slot: number;
-    location: 'inventory' | 'toolbar' | 'custom' | 'machine';
+    location: 'inventory' | 'toolbar' | 'custom' | 'second' | 'machine';
     hasItem: boolean;
     quantity: number;
     name: string;

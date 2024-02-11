@@ -21,6 +21,10 @@ let DEFAULT_CONFIG = {
         size: 256,
         weight: 64,
     },
+    second: {
+        size: 256,
+        weight: 64,
+    },
     machine: {
         size: 9,
         weight: 5,

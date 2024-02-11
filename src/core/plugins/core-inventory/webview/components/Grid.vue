@@ -117,11 +117,58 @@
                     <span class="weight-text">
                         {{ machineTotalWeight.toFixed(2) }} / {{ weightLimits.machine }} {{ config.units }}
                     </span>
+                    <span class="storage-name-text">
+                        {{ machineName }}
+                    </span>
                 </div>
             </div>
         </div>
         <div class="spacer">&nbsp;</div>
-        <div class="inventory-frame" v-if="custom && Array.isArray(custom)">
+        <div class="inventory-frame inventory-frame-small" v-if="second && Array.isArray(second)">
+            <div class="inventory-slots-max">
+                <Slot
+                    v-for="(slot, index) in slotLimits.second"
+                    class="slot"
+                    :class="getSelectedItemClass('second', index)"
+                    :key="index"
+                    :id="getID('second', index)"
+                    :info="getSlotInfo('second', index)"
+                    :showPrice="showSecondPrices"
+                    @mouseenter="updateDescriptor('second', index)"
+                    @mouseleave="updateDescriptor(undefined, undefined)"
+                    @mousedown="
+                        (e) => drag(e, { endDrag, canBeDragged: hasItem('second', index), singleClick, startDrag })
+                    "
+                >
+                    <template v-slot:image v-if="hasItem('second', index)">
+                        <img
+                            :src="getImagePath(getItem('second', index))"
+                            :class="`outlined-image-${getItemSex('second',index)}`"
+                        />
+                    </template>
+                    <template v-slot:index v-else>
+                        <template v-if="config.showGridNumbers">
+                            {{ slot }}
+                        </template>
+                    </template>
+                </Slot>
+            </div>
+            <div class="weight-frame" v-if="config.isWeightEnabled">
+                <div class="split">
+                    <div class="icon pr-2">
+                        <Icon class="grey--text text--lighten-1" :noSelect="true" :size="18" icon="icon-anvil"></Icon>
+                    </div>
+                    <span class="weight-text">
+                        {{ secondTotalWeight.toFixed(2) }} / {{ weightLimits.second }} {{ config.units }}
+                    </span>
+                    <span class="storage-name-text">
+                        {{ secondName }}
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="spacer">&nbsp;</div>
+        <div class="inventory-frame inventory-frame-small" v-if="custom && Array.isArray(custom)">
             <div class="inventory-slots-max">
                 <Slot
                     v-for="(slot, index) in slotLimits.custom"
@@ -157,6 +204,9 @@
                     </div>
                     <span class="weight-text">
                         {{ customTotalWeight.toFixed(2) }} / {{ weightLimits.custom }} {{ config.units }}
+                    </span>
+                    <span class="storage-name-text">
+                        {{ customName }}
                     </span>
                 </div>
             </div>
@@ -247,6 +297,9 @@
                     <span class="weight-text">
                         {{ totalWeight.toFixed(2) }} / {{ weightLimits.inventory }} {{ config.units }}
                     </span>
+                    <span class="storage-name-text">
+                        Inventory
+                    </span>
                 </div>
             </div>
             <Context :contextTitle="context.title" :x="context.x" :y="context.y" v-if="context && contextShow">
@@ -321,20 +374,24 @@ export default defineComponent({
             toolbar: [] as Array<Item>,
             inventory: [] as Array<Item>,
             custom: [] as Array<Item>,
+            second: [] as Array<Item>,
             machine: [] as Array<Item>,
             slotLimits: {
                 inventory: 30,
                 toolbar: 5,
                 custom: 35,
+                second: 35,
                 machine: 12,
             },
             weightLimits: {
                 inventory: 64,
                 toolbar: 64,
                 custom: 64,
+                second: 64,
                 machine: 5,
             },
             showCustomPrices: false,
+            showSecondPrices: false,
             recipe: {
                 recipeMode: "Produce",
                 recipeMachine: "BBQ Grill",
@@ -443,7 +500,11 @@ export default defineComponent({
             itemDescription: '',
             totalWeight: 0,
             customTotalWeight: 0,
+            secondTotalWeight: 0,
             machineTotalWeight: 0,
+            customName: '',
+            secondName: '',
+            machineName: '',
             splitData: undefined as { name: string; slot: number; quantity: number, inventoryType: InventoryType},
             giveData: undefined as { name: string; slot: number; quantity: number, inventoryType: InventoryType },
             config: {
@@ -650,13 +711,17 @@ export default defineComponent({
                 this.weightLimits = newWeightLimits;
             }
         },
-        setCustomItems(customItems: Array<Item>, maximumSize: number, totalWeight: number, maxWeight: number, showPrices: boolean = true) {
+        setCustomItems(customItems: Array<Item>, customName: string, maximumSize: number, totalWeight: number, maxWeight: number, showPrices: boolean = false) {
             if (typeof customItems === 'undefined') {
                 customItems = [];
             }
 
             this.custom = customItems;
             this.showCustomPrices = showPrices;
+
+            if(typeof customName !== 'undefined') {
+                this.secondName = customName;
+            }
 
             if (typeof maximumSize !== 'undefined') {
                 const newSlotLimits = { ...this.slotLimits };
@@ -674,14 +739,44 @@ export default defineComponent({
                 this.weightLimits = newWeightLimits;
             }
         },
-        setMachineItems(machineItems: Array<Item>, maximumSize: number, totalWeight: number, maxWeight: number) {
+        setSecondItems(secondItems: Array<Item>, secondName: string, maximumSize: number, totalWeight: number, maxWeight: number, showPrices: boolean = false) {
+            if (typeof secondItems === 'undefined') {
+                secondItems = [];
+            }
+
+            this.second = secondItems;
+            this.showSecondPrices = showPrices;
+
+            if(typeof secondName !== 'undefined') {
+                this.secondName = secondName;
+            }
+
+            if (typeof maximumSize !== 'undefined') {
+                const newSlotLimits = { ...this.slotLimits };
+                newSlotLimits.second = maximumSize;
+                this.slotLimits = newSlotLimits;
+            }
+            
+            if (typeof totalWeight !== 'undefined') {
+                this.secondTotalWeight = totalWeight;
+            }            
+
+            if (typeof maxWeight !== 'undefined') {
+                const newWeightLimits = { ...this.slotLimits };
+                newWeightLimits.second = maxWeight;
+                this.weightLimits = newWeightLimits;
+            }
+        },
+        setMachineItems(machineItems: Array<Item>, machineName: string, maximumSize: number, totalWeight: number, maxWeight: number) {
             if (typeof machineItems === 'undefined') {
                 machineItems = [];
             }
 
-            console.log('machineItems: ' + JSON.stringify(machineItems));
-            console.log('maximumSize: ' + maximumSize);
             this.machine = machineItems;
+
+            if(typeof machineName !== 'undefined') {
+                this.machineName = machineName;
+            }
 
             if (typeof maximumSize !== 'undefined') {
                 const newSlotLimits = { ...this.slotLimits };
@@ -917,10 +1012,15 @@ export default defineComponent({
     },
     mounted() {
         this.custom = undefined;
+        this.second = undefined;
         this.machine = undefined;
+        this.customName = '';
+        this.secondName = '';
+        this.machineName = '';   
 
         if ('alt' in window) {
             WebViewEvents.on(INVENTORY_EVENTS.TO_WEBVIEW.SET_CUSTOM, this.setCustomItems);
+            WebViewEvents.on(INVENTORY_EVENTS.TO_WEBVIEW.SET_SECOND, this.setSecondItems)
             WebViewEvents.on(INVENTORY_EVENTS.TO_WEBVIEW.SET_MACHINE, this.setMachineItems)
             WebViewEvents.on(INVENTORY_EVENTS.TO_WEBVIEW.SET_INVENTORY, this.setItems);
             WebViewEvents.on(INVENTORY_EVENTS.TO_WEBVIEW.SET_SIZE, this.setSize);
@@ -977,7 +1077,12 @@ export default defineComponent({
         );
 
         this.setCustomItems([exampleItem]);
+        this.setSecondItems([exampleItem2]);
         this.setMachineItems(recipeItems);
+        this.customName = 'Custom';
+        this.secondName = 'Second';
+        this.machineName = 'Machine';
+
     },
     watch: {
         offclick() {
@@ -991,7 +1096,7 @@ export default defineComponent({
 .inventory-split {
     display: flex;
     flex-direction: row;
-    justify-content: flex-end;
+    justify-content: center;
     width: 100%;
     position: relative;
 }
@@ -1011,6 +1116,11 @@ export default defineComponent({
     height: 110%;
     align-self: flex-end;
     position: relative;
+}
+
+.inventory-frame-small {
+    min-width: 400px;
+    max-width: 400px;
 }
 
 .inventory-frame .inventory-toolbar {
@@ -1137,7 +1247,7 @@ export default defineComponent({
 }
 
 .weight-frame {
-    display: flex;
+    /* display: flex; */
     width: 100%;
     min-height: 20px;
     padding: 10px;
@@ -1150,6 +1260,14 @@ export default defineComponent({
     font-family: 'Consolas';
     padding-top: 3px;
 }
+
+.storage-name-text {
+    font-size: 12px;
+    font-family: 'Consolas';
+    padding-top: 3px;
+    margin-left: auto;
+}
+
 
 .sub-menu {
     position: relative; /* Ermöglicht die Positionierung der Untermenü-Elemente */

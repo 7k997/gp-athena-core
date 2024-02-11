@@ -27,6 +27,7 @@ export const INVENTORY_EVENTS = {
     },
     TO_WEBVIEW: {
         SET_CUSTOM: 'inventory:event:set:custom',
+        SET_SECOND: 'inventory:event:set:second',
         SET_MACHINE: 'inventory:event:set:machine',
         SET_INVENTORY: 'inventory:event:set:inventory',
         SET_SIZE: 'inventory:event:set:size',

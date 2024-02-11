@@ -26,7 +26,7 @@ export interface ItemQuantityChange {
     remaining: number;
 }
 
-export type InventoryType = 'inventory' | 'toolbar' | 'custom' | 'machine';
+export type InventoryType = 'inventory' | 'toolbar' | 'custom' | 'second' | 'machine';
 export type ComplexSwap = {
     slot: number;
     data: Array<StoredItem>;
@@ -1014,7 +1014,7 @@ export async function swapBetween(
 export async function useItem(
     player: alt.Player,
     slot: number,
-    type: 'inventory' | 'toolbar' | 'custom' | 'machine' = 'toolbar',
+    type: 'inventory' | 'toolbar' | 'custom' | 'second' | 'machine' = 'toolbar',
     eventToCall: string | string[] = undefined,
 ) {
     if (Overrides.useItem) {

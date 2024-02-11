@@ -1,11 +1,11 @@
 import * as alt from 'alt-server';
 import * as Athena from '@AthenaServer/api/index.js';
 
-export type InventoryType = 'inventory' | 'toolbar' | 'custom' | 'machine';
+export type InventoryType = 'inventory' | 'toolbar' | 'custom' | 'second' | 'machine';
 export type EffectCallback = (
     player: alt.Player,
     slot: number,
-    type: 'inventory' | 'toolbar' | 'custom' | 'machine',
+    type: 'inventory' | 'toolbar' | 'custom' | 'second' | 'machine',
 ) => void;
 
 const effects: Map<string, EffectCallback> = new Map();
