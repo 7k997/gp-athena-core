@@ -83,6 +83,22 @@ export function getDoors(): Array<Door & { entity: alt.VirtualEntity }> {
     return globalDoors;
 }
 
+export function getNearestDoorByHash(hash: number, pos: alt.Vector3): Door | null {
+    const doorsByDistance = globalDoors.filter((door) => door.model === hash && Athena.utility.vector.distance(pos, door.pos) < 5);
+    if (!doorsByDistance || doorsByDistance.length === 0) {
+        return null;
+    }
+
+    const nearestDoors = doorsByDistance.sort((a, b) => {
+        const distA = Athena.utility.vector.distance2d(pos, a.pos);
+        const distB = Athena.utility.vector.distance2d(pos, b.pos);
+
+        return distA - distB;
+    });
+
+    return nearestDoors[0];
+}
+
 /**
  * Remove all controls from a door.
  *
@@ -145,6 +161,26 @@ export async function update(uid: string, isUnlocked: boolean): Promise<boolean>
 
     if (existingDoor) {
         await Database.updatePartialData(existingDoor._id.toString(), { isUnlocked: isUnlocked }, Collections.Doors);
+    } else {
+        await Database.insertData(globalDoors[index], Collections.Doors);
+    }
+
+    return true;
+}
+
+export async function updatePartialData(uid: string, data: Partial<Door>): Promise<boolean> {
+    const index = globalDoors.findIndex((door) => door.uid === uid);
+    if (index <= -1) {
+        return false;
+    }
+
+    globalDoors[index] = { ...globalDoors[index], ...data };
+    globalDoors[index].entity.setStreamSyncedMeta('door', deepCloneObject(globalDoors[index]));
+
+    const existingDoor = await Database.fetchData<DoorDocument>('uid', uid, Collections.Doors);
+
+    if (existingDoor) {
+        await Database.updatePartialData(existingDoor._id.toString(), data, Collections.Doors);
     } else {
         await Database.insertData(globalDoors[index], Collections.Doors);
     }

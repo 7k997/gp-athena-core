@@ -40,4 +40,20 @@ export interface Door {
      *
      */
     isUnlocked: boolean;
+
+    /**
+     * The lock of the door.
+     *
+     * @type {string}
+     *
+     */
+    lockID?: string;
+
+    /**
+     * The lock type of the door.
+     *
+     * @type {string}
+     *
+     */
+    lockType?: string;
 }

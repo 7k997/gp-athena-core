@@ -105,16 +105,48 @@ function onStreamSyncedMetaChanged(entity: alt.Object, key: string, value: any) 
     doors[index] = { ...data, entity };
 }
 
-function getData(object: alt.Object): Door {
+export function getData(object: alt.Object): Door {
     return object.getStreamSyncedMeta('door') as Door;
 }
 
-function isDoor(object: alt.Object) {
+export function isDoor(object: alt.Object) {
     if (!(object instanceof alt.VirtualEntity)) {
         return false;
     }
 
     return object.getStreamSyncedMeta('type') === 'door';
+}
+
+export function getVirtualEntity(hash: number, pos: alt.Vector3): alt.Object {
+    const doorsByDistance = doors.filter((x) => x.model === hash && AthenaClient.utility.vector.distance2d(pos, x.pos) < 5);
+    if (!doorsByDistance || doorsByDistance.length === 0) {
+        return undefined;
+    }
+
+    const nearestDoors = doorsByDistance.sort((a, b) => {
+        const distA = AthenaClient.utility.vector.distance2d(pos, a.pos);
+        const distB = AthenaClient.utility.vector.distance2d(pos, b.pos);
+
+        return distA - distB;
+    });
+
+    return nearestDoors[0] ? nearestDoors[0].entity : undefined;
+}
+
+export function getDoor(hash: number, pos: alt.Vector3): Door {
+    const doorsByDistance = doors.filter((x) => x.model === hash && AthenaClient.utility.vector.distance2d(pos, x.pos) < 5);
+    if (!doorsByDistance || doorsByDistance.length === 0) {
+        return undefined;
+    }
+
+    const nearestDoors = doorsByDistance.sort((a, b) => {
+        const distA = AthenaClient.utility.vector.distance2d(pos, a.pos);
+        const distB = AthenaClient.utility.vector.distance2d(pos, b.pos);
+
+        return distA - distB;
+    });
+
+    return nearestDoors[0] ? nearestDoors[0] : undefined;
 }
 
 alt.on('worldObjectStreamIn', onStreamEnter);
