@@ -1,6 +1,6 @@
 export const Config = {
     //DEBUG SETTINGS
-    DEBUG: false,
+    DEBUG: true,
     DEBUG_INFO: false,
     DEBUG_WARNING: true,
     DEVTOOLS: true, //Enable dev tools, in test set to false for test and production!
@@ -46,6 +46,10 @@ export const Config = {
     DEFAULT_PICKUP_DISTANCE: 2, //Default pickup distance for objects. (Athena Core Default is 2)
     DEFAULT_OBJECT_DROP_COLLISSION: true, //If not specified in item, the default collision state for dropped objects.
     DEFAULT_OBJECT_DROP_FROZEN: false, //If not specified in item, the default frozen state for dropped objects.
+    DEFAULT_OBJECT_DROP_MODEL: 'prop_cs_box_clothes', //If not specified in item, the default model for dropped objects.
+    DEFAULT_OBJECT_DROP_MODEL_HEAVY: 'prop_cs_cardbox_01', //If not specified in item, the default model for dropped objects.
+    DEFAULT_OBJECT_DROP_MODEL_HEAVY_WEIGHT: 2, //Use Heavy model if the weight is higher than this value.
+    DEFAULT_PED_DROP_MODEL: 'a_f_y_vinewood_04', //If not specified in item, the default model for dropped peds.
     INTERACTION_DISPLAY_NAME_ENABLED: true, //Display the interaction display name. (Default is true)
 
     //TODO: Configuration for Corechanges. These are quickly added and only working with some changes in core. These changes should

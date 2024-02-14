@@ -9,8 +9,6 @@ import { Config } from '@AthenaPlugins/gp-athena-overrides/shared/config.js';
 
 const drops: { [uid: string]: alt.Object | alt.Ped} = {};
 
-let defaultModel = 'prop_cs_cardbox_01';
-
 /**
  * Append item drop information to the server.
  *
@@ -49,6 +47,10 @@ export function append(itemDrop: ItemDrop): string {
         pedEntity.setStreamSyncedMeta(ITEM_SYNCED_META.ITEM_DROP_INFO, deepCloneObject(itemDrop));
         drops[String(itemDrop._id)] = pedEntity;
     } else {
+        let defaultModel = Config.DEFAULT_OBJECT_DROP_MODEL;
+        if (itemDrop.totalWeight && itemDrop.totalWeight > Config.DEFAULT_OBJECT_DROP_MODEL_HEAVY_WEIGHT) {
+            defaultModel = Config.DEFAULT_OBJECT_DROP_MODEL_HEAVY;
+        } 
     const object = new alt.Object(
         itemDrop.model ? itemDrop.model : defaultModel,
         itemDrop.pos,
@@ -97,16 +99,6 @@ export function remove(id: string): boolean {
 export function update(itemDrop: ItemDrop): boolean {
     drops[String(itemDrop._id)].setStreamSyncedMeta(ITEM_SYNCED_META.ITEM_DROP_INFO, deepCloneObject(itemDrop));
     return true;
-}
-
-/**
- * Overrides the default model for item drops.
- * By default it is a cardboard box.
- *
- * @param {string} model
- */
-export function setDefaultDropModel(model: string) {
-    defaultModel = model;
 }
 
 type ItemDropFuncs = ControllerFuncs<typeof append, typeof remove>;

@@ -930,7 +930,8 @@ export default defineComponent({
             }
 
             if (type === 'drop') {
-                WebViewEvents.emitServer(INVENTORY_EVENTS.TO_SERVER.DROP, inventoryType, slot);
+                const item = this.getItem(inventoryType, slot);
+                WebViewEvents.emitClient(INVENTORY_EVENTS.FROM_WEBVIEW.DROP_ONGROUND_PROPERLY, inventoryType, slot, item.model);
                 return;
             }
         },

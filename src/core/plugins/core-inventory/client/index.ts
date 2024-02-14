@@ -24,6 +24,8 @@ let isOpen = false;
 let ped: number;
 let previousHudColor: alt.RGBA;
 
+let tempObject: number;
+
 function onUpdate(_inventory: Array<Item>, _toolbar: Array<Item>, _totalWeight: number) {
     inventory = _inventory;
     toolbar = _toolbar;
@@ -95,6 +97,37 @@ function getClosestPlayers() {
     }
 
     AthenaClient.webview.emit(INVENTORY_EVENTS.FROM_CLIENT.SET_CLOSEST_PLAYERS, validPlayers);
+}
+
+function dropItemOnGroundProperly(inventoryType: string, slot: number, _model: string) {
+    let defaultModel = Config.DEFAULT_OBJECT_DROP_MODEL;
+    if (totalWeight && totalWeight > Config.DEFAULT_OBJECT_DROP_MODEL_HEAVY_WEIGHT) {
+        defaultModel = Config.DEFAULT_OBJECT_DROP_MODEL_HEAVY;
+    }
+
+    let model = _model ? _model : defaultModel;
+    const player = alt.Player.local;
+    const placeDistance = 0.5;
+    const frontPosition = AthenaClient.utility.vector.getVectorInFrontOfPlayer(player, placeDistance);
+    tempObject = native.createObject(
+        alt.hash(model),
+        frontPosition.x,
+        frontPosition.y,
+        frontPosition.z - 1,
+        true,
+        true,
+        true,
+    );
+
+    native.freezeEntityPosition(tempObject, true);
+    native.placeObjectOnGroundProperly(tempObject);
+
+    const newPosition = native.getEntityCoords(tempObject, true);
+
+    alt.emitServer(INVENTORY_EVENTS.TO_SERVER.DROP, inventoryType, slot, newPosition);
+
+    native.deleteEntity(tempObject);
+    tempObject = null;
 }
 
 function init() {
@@ -211,6 +244,7 @@ function init() {
     AthenaClient.systems.playerConfig.addCallback('inventory-weight-enabled', onInventoryWeightStateChange);
     AthenaClient.systems.playerConfig.addCallback('inventory-max-weight', onInventoryMaxWeightChange);
     AthenaClient.webview.on(INVENTORY_EVENTS.FROM_WEBVIEW.GET_CLOSEST_PLAYERS, getClosestPlayers);
+    AthenaClient.webview.on(INVENTORY_EVENTS.FROM_WEBVIEW.DROP_ONGROUND_PROPERLY, dropItemOnGroundProperly);
 
     alt.onServer(INVENTORY_EVENTS.TO_CLIENT.OPEN, () => {
         page.open();

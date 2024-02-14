@@ -148,7 +148,7 @@ const Internal = {
 
         Athena.systems.inventory.manager.useItem(player, slot, type, eventToCall);
     },
-    async drop(player: alt.Player, type: InventoryType, slot: number) {
+    async drop(player: alt.Player, type: InventoryType, slot: number, _position?: alt.Vector3) {
         if (type === 'custom') {
             return;
         }
@@ -188,18 +188,23 @@ const Internal = {
         await Athena.document.character.set(player, type, newDataSet);
 
         //Corechange: Drop item in front of player
+        alt.logWarning('Position: ' + JSON.stringify(_position));
+        let position = null
+        if (_position) {
+            position = _position;
+        } else {
         const forwardVector = getForwardVector(player.rot);
-        let position = new alt.Vector3(
+            position = new alt.Vector3(
             player.pos.x + forwardVector.x * 1,
             player.pos.y + forwardVector.y * 1,
             player.pos.z - 1,
         );
-
+        }
         let rotation = alt.Vector3.zero;
         if (Config.DEBUG) alt.logWarning('DropItem: ' + JSON.stringify(baseItem));
         if (baseItem.zaxisadjustment) {
             if (Config.DEBUG) alt.logWarning(`zaxisadjustment: ${baseItem.zaxisadjustment}`);
-            position = new alt.Vector3(player.pos.x, player.pos.y, player.pos.z - 1 + baseItem.zaxisadjustment);
+            position = new alt.Vector3(position.x, position.y, position.z + baseItem.zaxisadjustment);
         }
 
         if (baseItem.rotation) {
@@ -826,7 +831,6 @@ const Internal = {
         delete item._id;
         delete item.pos;
         delete item.expiration;
-        delete item.name;
         delete item.frozen;
         delete item.collision;
         delete item.maxDistance;

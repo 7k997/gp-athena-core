@@ -21,6 +21,7 @@ export const INVENTORY_EVENTS = {
     FROM_WEBVIEW: {
         READY: 'inventory:event:ready',
         GET_CLOSEST_PLAYERS: 'inventory:get:closest:players',
+        DROP_ONGROUND_PROPERLY: 'inventory:event:drop:onground:properly',
     },
     FROM_CLIENT: {
         SET_CLOSEST_PLAYERS: 'inventory:set:closest:players',
