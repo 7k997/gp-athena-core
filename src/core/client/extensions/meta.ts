@@ -24,4 +24,8 @@ export interface Meta {
 
     // Player Info
     appearance: Appearance;
+
+    // Keys
+    lockIDs: number[];
+    mainLockIDs: number[];
 }

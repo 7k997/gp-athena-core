@@ -47,7 +47,7 @@ export interface Door {
      * @type {string}
      *
      */
-    lockID?: string;
+    lockID?: number;
 
     /**
      * The lock type of the door.

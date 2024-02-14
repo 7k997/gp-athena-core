@@ -3,6 +3,7 @@ import * as Athena from '@AthenaServer/api/index.js';
 import { Character } from '@AthenaShared/interfaces/character.js';
 import { KnownKeys } from '@AthenaShared/utility/knownKeys.js';
 import { SYSTEM_EVENTS } from '@AthenaShared/enums/system.js';
+import * as PlayerEvents from '../player/events.js';
 import Database from '@stuyk/ezmongodb';
 
 export type KeyChangeCallback = (player: alt.Player, newValue: any, oldValue: any) => void;
@@ -230,6 +231,7 @@ export async function set<T = {}, Keys = keyof KnownKeys<Character & T>>(
 
     Athena.webview.emit(player, SYSTEM_EVENTS.PLAYER_EMIT_STATE, data);
     Athena.config.player.set(player, 'character-data', data);
+    PlayerEvents.trigger('character-data-change', player);
 
     if (typeof callbacks[typeSafeFieldName] === 'undefined') {
         return;

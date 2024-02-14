@@ -9,6 +9,7 @@ export type AthenaPlayerEvents =
     | 'item-equipped'
     | 'item-unequipped'
     | 'pickup-item'
+    | 'character-data-change'
     | 'player-account-created'
     | 'player-character-created'
     | 'player-armour-set'
@@ -187,6 +188,15 @@ export function on(eventName: 'drop-item', callback: (player: alt.Player, stored
  * @param {(player: alt.Player, _id: string) => void} callback
  */
 export function on(eventName: 'pickup-item', callback: (player: alt.Player, _id: string) => void);
+
+/**
+ * Called every time a character's data has changed.
+ *
+ *
+ * @param {'character-data-change'} eventName
+ * @param {(player: alt.Player) => void} callback
+ */
+export function on(eventName: 'character-data-change', callback: (player: alt.Player) => void);
 
 /**
  * Called when a player selects a character

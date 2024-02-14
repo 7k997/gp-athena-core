@@ -1,5 +1,6 @@
 /**
  *
+ * Some events still in used. TODO: Cleanup!
  * @ignore
  *
  * @enum {number}
@@ -169,8 +170,7 @@ export enum SYSTEM_EVENTS {
     WEBVIEW_INFO = 'webview:Info',
     //
     WEATHER_CHANGE_TO = 'weather:change:to',
-
-    //TODO: cllothings test!
+    //
     META_SET = 'meta:Set',
     META_CHANGED = 'meta:Changed',
 }

@@ -12,6 +12,7 @@ type DoorDocument = Door & { _id?: unknown };
 const MAX_MARKERS_TO_DRAW = 10;
 const doorGroup = new alt.VirtualEntityGroup(MAX_MARKERS_TO_DRAW);
 const globalDoors: (Door & { entity: alt.VirtualEntity })[] = [];
+let lastReservedLockID = 100;
 
 const InternalController = {
     create(door: Door) {
@@ -34,6 +35,7 @@ const InternalController = {
             }
 
             globalDoors[index].isUnlocked = door.isUnlocked;
+            lastReservedLockID = Math.max(lastReservedLockID, door.lockID);
             globalDoors[index].entity.setStreamSyncedMeta('door', deepCloneObject(globalDoors[index]));
         }
     },
@@ -81,6 +83,11 @@ export function append(door: Door): string {
  */
 export function getDoors(): Array<Door & { entity: alt.VirtualEntity }> {
     return globalDoors;
+}
+
+export function getNextDoorLockID(): number {
+    lastReservedLockID += 1;
+    return lastReservedLockID;
 }
 
 export function getNearestDoorByHash(hash: number, pos: alt.Vector3): Door | null {
