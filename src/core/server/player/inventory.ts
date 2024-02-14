@@ -337,7 +337,6 @@ export async function updateItem(player: alt.Player, slot: number, item: StoredI
     delete item['_id'];
     delete item['pos'];
     delete item['expiration'];
-    delete item.name;
     delete item['frozen'];
     delete item['collision'];
     delete item['maxDistance'];

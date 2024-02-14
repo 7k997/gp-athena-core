@@ -191,8 +191,8 @@ export async function add(
     }
 
     //Cleanup item
+    if (!item.name || item.name === '') item.name = baseItem.name;
     delete item['_id'];
-    delete item.name;
     delete item.slot;
     delete item['customEventsToCall'];
     delete item['behavior'];
@@ -201,7 +201,7 @@ export async function add(
 
     let document = await addToDatabase({
         ...item,
-        name: baseItem.name,
+        name: item.name,
         pos: pos,
         rot: rot,
         expiration: expiration,

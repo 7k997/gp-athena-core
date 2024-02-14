@@ -265,7 +265,6 @@ export async function updateItem<CustomData = {}>(
     delete item['_id'];
     delete item['pos'];
     delete item['expiration'];
-    delete item.name;
     delete item['frozen'];
     delete item['collision'];
     delete item['maxDistance'];
@@ -276,6 +275,26 @@ export async function updateItem<CustomData = {}>(
     delete item.description;
 
     toolbarRef[index] = item;
+    await document.character.set(player, 'toolbar', toolbarRef);
+    return true;
+}
+
+export async function updateItemPartial(player: alt.Player, slot: number, updatedItemData: Partial<StoredItem>): Promise<boolean> {
+    const data = document.character.get(player);
+    if (typeof data === 'undefined' || typeof data.toolbar === 'undefined') {
+        return false;
+    }
+
+    const toolbarRef = deepCloneArray<StoredItem>(data.toolbar);
+    const index = toolbarRef.findIndex((x) => x.slot === slot);
+
+    if (index <= -1) {
+        return false;
+    }
+
+    // Aktualisiere nur die übergebenen Eigenschaften des Items
+    toolbarRef[index] = { ...toolbarRef[index], ...updatedItemData };
+
     await document.character.set(player, 'toolbar', toolbarRef);
     return true;
 }
