@@ -114,7 +114,7 @@ const InternalFunctions = {
 /**
  * Create an input box.
  *
- * Retruns a string or undefined based on user input.
+ * Returns a string or undefined based on user input.
  *
  *
  * @param {InputBoxInfo} inputInfo
@@ -130,6 +130,7 @@ export function create(inputInfo: InputBoxInfo, skipMenuCheck = false): Promise<
         }
     } else {
         wasMenuCheckSkipped = true;
+        alt.Player.local.isSubMenuOpen = true;
     }
 
     if (typeof document === 'undefined') {
@@ -157,16 +158,21 @@ export async function cancel() {
 
     internalCallback = undefined;
     alt.off('keyup', InternalFunctions.handleKeyUp);
-    alt.showCursor(false);
+
     alt.toggleRmlControls(false);
+    alt.showCursor(false);
+
+    if (wasMenuCheckSkipped) {
+        alt.Player.local.isSubMenuOpen = false;
+    } else {
+    //let these handle parent menu, see above isSubMenuOpen              
     alt.toggleGameControls(true);
-    native.triggerScreenblurFadeOut(250);
     native.displayHud(true);
     native.displayRadar(true);
-
-    if (!wasMenuCheckSkipped) {
         alt.Player.local.isMenuOpen = false;
     }
+
+    native.triggerScreenblurFadeOut(250);
 
     await alt.Utils.waitFor(() => {
         return native.isScreenblurFadeRunning() === false;

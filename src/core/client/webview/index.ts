@@ -840,6 +840,13 @@ export function isAnyMenuOpen(excludeDead = false): boolean {
     return false;
 }
 
+export function isSubMenuOpen(): boolean {
+    if (alt.Player.local.isSubMenuOpen) {
+        return true;
+    }
+    return false;
+}
+
 export function isAllowToolbarKeys(): boolean {
     if (alt.Player.local.isAllowToolbarKeys) {
         return true;

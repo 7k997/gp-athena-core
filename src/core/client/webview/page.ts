@@ -214,7 +214,7 @@ export class Page {
      *
      */
     async open(forceOpen: boolean = false): Promise<boolean> {
-        if (!forceOpen && this.info.keybind && this.info.keybind.useSameKeyToClose) {
+        if (!forceOpen && this.info.keybind && this.info.keybind.useSameKeyToClose && !AthenaClient.webview.isSubMenuOpen()) {
             if (AthenaClient.webview.isPageOpen(this.info.name)) {
                 this.close(true);
                 return false;

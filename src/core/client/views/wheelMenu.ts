@@ -161,6 +161,11 @@ export async function open(label: string, options: Array<IWheelOptionExt>, setMo
  * @param {boolean} [setMouseToCenter=false]
  */
 export function update(label: string, options: Array<IWheelOptionExt>, setMouseToCenter = false) {
+    if (!alt.Player.local.isMenuOpen) {
+        open(label, options, setMouseToCenter);
+        return;
+    }
+
     _label = label;
     _options = options;
 
