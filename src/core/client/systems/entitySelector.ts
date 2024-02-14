@@ -314,8 +314,7 @@ const Internal = {
                     //Corechange: gp-athena-overrides
                     //Corechange: prevent duplicate entries for dropped items and objects, because there are always both.
                     const droppedItem = AthenaClient.streamers.item.getDropped(object.remoteID);
-                    // FIXME: Log will result in circular structure!!!
-                    // alt.logWarning('try to get dropped item: ' + JSON.stringify(droppedItem));
+
                     if (typeof droppedItem !== 'undefined') {
                         if (Config.DEBUG)
                             alt.logWarning(
