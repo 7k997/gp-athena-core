@@ -34,10 +34,9 @@ export const KEY_BINDS = {
     TOOLBAR_FOUR: 52,
     TOOLBAR_FIVE: 53,
 
-    // E - Interact outside of vehicle
+    // E - Interact outside of vehicle //Shift + E Interact inside vehicle
     INTERACT: 69,
-    // X - Interact in vehicle //Shift + X (Interact) or Alternative Key -> INTERACT_ALT
-    INTERACT_KEY_FOR_VEHICLE: 88,
+
     // F
     VEHICLE_FUNCS: 70, // Driver
     // U

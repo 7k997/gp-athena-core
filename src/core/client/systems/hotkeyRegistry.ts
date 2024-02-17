@@ -72,7 +72,7 @@ const Internal = {
             if (data.vehicleModels && !data.vehicleModels.find((x) => x === alt.Player.local.vehicle.model)) {
                 return false;
             }
-        } else if (data.isVehicle !== undefined || data.isVehicle !== undefined || data.isVehiclePassenger !== undefined) {
+        } else if (!data.isVehicle || !data.isVehicleDriver || !data.isVehiclePassenger) {
 
             if (data.isVehicleDriver === false) {
                 if (alt.Player.local.vehicle && alt.Player.local.seat === 1) {
