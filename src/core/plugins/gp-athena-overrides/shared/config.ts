@@ -4,7 +4,7 @@ export const Config = {
     DEBUG_INFO: false,
     DEBUG_WARNING: true,
     DEVTOOLS: true, //Enable dev tools, in test set to false for test and production!
-    ALT_DEBUG_OVERRIDE: true, //Override some places where alt.debug is used, just to remove somethings in Debug mode. (Default is false)
+    ALT_DEBUG_OVERRIDE: false, //Override some places where alt.debug is used, just to remove somethings in Debug mode. (Default is false)
 
     HIDE_WHEEL_MENU_FOR_OBJECTS_WITHOUT_OPTIONS: true, //Hide the wheel menu for objects without options. (Default is false, if true -> high performance impact)
 
@@ -13,7 +13,14 @@ export const Config = {
     DEFAULT_NOTIFICATION_DURATION: 5000, //Default notification duration in ms.
     DEFAULT_NOTIFICATION_SOUND: 'notification.ogg', //Default notification sound file. Set to null for none.
 
+    //Recommend to keep all distances to 1.5 or 2.0. This is the best value for performance and interaction.
+    //Different values can cause interaction issues. So keep them the same!
     MAX_INTERACTION_DISTANCE: 3, //Max interaction distance for interaction with objects, items, players and NPCs. Athena Default is 25
+    MAX_INTERACTION_DISTANCE_VIRTUAL_ENTITY: 1.5, //Max interaction distance for virtual entity interaction. Athena Default is 5
+    MAX_INTERACTION_DISTANCE_SINGLE_DOOR: 1.5, //Max interaction distance for single door interaction. Athena Default is 5
+    //Very special the door object positon is not the center of the door, it is the position of the door hinge edge.
+    MAX_INTERACTION_DISTANCE_DOUBLE_DOOR: 3, //Max interaction distance for double door interaction. 
+    MIN_INTERACTION_DISTANCE_DOUBLE_DOOR: 1, //Min interaction distance for double door interaction. For excluding doors hedge to hedge.
     MAX_INTERACTION_TARGETS: 50, //Max interaction targets for interaction with objects, items, players and NPCs. Athena Default is 50
     NPC_MENU_DISTANCE: 5, //Max interaction distance for the NPC menu. Athena Default is 5
     ENTITY_SELECTOR_HINT: "seehash", //The hint for the entity selector. If the model of an object is unknown, seehash means look into the hash attribute to get the model hash. (Default is "seehash")

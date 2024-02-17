@@ -231,7 +231,7 @@ export async function set<T = {}, Keys = keyof KnownKeys<Character & T>>(
 
     Athena.webview.emit(player, SYSTEM_EVENTS.PLAYER_EMIT_STATE, data);
     Athena.config.player.set(player, 'character-data', data);
-    PlayerEvents.trigger('character-data-change', player);
+    PlayerEvents.trigger('character-data-change', player, typeSafeFieldName, value, oldValue);
 
     if (typeof callbacks[typeSafeFieldName] === 'undefined') {
         return;

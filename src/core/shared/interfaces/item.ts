@@ -530,6 +530,8 @@ export interface BaseItem<Behavior = DefaultItemBehavior, CustomData = {}> exten
     maxDistancePickup?: number; //TODO: Test and explain - used in item place preview
     zaxisadjustment?: number; //TODO: Test and explain
     rotation?: alt.IVector3; //TODO: Test and explain
+
+    dynamic?: boolean; //If true, the item was created in gameplay and is not in any item file hardcoded
 }
 
 /**

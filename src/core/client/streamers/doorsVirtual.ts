@@ -8,14 +8,22 @@ import { Config } from '@AthenaPlugins/gp-athena-overrides/shared/config.js';
 let doors: Array<Door & { entity }> = [];
 let interval: number;
 
-function draw() {
-    if (alt.Player.local.isWheelMenuOpen) {
-        return;
-    }
+export type DoorOnStreamEnterEvent = (door: Door) => void;
 
-    if (alt.Player.local.isMenuOpen) {
-        return;
-    }
+const DoorOnStreamEnterEvents: Array<DoorOnStreamEnterEvent> = [];
+
+function draw() {
+    //Corechange:
+    //this here is not just drawing. Also the door state is set here.
+    //So this must also be set if a menu is open!!! if not you can sometimes run
+    //through closed doors.
+    // if (alt.Player.local.isWheelMenuOpen) {
+    //     return;
+    // }
+
+    // if (alt.Player.local.isMenuOpen) {
+    //     return;
+    // }
 
     if (doors.length <= 0) {
         return;
@@ -35,8 +43,12 @@ function draw() {
                 new alt.RGBA(255, 255, 255, 255),
             );
         }
-
+        //TODO: Maybe replace through native doorsystem.
         native.setStateOfClosestDoorOfType(door.model, door.pos.x, door.pos.y, door.pos.z, !door.isUnlocked, 0, false);
+        //native.addDoorToSystem(door.lockID, door.model, door.pos.x, door.pos.y, door.pos.z, false, false, false);
+        //native.doorSystemSetDoorState(door.lockID, door.isUnlocked ? 0 : 1, true, false);
+        // native.doorSystemSetAutomaticDistance
+
     }
 }
 
@@ -52,6 +64,10 @@ function onStreamEnter(entity: alt.Object) {
     const data = getData(entity);
     if (!data) {
         return;
+    }
+
+    for (let i = 0; i < DoorOnStreamEnterEvents.length; i++) {
+        DoorOnStreamEnterEvents[i](data);
     }
 
     const index = doors.findIndex((x) => x.uid === data.uid);
@@ -101,8 +117,8 @@ function onStreamSyncedMetaChanged(entity: alt.Object, key: string, value: any) 
         return;
     }
 
-    console.log(doors[index]);
     doors[index] = { ...data, entity };
+    console.log(doors[index]);
 }
 
 export function getData(object: alt.Object): Door {
@@ -118,7 +134,7 @@ export function isDoor(object: alt.Object) {
 }
 
 export function getVirtualEntity(hash: number, pos: alt.Vector3): alt.Object {
-    const doorsByDistance = doors.filter((x) => x.model === hash && AthenaClient.utility.vector.distance2d(pos, x.pos) < 5);
+    const doorsByDistance = doors.filter((x) => x.model === hash && AthenaClient.utility.vector.distance2d(pos, x.pos) < Config.MAX_INTERACTION_DISTANCE_VIRTUAL_ENTITY);
     if (!doorsByDistance || doorsByDistance.length === 0) {
         return undefined;
     }
@@ -133,20 +149,122 @@ export function getVirtualEntity(hash: number, pos: alt.Vector3): alt.Object {
     return nearestDoors[0] ? nearestDoors[0].entity : undefined;
 }
 
-export function getDoor(hash: number, pos: alt.Vector3): Door {
-    const doorsByDistance = doors.filter((x) => x.model === hash && AthenaClient.utility.vector.distance2d(pos, x.pos) < 5);
+export function getNearestDoorByHash(hash: number, pos: alt.Vector3): Door {
+    const doorsByDistance = doors.filter((x) => x.model === hash && AthenaClient.utility.vector.distance(pos, x.pos) < Config.MAX_INTERACTION_DISTANCE_SINGLE_DOOR);
     if (!doorsByDistance || doorsByDistance.length === 0) {
         return undefined;
     }
 
     const nearestDoors = doorsByDistance.sort((a, b) => {
-        const distA = AthenaClient.utility.vector.distance2d(pos, a.pos);
-        const distB = AthenaClient.utility.vector.distance2d(pos, b.pos);
+        const distA = AthenaClient.utility.vector.distance(pos, a.pos);
+        const distB = AthenaClient.utility.vector.distance(pos, b.pos);
 
         return distA - distB;
     });
 
     return nearestDoors[0] ? nearestDoors[0] : undefined;
+}
+
+export function getDoorByHash(hash: number, pos: alt.Vector3): Door {
+    const explicitDoor = doors.filter((x) => x.model === hash && x.pos.x === pos.x && x.pos.y === pos.y && x.pos.z === pos.z);
+    if (!explicitDoor || explicitDoor.length === 0) {
+        return undefined;
+    }
+
+    return explicitDoor[0] ? explicitDoor[0] : undefined;
+}
+
+export function getDoubleDoorsByHashes(combinedHashes: Array<number>, combinedPositions: Array<alt.Vector3>, _pos: alt.Vector3): Array<Door> {
+    let pos = _pos;
+
+    //Check for correct position for overlapping doors
+    // Verify if the first door is the correct one
+    // Very special case for 2 double doors beside each other.
+    // In some MLOs the doors are overlapping. So we will get the wrong door.
+    if (combinedPositions && combinedPositions.length > 0) {
+        for (let i = 0; i < combinedPositions.length; i++) {
+            if (combinedPositions[i].x === pos.x && combinedPositions[i].y === pos.y && combinedPositions[i].z === pos.z) {
+                continue;
+            }
+
+            const distance = AthenaClient.utility.vector.distance(_pos, combinedPositions[i]);
+            if (distance < Config.MIN_INTERACTION_DISTANCE_DOUBLE_DOOR) {
+                pos = combinedPositions[i];
+                break;
+            }
+        }
+    }
+
+    alt.logWarning('Getting double doors by combined hash: ' + combinedHashes.join(', ') + ' at ' + pos + ' with max distance: ' + Config.MAX_INTERACTION_DISTANCE_DOUBLE_DOOR);
+    alt.logWarning('Combined Positions: ' + JSON.stringify(combinedPositions));
+    const doorsByDistance = doors.filter((door) => combinedHashes.includes(door.model) && AthenaClient.utility.vector.distance(pos, door.pos) < Config.MAX_INTERACTION_DISTANCE_DOUBLE_DOOR);
+
+    const sortedDoors = doorsByDistance.sort((a, b) => {
+        const distA = AthenaClient.utility.vector.distance(pos, a.pos);
+        const distB = AthenaClient.utility.vector.distance(pos, b.pos);
+
+        return distA - distB;
+    });
+
+
+    let filteredDoors: Array<Door> = [];
+    alt.logWarning('Sorted Doors: ' + sortedDoors.length);
+    alt.logWarning('Sorted Doors: ' + JSON.stringify(sortedDoors));
+
+    for (let i = 0; i < sortedDoors.length; i++) {
+        const door = sortedDoors[i];
+        if (door.pos.x === pos.x && door.pos.y === pos.y && door.pos.z === pos.z) {
+            filteredDoors.push(door);
+        }
+    }
+
+    if (filteredDoors.length === 0) {
+        return null;
+    }
+
+    let detectedOverlappingDoor = null;
+    let lastDistance = null;
+    for (let i = 0; i < sortedDoors.length; i++) {
+        const door = sortedDoors[i];
+        if (door.pos.x === pos.x && door.pos.y === pos.y && door.pos.z === pos.z) {
+            continue;
+        }
+
+        const distance = AthenaClient.utility.vector.distance(pos, door.pos);
+
+        if (distance < Config.MIN_INTERACTION_DISTANCE_DOUBLE_DOOR) {
+            //Do not add overlapping doors
+            detectedOverlappingDoor = door;
+            continue;
+        }
+
+        if (lastDistance && (lastDistance - distance < Config.MIN_INTERACTION_DISTANCE_DOUBLE_DOOR)) {
+            //Do not add overlapping doors
+            detectedOverlappingDoor = door;
+            continue;
+        }
+
+        lastDistance = distance;
+
+        if (distance < Config.MAX_INTERACTION_DISTANCE_DOUBLE_DOOR) {
+            //check which door is closer
+            //if the overlapping door is closer, do not add the other door
+            if (detectedOverlappingDoor) {
+                const distA = AthenaClient.utility.vector.distance(detectedOverlappingDoor.pos, door.pos);
+                const distB = AthenaClient.utility.vector.distance(pos, door.pos);
+                if (distA < distB) {
+                    continue;
+                }
+            }
+            filteredDoors.push(door);
+        }
+    }
+
+    return filteredDoors;
+}
+
+export function registerOnStreamEnter(callback: DoorOnStreamEnterEvent) {
+    DoorOnStreamEnterEvents.push(callback);
 }
 
 alt.on('worldObjectStreamIn', onStreamEnter);

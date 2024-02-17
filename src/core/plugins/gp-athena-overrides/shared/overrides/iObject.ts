@@ -73,6 +73,8 @@ declare module '@AthenaShared/interfaces/iObject.js' {
         //Corechanges
         noFreeze?: boolean;
         hash?: number;
+        combinedHashes?: number[];
+        combinedPositions?: alt.IVector3[];
         //scriptID?: number;
         //item?: ItemEx<ISharedItem>;
     }

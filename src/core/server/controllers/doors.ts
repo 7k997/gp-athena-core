@@ -6,12 +6,14 @@ import Database from '@stuyk/ezmongodb';
 import { Collections } from '@AthenaServer/database/collections.js';
 import { ControllerFuncs } from './shared.js';
 import { deepCloneObject } from '@AthenaShared/utility/deepCopy.js';
+import { Config } from '@AthenaPlugins/gp-athena-overrides/shared/config.js';
 
 type DoorDocument = Door & { _id?: unknown };
 
 const MAX_MARKERS_TO_DRAW = 10;
 const doorGroup = new alt.VirtualEntityGroup(MAX_MARKERS_TO_DRAW);
 const globalDoors: (Door & { entity: alt.VirtualEntity })[] = [];
+let lastReservedDoorUID = 10000;
 let lastReservedLockID = 100;
 
 const InternalController = {
@@ -28,6 +30,8 @@ const InternalController = {
         const savedDoors = await Database.fetchAllData<DoorDocument>(Collections.Doors);
 
         for (let door of savedDoors) {
+            lastReservedLockID = Math.max(lastReservedLockID, door.lockID);
+            lastReservedDoorUID = Math.max(lastReservedDoorUID, parseInt(door.uid));
             const index = globalDoors.findIndex((x) => x.uid === door.uid);
             if (index <= -1) {
                 InternalController.create(door);
@@ -35,7 +39,6 @@ const InternalController = {
             }
 
             globalDoors[index].isUnlocked = door.isUnlocked;
-            lastReservedLockID = Math.max(lastReservedLockID, door.lockID);
             globalDoors[index].entity.setStreamSyncedMeta('door', deepCloneObject(globalDoors[index]));
         }
     },
@@ -90,21 +93,115 @@ export function getNextDoorLockID(): number {
     return lastReservedLockID;
 }
 
+export function getNextDoorUID(): string {
+    lastReservedDoorUID += 1;
+    return lastReservedDoorUID.toString();
+}
+
 export function getNearestDoorByHash(hash: number, pos: alt.Vector3): Door | null {
-    const doorsByDistance = globalDoors.filter((door) => door.model === hash && Athena.utility.vector.distance(pos, door.pos) < 5);
+    const doorsByDistance = globalDoors.filter((door) => door.model === hash && Athena.utility.vector.distance(pos, door.pos) < Config.MAX_INTERACTION_DISTANCE_SINGLE_DOOR);
     if (!doorsByDistance || doorsByDistance.length === 0) {
         return null;
     }
 
     const nearestDoors = doorsByDistance.sort((a, b) => {
-        const distA = Athena.utility.vector.distance2d(pos, a.pos);
-        const distB = Athena.utility.vector.distance2d(pos, b.pos);
+        const distA = Athena.utility.vector.distance(pos, a.pos);
+        const distB = Athena.utility.vector.distance(pos, b.pos);
 
         return distA - distB;
     });
 
     return nearestDoors[0];
 }
+
+export function getDoubleDoorsByHashes(combinedHashes: Array<number>, combinedPositions: Array<alt.Vector3>, _pos: alt.Vector3): Array<Door> {
+    let pos = _pos;
+
+    //Check for correct position for overlapping doors
+    // Verify if the first door is the correct one
+    // Very special case for 2 double doors beside each other.
+    // In some MLOs the doors are overlapping. So we will get the wrong door.
+    if (combinedPositions && combinedPositions.length > 0) {
+        for (let i = 0; i < combinedPositions.length; i++) {
+            if (combinedPositions[i].x === pos.x && combinedPositions[i].y === pos.y && combinedPositions[i].z === pos.z) {
+                continue;
+            }
+
+            const distance = Athena.utility.vector.distance(_pos, combinedPositions[i]);
+            if (distance < Config.MIN_INTERACTION_DISTANCE_DOUBLE_DOOR) {
+                pos = combinedPositions[i];
+                break;
+            }
+        }
+    }
+
+    alt.logWarning('Getting double doors by combined hash: ' + combinedHashes.join(', ') + ' at ' + pos + ' with max distance: ' + Config.MAX_INTERACTION_DISTANCE_DOUBLE_DOOR);
+    const doorsByDistance = globalDoors.filter((door) => combinedHashes.includes(door.model) && Athena.utility.vector.distance(pos, door.pos) < Config.MAX_INTERACTION_DISTANCE_DOUBLE_DOOR);
+
+    //Sorted by distance revert
+    const sortedDoors = doorsByDistance.sort((a, b) => {
+        const distA = Athena.utility.vector.distance(pos, a.pos);
+        const distB = Athena.utility.vector.distance(pos, b.pos);
+
+        return distB - distA;
+    });
+
+    let filteredDoors: Array<Door> = [];
+    alt.logWarning('Sorted Doors: ' + sortedDoors.length);
+    alt.logWarning('Sorted Doors: ' + JSON.stringify(sortedDoors));
+
+    for (let i = 0; i < sortedDoors.length; i++) {
+        const door = sortedDoors[i];
+        if (door.pos.x === pos.x && door.pos.y === pos.y && door.pos.z === pos.z) {
+            filteredDoors.push(door);
+        }
+    }
+
+    if (filteredDoors.length === 0) {
+        return null;
+    }
+
+    let detectedOverlappingDoor = null;
+    let lastDistance = null;
+    for (let i = 0; i < sortedDoors.length; i++) {
+        const door = sortedDoors[i];
+        if (door.pos.x === pos.x && door.pos.y === pos.y && door.pos.z === pos.z) {
+            continue;
+        }
+
+        const distance = Athena.utility.vector.distance(pos, door.pos);
+
+        if (distance < Config.MIN_INTERACTION_DISTANCE_DOUBLE_DOOR) {
+            //Do not add overlapping doors
+            detectedOverlappingDoor = door;
+            continue;
+        }
+
+        if (lastDistance && (lastDistance - distance < Config.MIN_INTERACTION_DISTANCE_DOUBLE_DOOR)) {
+            //Do not add overlapping doors
+            detectedOverlappingDoor = door;
+            continue;
+        }
+
+        lastDistance = distance;
+
+        if (distance < Config.MAX_INTERACTION_DISTANCE_DOUBLE_DOOR) {
+            //check which door is closer
+            //if the overlapping door is closer, do not add the other door
+            if (detectedOverlappingDoor) {
+                const distA = Athena.utility.vector.distance(detectedOverlappingDoor.pos, door.pos);
+                const distB = Athena.utility.vector.distance(pos, door.pos);
+                if (distA < distB) {
+                    continue;
+                }
+            }
+            filteredDoors.push(door);
+        }
+    }
+
+    return filteredDoors;
+}
+
 
 /**
  * Remove all controls from a door.

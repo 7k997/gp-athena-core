@@ -196,7 +196,7 @@ export function on(eventName: 'pickup-item', callback: (player: alt.Player, _id:
  * @param {'character-data-change'} eventName
  * @param {(player: alt.Player) => void} callback
  */
-export function on(eventName: 'character-data-change', callback: (player: alt.Player) => void);
+export function on(eventName: 'character-data-change', callback: (player: alt.Player, typeSafeFieldName: string, value: any, oldValue: any) => void);
 
 /**
  * Called when a player selects a character

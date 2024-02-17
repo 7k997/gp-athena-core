@@ -562,6 +562,24 @@ export function getBaseItemByFuzzySearch<CustomData = {}>(
     return deepCloneObject<BaseItem<DefaultItemBehavior, CustomData>>(databaseItems[index]);
 }
 
+/**
+ * Find all dynamic added items.
+ * 
+ * 
+ **/
+
+export async function findDynamicBaseItems<CustomData = {}, CustomBehavior = {}>(): Promise<Array<BaseItem<DefaultItemBehavior & CustomBehavior, CustomData>> | undefined> {
+
+    await isDoneLoadingAsync();
+
+    const items = databaseItems.filter((item) => item.dynamic === true);
+    if (items.length <= 0) {
+        return undefined;
+    }
+
+    return deepCloneObject<BaseItem<DefaultItemBehavior & CustomBehavior, CustomData>[]>(items);
+}
+
 interface FactoryFuncs {
     getBaseItemAsync: typeof getBaseItemAsync;
     upsertAsync: typeof upsertAsync;
@@ -574,6 +592,7 @@ interface FactoryFuncs {
     getBaseItemsAsync: typeof getBaseItemsAsync;
     getBaseItems: typeof getBaseItems;
     getBaseItemByFuzzySearch: typeof getBaseItemByFuzzySearch;
+    findDynamicBaseItems: typeof findDynamicBaseItems;
 }
 
 interface FactoryInjections {
