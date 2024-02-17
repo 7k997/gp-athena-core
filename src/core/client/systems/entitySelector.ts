@@ -16,7 +16,6 @@ import { CreatedDrop } from '@AthenaClient/streamers/item.js';
 import { Config } from '@AthenaPlugins/gp-athena-overrides/shared/config.js';
 import { ITEM_SYNCED_META_TYPES } from '@AthenaShared/enums/syncedMeta.js';
 import { IObject } from '@AthenaShared/interfaces/iObject.js';
-import en from '@AthenaShared/locale/languages/en.js';
 
 //Corechange: TODO remove entity selector over vehicles and maybe more
 // import { CreatedObject } from '@AthenaClient/streamers/object.js';
@@ -45,6 +44,10 @@ let autoMode = true;
 const IconMap = new Map<number, string>();
 const NameMap = new Map<number, string>();
 
+//Combined Object Map - Renders only one menue for two or more objects
+const CombinedObjectMap = new Map<number, string>();
+let CombinedObjects = new Map<string, Array<AthenaClient.CreatedObject>>();
+
 const Internal = {
     init() {
         everyTick = alt.everyTick(Internal.tick);
@@ -60,7 +63,7 @@ const Internal = {
         });
 
         AthenaClient.systems.hotkeys.add({
-            key: KEY_BINDS.INTERACT_KEY_FOR_VEHICLE,
+            key: KEY_BINDS.INTERACT,
             description: 'Interact',
             identifier: 'interact-hotkey-vehicle',
             modifier: 'shift',
@@ -232,6 +235,9 @@ const Internal = {
         const wheelOptions: Array<IWheelOptionExt> = [];
         const scriptIDsAdded: Map<number, boolean> = new Map();
 
+        //Clean up last combined objects
+        CombinedObjects.clear();
+
         for (const selection of selected) {
             if (typeof selection === 'undefined') {
                 break;
@@ -343,6 +349,17 @@ const Internal = {
                             break;
                         }
 
+                        const combinedType = CombinedObjectMap.get(createdObject.hash);
+                        if (combinedType) {
+                            alt.logWarning('Combined Object: ' + createdObject.hash);
+                            //Wait for further objects and create combined menu in the end
+                            const combinedObjects = CombinedObjects.get(combinedType);
+                            if (combinedObjects) {
+                                combinedObjects.push(createdObject);
+                            } else {
+                                CombinedObjects.set(combinedType, [createdObject]);
+                            }
+                        } else {     
                         if (Config.HIDE_WHEEL_MENU_FOR_OBJECTS_WITHOUT_OPTIONS) {
                             //Check if the object has options before add it.
                             let options = AthenaClient.menu.object.getOptions(createdObject);
@@ -362,6 +379,7 @@ const Internal = {
                             },
                         });
                     }
+                    }
 
                     break;
                 case 'pos':
@@ -377,6 +395,38 @@ const Internal = {
                     });
 
                     break;
+            }
+        }
+
+        //Add combined object menu
+        if (CombinedObjects.size > 0) {
+            for (let type of CombinedObjects.keys()) {
+                let objects = CombinedObjects.get(type);
+                if (!objects) {
+                    continue;
+                }
+
+                let iconReplacement = IconMap.get(objects[0].hash);
+                let nameReplacement = NameMap.get(objects[0].hash);
+
+                if (Config.HIDE_WHEEL_MENU_FOR_OBJECTS_WITHOUT_OPTIONS) {
+                    //Check if the object has options before add it.
+                    let options = AthenaClient.menu.object.getOptions(objects[0]);
+                    if (!options || options.length <= 0) {
+                        break;
+                    }
+                }
+
+                objects[0].combinedHashes = objects.map((x) => x.hash);
+                objects[0].combinedPositions = objects.map((x) => x.pos);
+                wheelOptions.push({
+                    name: nameReplacement ? nameReplacement : 'Object',
+                    icon: iconReplacement ? iconReplacement : 'icon-impact-point',
+                    data: [objects[0]],
+                    callback: (_createdObject: AthenaClient.CreatedObject) => {
+                        AthenaClient.menu.object.open(_createdObject);
+                    },
+                });
             }
         }
 
@@ -540,6 +590,10 @@ export function addIcon(hash: number, icon: string) {
 
 export function addName(hash: number, name: string) {
     NameMap.set(hash, name);
+}
+
+export function addCombinedObject(hash: number, type: string) {
+    CombinedObjectMap.set(hash, type);
 }
 
 alt.onServer(SYSTEM_EVENTS.TICKS_START, Internal.init);
