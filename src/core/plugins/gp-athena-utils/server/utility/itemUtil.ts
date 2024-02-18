@@ -3,16 +3,34 @@ import * as Athena from '@AthenaServer/api/index.js';
 import { ItemEx, StoredItemEx } from '@AthenaShared/interfaces/item.js';
 import { Character } from '@AthenaShared/interfaces/character.js';
 import { InventoryType } from '@AthenaPlugins/core-inventory/shared/interfaces.js';
+import { InventoryView } from '@AthenaPlugins/core-inventory/server/src/view.js';
 
 export class ItemUtil {
     static getItem<CustomData>(player: alt.Player, slot: number, type: InventoryType): ItemEx<CustomData> {
         if (type === 'toolbar') {
-            if (Athena.player.toolbar.getAt(player, slot)) {
+            const item = Athena.player.toolbar.getAt(player, slot);
+            if (item) {
                 return Athena.systems.inventory.convert.toItem<CustomData>(Athena.player.toolbar.getAt(player, slot));
             }
-        } else {
-            if (Athena.player.inventory.getAt(player, slot)) {
+        } else if (type === 'inventory') {
+            const item = Athena.player.inventory.getAt(player, slot);
+            if (item) {
                 return Athena.systems.inventory.convert.toItem<CustomData>(Athena.player.inventory.getAt(player, slot));
+            }
+        } else if (type === 'custom') {
+            const item = InventoryView.storage.getAt<CustomData>(player, slot);
+            if (item) {
+                return Athena.systems.inventory.convert.toItem<CustomData>(item);
+            }
+        } else if (type === 'second') {
+            const item = InventoryView.secondStorage.getAt<CustomData>(player, slot);
+            if (item) {
+                return Athena.systems.inventory.convert.toItem<CustomData>(item);
+            }
+        } else if (type === 'machine') {
+            const item = InventoryView.machineStorage.getAt<CustomData>(player, slot);
+            if (item) {
+                return Athena.systems.inventory.convert.toItem<CustomData>(item);
             }
         }
         return null;
@@ -21,9 +39,16 @@ export class ItemUtil {
     static getStoredItem<CustomData>(player: alt.Player, slot: number, type: InventoryType): StoredItemEx<CustomData> {
         if (type === 'toolbar') {
             return Athena.player.toolbar.getAt(player, slot);
-        } else {
+        } else if (type === 'inventory') {
             return Athena.player.inventory.getAt(player, slot);
+        } else if (type === 'custom') {
+            return InventoryView.storage.getAt(player, slot);
+        } else if (type === 'second') {
+            return InventoryView.secondStorage.getAt(player, slot);
+        } else if (type === 'machine') {
+            return InventoryView.machineStorage.getAt(player, slot);
         }
+        return null;
     }
 
     static getPlayerData(player: alt.Player): Character {

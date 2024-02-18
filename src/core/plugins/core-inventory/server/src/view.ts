@@ -138,10 +138,6 @@ const Internal = {
         Internal.callbacks.close(id);
     },
     async use(player: alt.Player, type: InventoryType, slot: number, eventToCall: string | string[] = undefined) {
-        if (type === 'custom') {
-            return;
-        }
-
         if (!player || !player.valid) {
             return;
         }
@@ -254,10 +250,6 @@ const Internal = {
      * @return {void}
      */
     async split(player: alt.Player, type: InventoryType, slot: number, amount: number) {
-        if (type === 'custom') {
-            return;
-        }
-
         if (!player || !player.valid) {
             return;
         }
@@ -267,16 +259,46 @@ const Internal = {
             return;
         }
 
-        if (typeof data[type] === 'undefined') {
+        if (type === 'custom') {
+            const newInventory = await Athena.systems.inventory.manager.splitAt(slot, openStorages[player.id], amount, type);
+            if (typeof newInventory === 'undefined') {
             return;
         }
 
+            openStorages[player.id] = newInventory;
+            await Athena.systems.storage.set(openStorageSessions[player.id], openStorages[player.id]);
+            InventoryView.storage.resync(player);
+
+        } else if (type === 'second') {
+            const newInventory = await Athena.systems.inventory.manager.splitAt(slot, openSecondStorages[player.id], amount, type);
+            if (typeof newInventory === 'undefined') {
+            return;
+        }
+
+            openSecondStorages[player.id] = newInventory;
+            await Athena.systems.storage.set(openSecondStorageSessions[player.id], openSecondStorages[player.id]);
+            InventoryView.secondStorage.resync(player);
+
+        } else if (type === 'machine') {
+            const newInventory = await Athena.systems.inventory.manager.splitAt(slot, openMachineStorages[player.id], amount, type);
+            if (typeof newInventory === 'undefined') {
+            return;
+        }
+
+            openMachineStorages[player.id] = newInventory;
+            await Athena.systems.storage.set(openMachineStorageSessions[player.id], openMachineStorages[player.id]);
+            InventoryView.machineStorage.resync(player);
+
+        } else if (type === 'inventory') {
         const newInventory = await Athena.systems.inventory.manager.splitAt(slot, data[type], amount, type);
         if (typeof newInventory === 'undefined') {
             return;
         }
 
         await Athena.document.character.set(player, type, newInventory);
+        } else if (type === 'toolbar') {
+            return;
+        }
     },
     /**
      * Attempt to combine two items by left-clicking both of them in an inventory.
@@ -425,7 +447,22 @@ const Internal = {
             return;
         }
 
-        const endItem = Athena.systems.inventory.slot.getAt(info.endIndex, endData);
+        let endItem = null;
+        if (info.endIndex === -1) {
+
+            //Swap to a slot with same type if possible
+            info.endIndex = Athena.systems.inventory.slot.findStackable(startItem, endData);
+
+            if (info.endIndex === -1) {
+                //swap into free slot
+                info.endIndex = Athena.systems.inventory.slot.findOpen(info.endType, endData);
+                if (!info.endIndex) {
+                    Athena.player.emit.notification(player, 'No free slot available');
+                }
+            }
+        }
+
+        endItem = Athena.systems.inventory.slot.getAt(info.endIndex, endData);
 
         // If its the same data set that we are modifying. Just does a simple combine for the same inventory type.
         // Stacking items in same data set.
@@ -437,13 +474,23 @@ const Internal = {
 
             if (info.startType === 'custom') {
                 openStorages[player.id] = newInventory;
+                await Athena.systems.storage.set(openStorageSessions[player.id], openStorages[player.id]); 
                 InventoryView.storage.resync(player);
                 Athena.systems.inventory.swap.invoke('item-combine', 'combineSameCustom1', player, endItem, info);
                 return;
             }
 
+            if (info.startType === 'second') {
+                openStorages[player.id] = newInventory;
+                await Athena.systems.storage.set(openSecondStorageSessions[player.id], openStorages[player.id]);
+                InventoryView.secondStorage.resync(player);
+                Athena.systems.inventory.swap.invoke('item-combine', 'combineSameSecond1', player, endItem, info);
+                return;
+            }
+
             if (info.startType === 'machine') {
                 openMachineStorages[player.id] = newInventory;
+                await Athena.systems.storage.set(openMachineStorageSessions[player.id], openStorages[player.id]); 
                 InventoryView.machineStorage.resync(player);
                 Athena.systems.inventory.swap.invoke('item-combine', 'combineSameMachine1', player, endItem, info);
                 return;
@@ -464,14 +511,25 @@ const Internal = {
 
             if (info.startType === 'custom') {
                 openStorages[player.id] = newInventory;
+                await Athena.systems.storage.set(openStorageSessions[player.id], openStorages[player.id]);       
                 InventoryView.storage.resync(player);
                 Athena.systems.inventory.swap.invoke('item-swap', 'swapDifferentCustomStart1', player, startItem, info);
                 Athena.systems.inventory.swap.invoke('item-swap', 'swapDifferentCustomEnd1', player, endItem, info);
                 return;
             }
 
+            if (info.startType === 'second') {
+                openStorages[player.id] = newInventory;
+                await Athena.systems.storage.set(openSecondStorageSessions[player.id], openStorages[player.id]);
+                InventoryView.secondStorage.resync(player);
+                Athena.systems.inventory.swap.invoke('item-swap', 'swapDifferentSecondStart1', player, startItem, info);
+                Athena.systems.inventory.swap.invoke('item-swap', 'swapDifferentSecondEnd1', player, endItem, info);
+                return;
+            }
+
             if (info.startType === 'machine') {
                 openMachineStorages[player.id] = newInventory;
+                await Athena.systems.storage.set(openMachineStorageSessions[player.id], openMachineStorages[player.id]);       
                 InventoryView.machineStorage.resync(player);
                 Athena.systems.inventory.swap.invoke('item-swap', 'swapDifferentMachineStart1', player, startItem, info);
                 Athena.systems.inventory.swap.invoke('item-swap', 'swapDifferentMachineEnd1', player, endItem, info);
@@ -542,6 +600,7 @@ const Internal = {
 
             if (Athena.systems.inventory.weight.isWeightExceeded([complexSwap.to], maxWeight)) {
                 InventoryView.storage.resync(player);
+                InventoryView.secondStorage.resync(player);
                 InventoryView.machineStorage.resync(player);
                 return;
             }
@@ -560,15 +619,19 @@ const Internal = {
 
         if (info.endType === 'custom') {
             openStorages[player.id] = complexSwap.to;
+            await Athena.systems.storage.set(openStorageSessions[player.id], openStorages[player.id]); 
         } else if (info.endType === 'second') {
             openSecondStorages[player.id] = complexSwap.to;
+            await Athena.systems.storage.set(openSecondStorageSessions[player.id], openSecondStorages[player.id]); 
         } else if(info.endType === 'machine') {
             openMachineStorages[player.id] = complexSwap.to;        
+            await Athena.systems.storage.set(openMachineStorageSessions[player.id], openMachineStorages[player.id]);       
         } else {
             await Athena.document.character.set(player, info.endType, complexSwap.to);
         }
 
         InventoryView.storage.resync(player);
+        InventoryView.secondStorage.resync(player);
         InventoryView.machineStorage.resync(player);
     },
     /**
@@ -1027,6 +1090,20 @@ export const InventoryView = {
         /** Returns current open storage id */
         getOpenStorageId(player: alt.Player) {
             return openStorageSessions[player.id];
+        },
+
+        getAt<CustomData = {}>(player: alt.Player, slot: number): StoredItem<CustomData> | undefined {
+            const openStorage = openStorages[player.id];
+            if (!openStorage) {
+                return undefined;
+            }
+
+            const index = openStorage.findIndex((x) => x.slot === slot);
+            if (index <= -1) {
+                return undefined;
+            }
+
+            return openStorage[index] as StoredItem<CustomData>;
         }
 
     },
@@ -1129,6 +1206,18 @@ export const InventoryView = {
         /** Returns current open machine storage id */
         getOpenMachineStorageId(player: alt.Player) {
             return openMachineStorageSessions[player.id];
+        },
+        getAt<CustomData = {}>(player: alt.Player, slot: number): StoredItem<CustomData> | undefined {
+            const openStorage = openMachineStorages[player.id];
+            if (!openStorage) {
+                return undefined;
+            }
+            const index = openStorage.findIndex((x) => x.slot === slot);
+            if (index <= -1) {
+                return undefined;
+            }
+
+            return openStorage[index] as StoredItem<CustomData>;
         }
 
     },
@@ -1215,6 +1304,18 @@ export const InventoryView = {
         /** Returns current open second storage id */
         getOpenSecondStorageId(player: alt.Player) {
             return openSecondStorageSessions[player.id];
+        },
+        getAt<CustomData = {}>(player: alt.Player, slot: number): StoredItem<CustomData> | undefined {
+            const openStorage = openSecondStorages[player.id];
+            if (!openStorage) {
+                return undefined;
+            }
+            const index = openStorage.findIndex((x) => x.slot === slot);
+            if (index <= -1) {
+                return undefined;
+            }
+
+            return openStorage[index] as StoredItem<CustomData>;
         }
     },
 };

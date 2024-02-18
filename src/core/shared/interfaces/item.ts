@@ -223,6 +223,16 @@ export interface CustomContextAction {
      * The events which should be triggered.
      */
     eventToCall: string | Array<string>;
+
+    /**
+    * true if Custom sub menu supports also toolbar
+    */
+    toolbarSupport?: boolean;
+
+    /**
+     * true if Custom action supports also storages
+     */
+    storageSupport?: boolean;
 }
 
 export interface CustomSubMenu {
@@ -239,6 +249,16 @@ export interface CustomSubMenu {
     contextActions?: Array<CustomContextAction>;
 
     customSubMenus?: Array<CustomSubMenu>;
+
+    /**
+     * true if Custom sub menu supports also toolbar
+     */
+    toolbarSupport?: boolean;
+
+    /**
+     * true if Custom sub menu supports also storages
+     */
+    storageSupport?: boolean;
 }
 
 /**

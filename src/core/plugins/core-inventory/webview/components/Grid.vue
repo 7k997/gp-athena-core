@@ -78,8 +78,9 @@
                         @mouseenter="updateDescriptor('machine', index)"
                         @mouseleave="updateDescriptor(undefined, undefined)"
                         @mousedown="
-                            (e) => drag(e, { endDrag, canBeDragged: hasItem('machine', index), singleClick, startDrag })
+                            (e) => onMouseDownMachine(e, index, { endDrag, canBeDragged: hasItem('machine', index), singleClick, startDrag })
                         "
+                        @contextmenu="(e) => contextMenuMachine(e, index)"
                     >
                         <template v-slot:image v-if="hasItem('machine', index)">
                             <img
@@ -137,8 +138,9 @@
                     @mouseenter="updateDescriptor('second', index)"
                     @mouseleave="updateDescriptor(undefined, undefined)"
                     @mousedown="
-                        (e) => drag(e, { endDrag, canBeDragged: hasItem('second', index), singleClick, startDrag })
+                        (e) => onMouseDownSecond(e, index,  { endDrag, canBeDragged: hasItem('second', index), singleClick, startDrag })
                     "
+                    @contextmenu="(e) => contextMenuSecond(e, index)"
                 >
                     <template v-slot:image v-if="hasItem('second', index)">
                         <img
@@ -181,8 +183,9 @@
                     @mouseenter="updateDescriptor('custom', index)"
                     @mouseleave="updateDescriptor(undefined, undefined)"
                     @mousedown="
-                        (e) => drag(e, { endDrag, canBeDragged: hasItem('custom', index), singleClick, startDrag })
+                        (e) => onMouseDownCustom(e, index, { endDrag, canBeDragged: hasItem('custom', index), singleClick, startDrag })
                     "
+                    @contextmenu="(e) => contextMenuCustom(e, index)"
                 >
                     <template v-slot:image v-if="hasItem('custom', index)">
                         <img
@@ -240,7 +243,7 @@
                     :info="getSlotInfo('toolbar', index)"
                     @mouseenter="updateDescriptor('toolbar', index)"
                     @mouseleave="updateDescriptor(undefined, undefined)"
-                    @mousedown="(e) => drag(e, { endDrag, canBeDragged: hasItem('toolbar', index), startDrag })"
+                    @mousedown="(e) => onMouseDownToolbar(e, index, { endDrag, canBeDragged: hasItem('toolbar', index), startDrag })"
                     @contextmenu="(e) => contextMenuToolbar(e, index)"
                 >
                     <template v-slot:image v-if="hasItem('toolbar', index)">
@@ -263,9 +266,9 @@
                     :info="getSlotInfo('inventory', index)"
                     @mouseenter="updateDescriptor('inventory', index)"
                     @mouseleave="updateDescriptor(undefined, undefined)"
-                    @contextmenu="(e) => contextMenu(e, index)"
+                    @contextmenu="(e) => contextMenuInventory(e, index)"
                     @mousedown="
-                        (e) => drag(e, { endDrag, canBeDragged: hasItem('inventory', index), singleClick, startDrag })
+                        (e) => onMouseDownInventory(e, index, { endDrag, canBeDragged: hasItem('inventory', index), singleClick, startDrag })
                     "
                 >
                     <template v-slot:image v-if="hasItem('inventory', index)">
@@ -303,14 +306,17 @@
                 </div>
             </div>
             <Context :contextTitle="context.title" :x="context.x" :y="context.y" v-if="context && contextShow">
-                <div v-if="context.hasUseEffect" @click="contextAction('use')">Use</div>
+                <div v-if="context.hasUseEffect && (context.inventoryType === 'toolbar' || context.inventoryType === 'inventory')" @click="contextAction('use')" >Use</div>
                 <template v-for="customAction in context.customEvents">
-                    <div @click="contextAction('custom', customAction.eventToCall)">{{ customAction.name }}</div>
+                    <div 
+                        v-if="context.inventoryType === 'inventory' || (context.inventoryType === 'toolbar' && customAction.toolbarSupport) || (context.inventoryType !== 'toolbar' && customAction.storageSupport)"
+                        @click="contextAction('custom', customAction.eventToCall)">{{ customAction.name }}</div>
                 </template>
           
                 <!-- Hier beginnt die Hinzufügung der rekursiven Untermenüs -->
                 <template v-for="customSub in context.customSubMenus">
                     <ContextSub
+                    v-if="context.inventoryType === 'inventory' || (context.inventoryType === 'toolbar' && customSub.toolbarSupport) || (context.inventoryType !== 'toolbar' && customSub.storageSupport)"
                         :subContextTitle="customSub.name"
                         :submenus="customSub.customSubMenus"
                         :actions="customSub.contextActions"
@@ -327,9 +333,9 @@
                 </template>
                 <!-- Hier endet die Hinzufügung der rekursiven Untermenüs -->
 
-                <div @click="contextAction('split')" v-if="context.inventoryType === 'inventory'">Split</div>
-                <div @click="contextAction('drop')">Drop</div>
-                <div @click="contextAction('give')">Give</div>
+                <div @click="contextAction('split')" v-if="context.inventoryType !== 'toolbar' && context.quantity > 1">Split</div>
+                <div @click="contextAction('drop')" v-if="context.inventoryType === 'toolbar' || context.inventoryType === 'inventory'">Drop</div>
+                <div @click="contextAction('give')" v-if="context.inventoryType === 'toolbar' || context.inventoryType === 'inventory'">Give</div>
                 <!-- <div @click="contextAction('cancel')">Cancel</div> -->
             </Context>
         </div>
@@ -348,7 +354,7 @@ import { getImagePath } from '../utility/inventoryIcon.js';
 import { INVENTORY_CONFIG } from '../../shared/config.js';
 import { debounceReady } from '../utility/debounce.js';
 import { DualSlotInfo, InventoryType, SlotInfo } from '@AthenaPlugins/core-inventory/shared/interfaces.js';
-import { on } from 'events';
+import { Draggable } from '@ViewUtility/drag.js';
 
 export default defineComponent({
     name: 'Inventory',
@@ -485,6 +491,7 @@ export default defineComponent({
             contextShow: false,
             context: undefined as
                 | {
+                      quantity: number;
                       x: number;
                       y: number;
                       title: string;
@@ -816,6 +823,7 @@ export default defineComponent({
             this.contextShow = false;
             this.context = {
                 title: item.name,
+                quantity: item.quantity,
                 slot: item.slot,
                 inventoryType: "toolbar",
                 x: e.clientX,
@@ -833,9 +841,43 @@ export default defineComponent({
                 this.contextShow = true;
             }
         },
-        contextMenu(e: MouseEvent, slot: number) {
-            //TODO: Allow running with inventory.
-
+        onMouseDownInventory(e: MouseEvent, startIndex: number, draggable: Draggable) {
+            if (e.altKey && e.button === 0 && draggable.canBeDragged) {
+                // Move item to custom or second storage
+                console.log('alt key pressed, startIndex: ' + startIndex + ' draggable: ' + JSON.stringify(draggable));
+                this.endDrag('inventory', startIndex, 'custom', -1);
+            } else {
+                this.drag(e, draggable);
+            }           
+        },
+        onMouseDownToolbar(e: MouseEvent, startIndex: number, draggable: Draggable) {
+            this.drag(e, draggable);
+        },
+        onMouseDownCustom(e: MouseEvent, startIndex: number, draggable: Draggable) {
+            if (e.altKey && e.button === 0 && draggable.canBeDragged) {
+                // Move item to inventory
+                this.endDrag('custom', startIndex, 'inventory', -1);
+            } else {
+                this.drag(e, draggable);
+            }           
+        },
+        onMouseDownSecond(e: MouseEvent, startIndex: number, draggable: Draggable) {
+            if (e.altKey && e.button === 0 && draggable.canBeDragged) {
+                // Move item to inventory
+                this.endDrag('second', startIndex, 'inventory', -1);
+            } else {
+                this.drag(e, draggable);
+            }           
+        },
+        onMouseDownMachine(e: MouseEvent, startIndex: number, draggable: Draggable) {
+            if (e.altKey && e.button === 0 && draggable.canBeDragged) {
+                // Move item to custom storage
+                this.endDrag('machine', startIndex, 'custom', -1);
+            } else {
+                this.drag(e, draggable);
+            }           
+        },
+        contextMenuInventory(e: MouseEvent, slot: number) {
             e.preventDefault();
             if (!this.hasItem('inventory', slot)) {
                 return;
@@ -851,8 +893,111 @@ export default defineComponent({
             this.contextShow = false;
             this.context = {
                 title: item.name,
+                quantity: item.quantity,
                 slot: item.slot,
                 inventoryType: "inventory",
+                x: e.clientX,
+                y: e.clientY,
+                hasUseEffect: hasUseEffect,
+                customEvents: item.customEventsToCall,
+                customSubMenus: item.customSubMenus,
+            };
+
+            if (e.altKey) {
+                // Use item direct if alt is pressed
+                this.contextAction('use');
+                return;
+            } else {
+                this.contextShow = true;
+            }
+        },
+        contextMenuCustom(e: MouseEvent, slot: number) {
+            e.preventDefault();
+            if (!this.hasItem('custom', slot)) {
+                return;
+            }
+
+            const item = this.getItem('custom', slot);
+
+            // Let's check, if this item can be used. This information is used to show/hide the "Use" context menu action.
+            const hasUseEffect: boolean =
+                typeof item.consumableEventToCall !== 'undefined' ||
+                (item.behavior && (item.behavior.isEquippable || item.behavior.isWeapon || item.behavior.isClothing));
+
+            this.contextShow = false;
+            this.context = {
+                title: item.name,
+                quantity: item.quantity,
+                slot: item.slot,
+                inventoryType: "custom",
+                x: e.clientX,
+                y: e.clientY,
+                hasUseEffect: hasUseEffect,
+                customEvents: item.customEventsToCall,
+                customSubMenus: item.customSubMenus,
+            };
+
+            if (e.altKey) {
+                // Use item direct if alt is pressed
+                this.contextAction('use');
+                return;
+            } else {
+                this.contextShow = true;
+            }
+        },
+        contextMenuSecond(e: MouseEvent, slot: number) {
+            e.preventDefault();
+            if (!this.hasItem('second', slot)) {
+                return;
+            }
+
+            const item = this.getItem('second', slot);
+
+            // Let's check, if this item can be used. This information is used to show/hide the "Use" context menu action.
+            const hasUseEffect: boolean =
+                typeof item.consumableEventToCall !== 'undefined' ||
+                (item.behavior && (item.behavior.isEquippable || item.behavior.isWeapon || item.behavior.isClothing));
+
+            this.contextShow = false;
+            this.context = {
+                title: item.name,
+                quantity: item.quantity,
+                slot: item.slot,
+                inventoryType: "second",
+                x: e.clientX,
+                y: e.clientY,
+                hasUseEffect: hasUseEffect,
+                customEvents: item.customEventsToCall,
+                customSubMenus: item.customSubMenus,
+            };
+
+            if (e.altKey) {
+                // Use item direct if alt is pressed
+                this.contextAction('use');
+                return;
+            } else {
+                this.contextShow = true;
+            }
+        },
+        contextMenuMachine(e: MouseEvent, slot: number) {
+            e.preventDefault();
+            if (!this.hasItem('machine', slot)) {
+                return;
+            }
+
+            const item = this.getItem('machine', slot);
+
+            // Let's check, if this item can be used. This information is used to show/hide the "Use" context menu action.
+            const hasUseEffect: boolean =
+                typeof item.consumableEventToCall !== 'undefined' ||
+                (item.behavior && (item.behavior.isEquippable || item.behavior.isWeapon || item.behavior.isClothing));
+
+            this.contextShow = false;
+            this.context = {
+                title: item.name,
+                quantity: item.quantity,
+                slot: item.slot,
+                inventoryType: "machine",
                 x: e.clientX,
                 y: e.clientY,
                 hasUseEffect: hasUseEffect,
