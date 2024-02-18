@@ -35,7 +35,7 @@ export const VehicleController = {
         });
 
         AthenaClient.systems.hotkeys.add({
-            key: KEY_BINDS.VEHICLE_LOCK,
+            key: KEY_BINDS.TOGGLE_LOCK,
             description: 'Vehicle Lock Toggle',
             identifier: 'toggle-vehicle-lock',
             keyDown: VehicleController.emitLock,

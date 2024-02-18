@@ -55,8 +55,8 @@ export const KEY_BINDS = {
     WALKIETALKIE_TALK: 84,
     // F5
     CHAT: 116,
-    // X
-    VEHICLE_LOCK: 88,
+    // X - Toogles Locks, e.g vehicle locks
+    TOGGLE_LOCK: 88,
     // Y
     VEHICLE_ENGINE: 89,
     // Y (REPLACED WITH E OBJECT MENU)
