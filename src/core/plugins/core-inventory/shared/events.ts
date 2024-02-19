@@ -28,9 +28,13 @@ export const INVENTORY_EVENTS = {
     },
     TO_WEBVIEW: {
         SET_CUSTOM: 'inventory:event:set:custom',
+        RESYNC_CUSTOM: 'inventory:event:resync:custom',
         SET_SECOND: 'inventory:event:set:second',
+        RESYNC_SECOND: 'inventory:event:resync:second',
         SET_MACHINE: 'inventory:event:set:machine',
+        RESYNC_MACHINE: 'inventory:event:resync:machine',
         SET_INVENTORY: 'inventory:event:set:inventory',
+        RESYNC_INVENTORY: 'inventory:event:resync:inventory',
         SET_SIZE: 'inventory:event:set:size',
         SET_WEIGHT_STATE: 'inventory:event:set:weight:state',
         SET_MAX_WEIGHT: 'inventory:event:set:max:weight',

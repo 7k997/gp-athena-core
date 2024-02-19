@@ -746,6 +746,9 @@ export default defineComponent({
                 this.weightLimits = newWeightLimits;
             }
         },
+        resyncCustomItems(customItems: Array<Item>) {
+           this.setCustomItems(customItems, this.customName, this.slotLimits.custom, this.customTotalWeight, this.weightLimits.custom, this.showCustomPrices)
+        },
         setSecondItems(secondItems: Array<Item>, secondName: string, maximumSize: number, totalWeight: number, maxWeight: number, showPrices: boolean = false) {
             if (typeof secondItems === 'undefined') {
                 secondItems = [];
@@ -774,6 +777,9 @@ export default defineComponent({
                 this.weightLimits = newWeightLimits;
             }
         },
+        resyncSecondItems(secondItems: Array<Item>) {
+            this.setSecondItems(secondItems, this.secondName, this.slotLimits.second, this.secondTotalWeight, this.weightLimits.second, this.showSecondPrices)
+        },
         setMachineItems(machineItems: Array<Item>, machineName: string, maximumSize: number, totalWeight: number, maxWeight: number) {
             if (typeof machineItems === 'undefined') {
                 machineItems = [];
@@ -800,6 +806,9 @@ export default defineComponent({
                 newWeightLimits.machine = maxWeight;
                 this.weightLimits = newWeightLimits;
             }
+        },
+        resyncMachineItems(machineItems: Array<Item>) {
+            this.setMachineItems(machineItems, this.machineName, this.slotLimits.machine, this.machineTotalWeight, this.weightLimits.machine);
         },
         contextMenuToolbar(e: MouseEvent, slot: number) {
             if (e.altKey) {
@@ -1166,8 +1175,11 @@ export default defineComponent({
 
         if ('alt' in window) {
             WebViewEvents.on(INVENTORY_EVENTS.TO_WEBVIEW.SET_CUSTOM, this.setCustomItems);
+            WebViewEvents.on(INVENTORY_EVENTS.TO_WEBVIEW.RESYNC_CUSTOM, this.resyncCustomItems);         
             WebViewEvents.on(INVENTORY_EVENTS.TO_WEBVIEW.SET_SECOND, this.setSecondItems)
+            WebViewEvents.on(INVENTORY_EVENTS.TO_WEBVIEW.RESYNC_SECOND, this.resyncSecondItems);
             WebViewEvents.on(INVENTORY_EVENTS.TO_WEBVIEW.SET_MACHINE, this.setMachineItems)
+            WebViewEvents.on(INVENTORY_EVENTS.TO_WEBVIEW.RESYNC_MACHINE, this.resyncMachineItems);
             WebViewEvents.on(INVENTORY_EVENTS.TO_WEBVIEW.SET_INVENTORY, this.setItems);
             WebViewEvents.on(INVENTORY_EVENTS.TO_WEBVIEW.SET_SIZE, this.setSize);
             WebViewEvents.on(INVENTORY_EVENTS.TO_WEBVIEW.SET_WEIGHT_STATE, this.setWeightState);
