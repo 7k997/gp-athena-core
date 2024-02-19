@@ -941,11 +941,11 @@ export async function swapBetween(
     if (toIndex !== -1) {
         toItem = deepCloneObject<StoredItem>(toData[toIndex]);
         const toBaseItem = Athena.systems.inventory.factory.getBaseItem(toItem.dbName, toItem.version);
-        if (from.type === 'toolbar' && toBaseItem && toBaseItem.behavior && !toBaseItem.behavior.isToolbar) {
+        if (from.type === 'toolbar' && toBaseItem && toBaseItem.behavior && toBaseItem.behavior && !toBaseItem.behavior.isToolbar) {
             return undefined;
         }
 
-        if (from.type === 'toolbar' && toBaseItem.behavior.isWeapon) {
+        if (from.type === 'toolbar' && toBaseItem && toBaseItem.behavior && toBaseItem.behavior.isWeapon) {
             toItem.isEquipped = false;
         }
 

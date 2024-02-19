@@ -157,6 +157,7 @@ export async function invokeInjection(
         for (let cb of InjectionList[event][anyDbNamePlaceholder]) {
             try {
                 item = await cb(player, item, info);
+                if (item === null) return null;
             } catch (err) {
                 console.warn(`Got swap Injection Error: ${err}`);
                 continue;
@@ -171,6 +172,7 @@ export async function invokeInjection(
     for (let cb of InjectionList[event][item.dbName]) {
         try {
             item = await cb(player, item, info);
+            if (item === null) return null;
         } catch (err) {
             console.warn(`Got swap Injection Error: ${err}`);
             continue;

@@ -118,6 +118,7 @@ export function set<CustomCurrency>(
     player: alt.Player,
     type: DefaultCurrency | CustomCurrency,
     amount: number,
+    skipCallbacks = false,
 ): boolean {
     if (typeof Overrides.set === 'function') {
         return Overrides.set(player, type, amount);
@@ -129,7 +130,7 @@ export function set<CustomCurrency>(
 
     try {
         const actualType = String(type);
-        Athena.document.character.set(player, actualType, amount);
+        Athena.document.character.set(player, actualType, amount, skipCallbacks);
         Athena.player.emit.meta(player, actualType, amount);
         return true;
     } catch (err) {
@@ -200,7 +201,8 @@ interface CurrencyFunctions {
 const Overrides: Partial<CurrencyFunctions> = {};
 
 export function override(functionName: 'add', callback: typeof add);
-export function override(functionName: 'set', callback: typeof set);
+// DO NOT OVERRIDE THIS FUNCTION. IT COULD BREAK THE CURRENCY SYSTEM.
+// export function override(functionName: 'set', callback: typeof set);
 export function override(functionName: 'sub', callback: typeof sub);
 export function override(functionName: 'subAllCurrencies', callback: typeof subAllCurrencies);
 /**

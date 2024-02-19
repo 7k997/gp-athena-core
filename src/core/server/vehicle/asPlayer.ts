@@ -175,7 +175,12 @@ export async function closeDoor(player: alt.Player, vehicle: alt.Vehicle, door: 
         return;
     }
 
+    if (!sharedOwnershipChecks(player, vehicle)) {
+        return;
+    }
+
     const eventToEmit = 'door-closed'
+    await Athena.vehicle.controls.closeDoor(vehicle, door);
     Athena.vehicle.events.trigger(eventToEmit, vehicle, door, player);
 }
 

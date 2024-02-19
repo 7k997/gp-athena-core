@@ -30,8 +30,8 @@ const InternalController = {
         const savedDoors = await Database.fetchAllData<DoorDocument>(Collections.Doors);
 
         for (let door of savedDoors) {
-            lastReservedLockID = Math.max(lastReservedLockID, door.lockID);
-            lastReservedDoorUID = Math.max(lastReservedDoorUID, parseInt(door.uid));
+            if (door.lockID) lastReservedLockID = Math.max(lastReservedLockID, door.lockID);
+            if (door.uid) lastReservedDoorUID = Math.max(lastReservedDoorUID, parseInt(door.uid));
             const index = globalDoors.findIndex((x) => x.uid === door.uid);
             if (index <= -1) {
                 InternalController.create(door);

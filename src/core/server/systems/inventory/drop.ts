@@ -85,6 +85,7 @@ export function invokeInjection(
     for (let cb of InjectionList[event][anyDbNamePlaceholder]) {
         try {
             item = cb(player, item, fromType);
+            if (item === null) return null;
         } catch (err) {
             console.warn(`Got drop Injection Error: ${err}`);
             continue;
@@ -98,6 +99,7 @@ export function invokeInjection(
     for (let cb of InjectionList[event][item.dbName]) {
         try {
             item = cb(player, item, fromType);
+            if (item === null) return null;
         } catch (err) {
             console.warn(`Got drop Injection Error: ${err}`);
             continue;
