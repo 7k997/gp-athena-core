@@ -99,7 +99,7 @@ export class GPFactionStorageSystem {
         const maxWeight = faction.storages[storageIndex].maxWeight
             ? faction.storages[storageIndex].maxWeight
             : FactionStorageConfig.DEFAULT_MAX_WEIGHT;
-        InventoryView.storage.open(player, storageID, storedItems, maxSlots, true, maxWeight);
+        InventoryView.storage.open(player, storageID, storedItems, maxSlots, true, maxWeight, false, faction.name);
         return true;
     }
 

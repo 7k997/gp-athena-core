@@ -1103,9 +1103,12 @@ export const InventoryView = {
             openStorages[player.id] = deepCloneArray<StoredItem>(items);
             openStorageSessions[player.id] = uid;
             openStoragesWeight[player.id] = maxWeight;
+
+            openStorages[player.id] = Athena.systems.inventory.weight.update(openStorages[player.id]);
+            const storageWeight = Athena.systems.inventory.weight.getDataWeight(openStorages[player.id]);
+
             const fullStorageList = Athena.systems.inventory.manager.convertFromStored(openStorages[player.id]);
-            //TODO: Calculate weight
-            Athena.webview.emit(player, INVENTORY_EVENTS.TO_WEBVIEW.SET_CUSTOM, fullStorageList, storageName, storageSize, 0, maxWeight, showPrices);
+            Athena.webview.emit(player, INVENTORY_EVENTS.TO_WEBVIEW.SET_CUSTOM, fullStorageList, storageName, storageSize, storageWeight, maxWeight, showPrices);
         },
         /**
          * Updates a storage session with new data.
@@ -1118,9 +1121,11 @@ export const InventoryView = {
                 return;
             }
 
+            openStorages[player.id] = Athena.systems.inventory.weight.update(openStorages[player.id]);
+            const storageWeight = Athena.systems.inventory.weight.getDataWeight(openStorages[player.id]);
+
             const fullStorageList = Athena.systems.inventory.manager.convertFromStored(openStorages[player.id]);
-            //TODO: Calculate weight
-            Athena.webview.emit(player, INVENTORY_EVENTS.TO_WEBVIEW.RESYNC_CUSTOM, fullStorageList);
+            Athena.webview.emit(player, INVENTORY_EVENTS.TO_WEBVIEW.RESYNC_CUSTOM, fullStorageList, storageWeight);
         },
         /**
          * Returns true if a player is using the matching session uid.
@@ -1215,12 +1220,17 @@ export const InventoryView = {
             openStoragesWeight[player.id] = maxWeight;
             openMachineStoragesWeight[player.id] = machineMaxWeight;
 
+            openStorages[player.id] = Athena.systems.inventory.weight.update(openStorages[player.id]);
+            const storageWeight = Athena.systems.inventory.weight.getDataWeight(openStorages[player.id]);
+
+            openMachineStorages[player.id] = Athena.systems.inventory.weight.update(openMachineStorages[player.id]);
+            const machineStorageWeight = Athena.systems.inventory.weight.getDataWeight(openMachineStorages[player.id]);
+
             const fullStorageList = Athena.systems.inventory.manager.convertFromStored(openStorages[player.id]);
             const fullMachineStorageList = Athena.systems.inventory.manager.convertFromStored(openMachineStorages[player.id]);
 
-            //TODO: Calculate weight
-            Athena.webview.emit(player, INVENTORY_EVENTS.TO_WEBVIEW.SET_CUSTOM, fullStorageList, storageName, storageSize, 0, maxWeight);
-            Athena.webview.emit(player, INVENTORY_EVENTS.TO_WEBVIEW.SET_MACHINE, fullMachineStorageList, machineName, machineStorageSize, 0, machineMaxWeight);
+            Athena.webview.emit(player, INVENTORY_EVENTS.TO_WEBVIEW.SET_CUSTOM, fullStorageList, storageName, storageSize, storageWeight, maxWeight, false, storageName);
+            Athena.webview.emit(player, INVENTORY_EVENTS.TO_WEBVIEW.SET_MACHINE, fullMachineStorageList, machineName, machineStorageSize, machineStorageWeight, machineMaxWeight, machineName);
         },
         /**
          * Updates a storage session with new data.
@@ -1233,10 +1243,11 @@ export const InventoryView = {
                 return;
             }
 
+            openMachineStorages[player.id] = Athena.systems.inventory.weight.update(openMachineStorages[player.id]);
+            const storageWeight = Athena.systems.inventory.weight.getDataWeight(openMachineStorages[player.id]);
+
             const fullStorageList = Athena.systems.inventory.manager.convertFromStored(openMachineStorages[player.id]);
-            //TODO: Calculate weight
-            // alt.logWarning('resync machine storage, JSON: ' + JSON.stringify(fullStorageList));
-            Athena.webview.emit(player, INVENTORY_EVENTS.TO_WEBVIEW.RESYNC_MACHINE, fullStorageList);
+            Athena.webview.emit(player, INVENTORY_EVENTS.TO_WEBVIEW.RESYNC_MACHINE, fullStorageList, storageWeight);
         },
         /**
          * Returns true if a player is using the matching session uid.
@@ -1313,12 +1324,13 @@ export const InventoryView = {
 
             openSecondStorages[player.id] = deepCloneArray<StoredItem>(secondStorageItems);
             openSecondStorageSessions[player.id] = secondStorageUid;
-            openMachineStoragesWeight[player.id] = secondStorageMaxWeight;
+            openSecondStoragesWeight[player.id] = secondStorageMaxWeight;
+
+            secondStorageItems = Athena.systems.inventory.weight.update(secondStorageItems);
+            const storageWeight = Athena.systems.inventory.weight.getDataWeight(secondStorageItems);
 
             const fullSecondStorageList = Athena.systems.inventory.manager.convertFromStored(openSecondStorages[player.id]);
-
-            //TODO: Calculate weight
-            Athena.webview.emit(player, INVENTORY_EVENTS.TO_WEBVIEW.SET_SECOND, fullSecondStorageList, storageName, secondStorageSize, 0, secondStorageMaxWeight);
+            Athena.webview.emit(player, INVENTORY_EVENTS.TO_WEBVIEW.SET_SECOND, fullSecondStorageList, storageName, secondStorageSize, storageWeight, secondStorageMaxWeight);
         },
         /**
          * Updates a storage session with new data.
@@ -1331,10 +1343,12 @@ export const InventoryView = {
                 return;
             }
 
+            openSecondStorages[player.id] = Athena.systems.inventory.weight.update(openSecondStorages[player.id]);
+            const storageWeight = Athena.systems.inventory.weight.getDataWeight(openSecondStorages[player.id]);
+
             const fullStorageList = Athena.systems.inventory.manager.convertFromStored(openSecondStorages[player.id]);
-            //TODO: Calculate weight
-            // alt.logWarning('resync machine storage, JSON: ' + JSON.stringify(fullStorageList));
-            Athena.webview.emit(player, INVENTORY_EVENTS.TO_WEBVIEW.RESYNC_SECOND, fullStorageList);
+
+            Athena.webview.emit(player, INVENTORY_EVENTS.TO_WEBVIEW.RESYNC_SECOND, fullStorageList, storageWeight);
         },
         /**
          * Returns true if a player is using the matching session uid.

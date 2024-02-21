@@ -295,13 +295,17 @@ export async function sub(id: string): Promise<StoredItem | undefined> {
         return Overrides.sub(id);
     }
 
-    alt.logWarning('Sub item drop!!!!: ' + id);
     let itemClone: StoredItem = undefined;
+
+    const drop = drops.get(id);
+    if (!drop) {
+        alt.logWarning(`[Athena] Drop Sub - Item drop not found: ${id}`);
+    }
 
     let remove = true;
     for (const callback of RemoveInjections) {
         try {
-            remove = await callback(drops.get(id));
+            remove = await callback(drop);
         } catch (err) {
             console.warn(`Got Itemdrop Remove Injection Error: ${err}`);
             continue;
@@ -312,7 +316,8 @@ export async function sub(id: string): Promise<StoredItem | undefined> {
     delete markAsTaken[id];
 
     Athena.controllers.itemDrops.remove(id);
-    const newItem = deepCloneObject<ItemDrop>(drops.get(id));
+
+    const newItem = deepCloneObject<ItemDrop>(drop);
     drops.delete(id);
     await removeFromDatabase(id);
     delete newItem._id;

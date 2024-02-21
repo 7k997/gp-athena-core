@@ -727,7 +727,7 @@ export default defineComponent({
             this.showCustomPrices = showPrices;
 
             if(typeof customName !== 'undefined') {
-                this.secondName = customName;
+                this.customName = customName;
             }
 
             if (typeof maximumSize !== 'undefined') {
@@ -741,12 +741,15 @@ export default defineComponent({
             }            
 
             if (typeof maxWeight !== 'undefined') {
-                const newWeightLimits = { ...this.slotLimits };
+                const newWeightLimits = { ...this.weightLimits };
                 newWeightLimits.custom = maxWeight;
                 this.weightLimits = newWeightLimits;
             }
         },
-        resyncCustomItems(customItems: Array<Item>) {
+        resyncCustomItems(customItems: Array<Item>, customTotalWeight: number = null) {
+            if(customTotalWeight !== null) {
+                this.customTotalWeight = customTotalWeight;
+            }
            this.setCustomItems(customItems, this.customName, this.slotLimits.custom, this.customTotalWeight, this.weightLimits.custom, this.showCustomPrices)
         },
         setSecondItems(secondItems: Array<Item>, secondName: string, maximumSize: number, totalWeight: number, maxWeight: number, showPrices: boolean = false) {
@@ -772,12 +775,15 @@ export default defineComponent({
             }            
 
             if (typeof maxWeight !== 'undefined') {
-                const newWeightLimits = { ...this.slotLimits };
+                const newWeightLimits = { ...this.weightLimits };
                 newWeightLimits.second = maxWeight;
                 this.weightLimits = newWeightLimits;
             }
         },
-        resyncSecondItems(secondItems: Array<Item>) {
+        resyncSecondItems(secondItems: Array<Item>, customTotalWeight: number = null) {
+            if(customTotalWeight !== null) {
+                this.secondTotalWeight = customTotalWeight;
+            }
             this.setSecondItems(secondItems, this.secondName, this.slotLimits.second, this.secondTotalWeight, this.weightLimits.second, this.showSecondPrices)
         },
         setMachineItems(machineItems: Array<Item>, machineName: string, maximumSize: number, totalWeight: number, maxWeight: number) {
@@ -807,7 +813,10 @@ export default defineComponent({
                 this.weightLimits = newWeightLimits;
             }
         },
-        resyncMachineItems(machineItems: Array<Item>) {
+        resyncMachineItems(machineItems: Array<Item>, customTotalWeight: number = null) {
+            if(customTotalWeight !== null) {
+                this.machineTotalWeight = customTotalWeight;
+            }
             this.setMachineItems(machineItems, this.machineName, this.slotLimits.machine, this.machineTotalWeight, this.weightLimits.machine);
         },
         contextMenuToolbar(e: MouseEvent, slot: number) {
@@ -1353,7 +1362,7 @@ export default defineComponent({
 
 .production {
     overflow-y: auto;
-    height: 21vh;
+    height: 18.5vh;
     padding-left: 10px;
 
     min-height: 5.5vh;
@@ -1558,7 +1567,7 @@ export default defineComponent({
 .item-descriptor {
     min-height: 5.5vh;
     margin-left: 10px;
-    margin-top: 10px;
+    margin-top: 5px;
     border: 2px solid rgba(255, 255, 255, 0.1);
     /* padding: 15px; */
     margin-right: 10px;
