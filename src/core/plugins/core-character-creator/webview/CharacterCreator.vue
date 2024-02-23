@@ -48,6 +48,15 @@ import { MaleHairOverlays, FemaleHairOverlays } from './utility/hairOverlays.js'
 import { MalePresets, FemalePresets } from './utility/presets.js';
 import { CHARACTER_CREATOR_LOCALE } from '../shared/locale.js';
 import { CHARACTER_CREATOR_WEBVIEW_EVENTS } from '../shared/events.js';
+import { LocaleController } from '@AthenaShared/locale/locale.js'; 
+
+//detect browser language only on char creator. 
+//Verify if language is supported and if not, use default language
+const browserLanguage = navigator.language.split('-')[0];
+let language = LocaleController.getDefaultLocale().toString();
+if( LocaleController.isLocaleValid(browserLanguage) && !!CHARACTER_CREATOR_LOCALE[browserLanguage] ){
+    language = browserLanguage;
+}
 
 const ComponentName = 'CharacterCreator';
 export default defineComponent({
@@ -104,7 +113,7 @@ export default defineComponent({
             },
             navOptions: ['Appearance', 'Structure', 'Hair', 'Overlays', 'Makeup', 'Info'],
             totalCharacters: 1,
-            locales: CHARACTER_CREATOR_LOCALE,
+            locales: CHARACTER_CREATOR_LOCALE[language],
         };
     },
     computed: {

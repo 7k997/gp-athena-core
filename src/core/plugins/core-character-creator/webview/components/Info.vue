@@ -1,6 +1,6 @@
 <template>
     <div class="wrapper stack" v-if="!processing">
-        <div class="subtitle-2 grey--text mb-2 mt-2">Character Info</div>
+        <div class="subtitle-2 grey--text mb-2 mt-2">{{ locales.LABEL_CHAR_INFO }}</div>
         <div class="split split-full center">
             <Input
                 :label="locales.LABEL_FIRST_NAME"
@@ -10,10 +10,10 @@
                 :value="''"
                 :rules="[
                     (text) => {
-                        return new RegExp(/^[a-zA-Z]+$/gm).test(text) ? null : 'Name cannot include special characters';
+                        return new RegExp(/^[a-zA-Z]+$/gm).test(text) ? null : `${locales.MESSAGE_NAME_SPECIAL}`;
                     },
                     (text) => {
-                        return text.length >= 3 ? null : 'First name must be at least 3 characters';
+                        return text.length >= 3 ? null : `${locales.MESSAGE_NAME_LENGTH}`;
                     },
                 ]"
                 :swapIconSide="true"
@@ -31,10 +31,10 @@
                 :value="''"
                 :rules="[
                     (text) => {
-                        return new RegExp(/^[a-zA-Z]+$/gm).test(text) ? null : 'Name cannot include special characters';
+                        return new RegExp(/^[a-zA-Z]+$/gm).test(text) ? null : `${locales.MESSAGE_NAME_SPECIAL}`;
                     },
                     (text) => {
-                        return text.length >= 3 ? null : 'Last name must be at least 3 characters';
+                        return text.length >= 3 ? null : `${locales.MESSAGE_NAME_LENGTH}`;
                     },
                 ]"
                 :swapIconSide="true"
@@ -44,7 +44,7 @@
             />
         </div>
 
-        <div class="subtitle-2 grey--text mb-2 mt-6">Age</div>
+        <div class="subtitle-2 grey--text mb-2 mt-6">{{ locales.LABEL_CHAR_AGE }}</div>
         <div class="split split-full center mt-2">
             <Input
                 :label="locales.LABEL_MONTH"
@@ -55,7 +55,7 @@
                 :value="''"
                 :rules="[
                     (text) => {
-                        return parseFloat(text) >= 1 && parseFloat(text) <= 12 ? null : 'Month is 1 to 12';
+                        return parseFloat(text) >= 1 && parseFloat(text) <= 12 ? null : `${locales.MESSAGE_MONTH}`;
                     },
                 ]"
                 :swapIconSide="true"
@@ -74,7 +74,7 @@
                 :value="''"
                 :rules="[
                     (text) => {
-                        return parseFloat(text) >= 1 && parseFloat(text) <= 31 ? null : 'Day is 1 to 31';
+                        return parseFloat(text) >= 1 && parseFloat(text) <= 31 ? null : `${locales.MESSAGE_DAY}`;
                     },
                 ]"
                 :swapIconSide="true"
@@ -93,10 +93,10 @@
                 :value="''"
                 :rules="[
                     (text) => {
-                        return parseFloat(text) >= minYear ? null : `Minimum Year: ${minYear}`;
+                        return parseFloat(text) >= minYear ? null : `${locales.MESSAGE_MINIMUM_YEAR} ${minYear}`;
                     },
                     (text) => {
-                        return parseFloat(text) <= maxYear ? null : `Maximum Year: ${maxYear}`;
+                        return parseFloat(text) <= maxYear ? null : `${locales.MESSAGE_MAXIMUM_YEAR} ${maxYear}`;
                     },
                 ]"
                 :swapIconSide="true"
@@ -106,7 +106,7 @@
             />
         </div>
 
-        <div class="subtitle-2 grey--text mb-2 mt-6">Gender</div>
+        <div class="subtitle-2 grey--text mb-2 mt-6">{{ locales.LABEL_CHAR_GENDER }}</div>
         <div class="split split-full center mt-2 mb-4">
             <Input
                 :label="locales.characterGender"
@@ -116,10 +116,10 @@
                 :value="''"
                 :rules="[
                     (text) => {
-                        return new RegExp(/^[a-zA-Z]+$/gm).test(text) ? null : 'No special characters';
+                        return new RegExp(/^[a-zA-Z]+$/gm).test(text) ? null : `${locales.MESSAGE_NO_SPECIAL}`;
                     },
                     (text) => {
-                        return text.length >= 3 ? null : 'Gender must be at least 3 characters';
+                        return text.length >= 3 ? null : `${locales.MESSAGE_GENDER}`;
                     },
                 ]"
                 :swapIconSide="true"
@@ -128,7 +128,7 @@
                 class="fill-full-width"
             />
         </div>
-        <div class="subtitle-2 grey--text mb-2 mt-6">Language</div>
+        <div class="subtitle-2 grey--text mb-2 mt-6">{{ locales.LABEL_CHAR_LANG }}</div>
         <div class="split split-full center mt-2 mb-4">
             <Input
                 :label="locales.characterLanguage"
@@ -138,10 +138,10 @@
                 :value="''"
                 :rules="[
                     (text) => {
-                        return new RegExp(/^[a-zA-Z]+$/gm).test(text) ? null : 'No special characters';
+                        return new RegExp(/^[a-zA-Z]+$/gm).test(text) ? null : `${locales.MESSAGE_NAME_SPECIAL}`;
                     },
                     (text) => {
-                        return text.length == 2 ? null : 'language must 2 characters (en, de, es, fr, etc.)';
+                        return text.length == 2 ? null : `${locales.MESSAGE_LANGUAGE}`;
                     },
                 ]"
                 :swapIconSide="true"
@@ -151,11 +151,11 @@
             />
         </div>
         <div class="split split-full center mt-8 pb-4" v-if="!isAllValid() && valid.first && valid.last">
-            <Button color="amber" :raise="true" @click="verifyName">Verify Name</Button>
+            <Button color="amber" :raise="true" @click="verifyName">{{ locales.BUTTON_VERIFY_NAME }}</Button>
         </div>
         <div class="split split-full space-between center mt-8 pb-4" v-if="isAllValid() && valid?.first && valid.last">
-            <Button class="mr-2 fill-full-width" color="amber" :raise="true" @click="verifyName">Verify Name</Button>
-            <Button class="ml-2 fill-full-width" color="green" :raise="true" @click="save">Finish</Button>
+            <Button class="mr-2 fill-full-width" color="amber" :raise="true" @click="verifyName">{{ locales.BUTTON_VERIFY_NAME }}</Button>
+            <Button class="ml-2 fill-full-width" color="green" :raise="true" @click="save">{{ locales.BUTTON_FINISH }}</Button>
         </div>
     </div>
 </template>
@@ -185,7 +185,7 @@ export default defineComponent({
             first: '',
             last: '',
             gender: '',
-            language: 'en',
+            language: navigator.language.split('-')[0],
             valid: {
                 first: false,
                 last: false,
