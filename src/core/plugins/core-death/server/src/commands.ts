@@ -7,7 +7,7 @@ export class DeathCommands {
     static init() {
         Athena.systems.messenger.commands.register(
             'revive',
-            LocaleController.get(LOCALE_KEYS.COMMAND_REVIVE, '/revive'),
+            LocaleController.get(LOCALE_KEYS.COMMAND_REVIVE, null, '/revive'),
             ['admin'],
             DeathCommands.handleRevive,
         );

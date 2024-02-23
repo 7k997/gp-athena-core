@@ -1,3 +1,5 @@
+import { LOCALE } from "@AthenaShared/locale/locale.js";
+
 /**
  * Used for supplying general character information to the Database.
  *
@@ -20,4 +22,11 @@ export interface CharacterInfo {
      *
      */
     age?: any;
+
+    /**
+     * A custom field for character information about language.
+     * @type {string}
+     *
+     */
+    language?: LOCALE;
 }

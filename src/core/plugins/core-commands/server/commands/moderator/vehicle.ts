@@ -78,14 +78,14 @@ Athena.commands.register(
 
 Athena.commands.register(
     'setVehicleLivery',
-    LocaleController.get(LOCALE_KEYS.COMMAND_SET_VEHICLE_LIVERY, '/setVehicleLivery'),
+    LocaleController.get(LOCALE_KEYS.COMMAND_SET_VEHICLE_LIVERY, null, '/setVehicleLivery'),
     ['admin'],
     setLivery,
 );
 
 Athena.commands.register(
     'svl',
-    LocaleController.get(LOCALE_KEYS.COMMAND_SET_VEHICLE_LIVERY, '/svl'),
+    LocaleController.get(LOCALE_KEYS.COMMAND_SET_VEHICLE_LIVERY, null, '/svl'),
     ['admin'],
     setLivery,
 );
@@ -134,14 +134,14 @@ function setLivery(player: alt.Player, livery: string) {
 
 Athena.commands.register(
     'setvehicledirtLevel',
-    LocaleController.get(LOCALE_KEYS.COMMAND_SET_VEH_DIRT_LEVEL, '/setvehicledirtLevel'),
+    LocaleController.get(LOCALE_KEYS.COMMAND_SET_VEH_DIRT_LEVEL, null, '/setvehicledirtLevel'),
     ['admin'],
     setVehicleDirtlevel,
 );
 
 Athena.commands.register(
     'svdl',
-    LocaleController.get(LOCALE_KEYS.COMMAND_SET_VEH_DIRT_LEVEL, '/svdl'),
+    LocaleController.get(LOCALE_KEYS.COMMAND_SET_VEH_DIRT_LEVEL, null, '/svdl'),
     ['admin'],
     setVehicleDirtlevel,
 );
@@ -179,7 +179,7 @@ function setVehicleDirtlevel(player: alt.Player, dirtLevel: string) {
 
 Athena.commands.register(
     'sessionvehicle',
-    LocaleController.get(LOCALE_KEYS.COMMAND_SESSION_VEHICLE, '/sessionvehicle'),
+    LocaleController.get(LOCALE_KEYS.COMMAND_SESSION_VEHICLE, null, '/sessionvehicle'),
     ['admin'],
     (player: alt.Player, model: string) => {
         if (!model) {
@@ -198,7 +198,7 @@ Athena.commands.register(
 
 Athena.commands.register(
     'fullTuneVehicle',
-    LocaleController.get(LOCALE_KEYS.COMMAND_FULL_TUNE_VEHICLE, '/fullTuneVehicle'),
+    LocaleController.get(LOCALE_KEYS.COMMAND_FULL_TUNE_VEHICLE, null, '/fullTuneVehicle'),
     ['admin'],
     (player: alt.Player) => {
         const vehicle = player.vehicle ? player.vehicle : Athena.utility.closest.getClosestVehicle(player.pos);

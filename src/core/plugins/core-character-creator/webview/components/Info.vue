@@ -128,6 +128,28 @@
                 class="fill-full-width"
             />
         </div>
+        <div class="subtitle-2 grey--text mb-2 mt-6">Language</div>
+        <div class="split split-full center mt-2 mb-4">
+            <Input
+                :label="locales.characterLanguage"
+                :stack="true"
+                :onInput="(text) => inputChange('language', text)"
+                :validateCallback="(valid) => setValidityProp('language', valid)"
+                :value="''"
+                :rules="[
+                    (text) => {
+                        return new RegExp(/^[a-zA-Z]+$/gm).test(text) ? null : 'No special characters';
+                    },
+                    (text) => {
+                        return text.length == 2 ? null : 'language must 2 characters (en, de, es, fr, etc.)';
+                    },
+                ]"
+                :swapIconSide="true"
+                :icon="valid?.language ? 'icon-checkmark' : 'icon-question'"
+                :placeholder="language"
+                class="fill-full-width"
+            />
+        </div>
         <div class="split split-full center mt-8 pb-4" v-if="!isAllValid() && valid.first && valid.last">
             <Button color="amber" :raise="true" @click="verifyName">Verify Name</Button>
         </div>
@@ -163,6 +185,7 @@ export default defineComponent({
             first: '',
             last: '',
             gender: '',
+            language: 'en',
             valid: {
                 first: false,
                 last: false,
@@ -171,6 +194,7 @@ export default defineComponent({
                 year: false,
                 name: false,
                 gender: false,
+                language: true,
             },
             day: 1,
             month: 1,
@@ -249,6 +273,7 @@ export default defineComponent({
             }
 
             this.$emit('set-infodata', 'gender', this.gender);
+            this.$emit('set-infodata', 'language', this.language);
             this.$emit('set-infodata', 'age', `${this.day}-${this.month}-${this.year}`);
 
             if (!('alt' in window)) {

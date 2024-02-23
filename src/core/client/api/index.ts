@@ -8,5 +8,6 @@ import * as utility from '@AthenaClient/utility/index.js';
 import * as webview from '@AthenaClient/webview/index.js';
 import * as webviewCinema from '@AthenaClient/webviewCinema/index.js';
 import * as world from '@AthenaClient/world/index.js';
+import { LocaleController as locale } from "@AthenaShared/locale/locale.js";
 
-export { camera, menu, rmlui, screen, streamers, systems, utility, webview, webviewCinema, world };
+export { camera, menu, rmlui, screen, streamers, systems, utility, webview, webviewCinema, world, locale };

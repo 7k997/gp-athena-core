@@ -13,6 +13,7 @@ export * as systems from '@AthenaServer/systems/index.js';
 export * as utility from '@AthenaServer/utility/index.js';
 export * as vehicle from '@AthenaServer/vehicle/index.js';
 export * as webview from '@AthenaServer/webview/index.js';
+export { LocaleController as locale } from "@AthenaShared/locale/locale.js";
 
 import * as config from '@AthenaServer/config/index.js';
 import * as controllers from '@AthenaServer/controllers/index.js';
@@ -28,6 +29,7 @@ import * as systems from '@AthenaServer/systems/index.js';
 import * as utility from '@AthenaServer/utility/index.js';
 import * as vehicle from '@AthenaServer/vehicle/index.js';
 import * as webview from '@AthenaServer/webview/index.js';
+import { LocaleController as locale } from "@AthenaShared/locale/locale.js";
 
 export default {
     config,
@@ -44,4 +46,5 @@ export default {
     utility,
     vehicle,
     webview,
+    locale,
 };

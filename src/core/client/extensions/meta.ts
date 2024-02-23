@@ -1,4 +1,5 @@
 import { Appearance } from '@AthenaShared/interfaces/appearance.js';
+import { LOCALE } from '@AthenaShared/locale/locale.js';
 
 export interface Meta {
     permissionLevel: number; // Used to determine the player's current permissionLevel as a player..
@@ -28,4 +29,7 @@ export interface Meta {
     // Keys
     lockIDs: number[];
     mainLockIDs: number[];
+
+    // Multilanguage
+    language: LOCALE;
 }
