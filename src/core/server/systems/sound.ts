@@ -20,6 +20,16 @@ export interface CustomSoundInfo {
     pos?: alt.IVector3;
 
     /**
+     * Play sound also for all players in the vehicle.
+     * You can leave the pos empty if you want to play the sound only for players in the vehicle.
+     * If you set also the pos, the sound will be played for all players in the vehicle and in the area.
+     *
+     * @type {alt.IVector3}
+     *
+     */
+    vehicle?: alt.Vehicle;
+
+    /**
      * The volume between `0.0` - `1.0`.
      *
      * Recommended: `0.35`.
@@ -97,30 +107,39 @@ export function playSoundInDimension(dimension: number, soundInfo: Omit<CustomSo
  * @return {void}
  *
  */
-export function playSoundInArea(soundInfo: Required<Omit<CustomSoundInfo, 'target' | 'volume'>>, maxDistance?: number) {
+export function playSoundInArea(soundInfo: CustomSoundInfo, maxDistance?: number, soundInstantID?: string) {
     if (Overrides.playSoundInArea) {
         return Overrides.playSoundInArea(soundInfo);
     }
 
-    const players = [...alt.Player.all].filter((t) => {
-        const dist = distance2d(t.pos, soundInfo.pos);
+    let pos = soundInfo.pos;
+    const playersMap = new Map<alt.Player, boolean>();
+    if (soundInfo.vehicle) {
+        Object.values(soundInfo.vehicle.passengers).forEach(player => playersMap.set(player, true));
 
-        if (maxDistance) {
-            if (dist > maxDistance) {
-                return false;
+        if (!pos) {
+            pos = soundInfo.vehicle.pos;
             }
-        } else if (dist > MAX_AUDIO_AREA_DISTANCE) {
-            return false;
         }
 
-        return true;
-    });
+    if (soundInfo.pos) {
+        [...alt.Player.all].forEach(player => {
+            const dist = distance2d(player.pos, soundInfo.pos);
 
-    if (players.length <= 0) {
+            if ((maxDistance && dist <= maxDistance) || (!maxDistance && dist <= MAX_AUDIO_AREA_DISTANCE)) {
+                playersMap.set(player, true);
+            }
+    });
+    }
+
+    const players = Array.from(playersMap.keys());
+    if (!players || players.length <= 0) {
         return;
     }
 
-    alt.emitClient(players, SYSTEM_EVENTS.PLAYER_EMIT_SOUND_3D_POSITIONAL, soundInfo.pos, soundInfo.audioName);
+    const volume = soundInfo.volume;
+
+    alt.emitClient(players, SYSTEM_EVENTS.PLAYER_EMIT_SOUND_3D_POSITIONAL, pos, soundInfo.audioName, volume, soundInstantID);
 }
 
 interface SoundFuncs {

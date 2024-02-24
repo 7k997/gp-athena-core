@@ -28,18 +28,17 @@ export function frontend(audioName: string, ref: string): void {
  * @param {string} soundName
  * @param {string} soundInstantID, optional unique id to play sound instant
  */
-export function handlePlayAudioPositional(pos: alt.Vector3, soundName: string, soundInstantID?: string) {
+export function handlePlayAudioPositional(pos: alt.Vector3, soundName: string, volume: number = 0.35, soundInstantID?: string) {
     if (!pos || !soundName) {
         return;
     }
 
     const dist = distance(pos, alt.Player.local.pos);
-    let volume = 0.35;
     let pan = 0;
 
     const [_, x, y] = native.getScreenCoordFromWorldCoord(pos.x, pos.y, pos.z, undefined, undefined);
-    pan = x * 2 - 1;
-    volume = dist / 100 / 0.35;
+    pan = x * 2 - 1; //Direction
+    volume = volume - (dist / 100 * volume); //Corechange: Fixed volume calculation
 
     if (pan < -1) {
         pan = -1;
@@ -63,13 +62,12 @@ export function handlePlayAudioPositional(pos: alt.Vector3, soundName: string, s
  * @param {string} soundName
  * @param {string} soundInstantID, optional unique id to play sound instant
  */
-export function play3d(entity: alt.Entity, soundName: string, soundInstantID?: string): void {
+export function play3d(entity: alt.Entity, soundName: string, volume: number = 0.35, soundInstantID?: string): void {
     if (!entity || !soundName) {
         return;
     }
 
     const dist = distance(entity.pos, alt.Player.local.pos);
-    let volume = 0.35;
     let pan = 0;
 
     if (alt.Player.local.scriptID !== entity.scriptID) {
