@@ -447,7 +447,8 @@ class InternalSystem {
         Athena.systems.storage.closeOnDisconnect(player, storageID);
 
         const storedItems = await Athena.systems.storage.get(storageID);
-        InventoryView.storage.open(player, storageID, storedItems, 256, true);
+        //TODO: Interior max weight
+        InventoryView.storage.open(player, storageID, storedItems, 256, true, 100, false, interior.name);
     }
 
     /**
