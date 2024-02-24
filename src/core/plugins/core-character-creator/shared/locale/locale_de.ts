@@ -315,6 +315,7 @@ export const CHARACTER_CREATOR_LOCALE_DE = {
             'Brusthaar',
             'Lachendes Gesicht',
             'Schädel',
+            'Schneckenschwanz',
             'Schnecke und Brustwarzen',
             'Haarige Arme',
             'Rasiert',
