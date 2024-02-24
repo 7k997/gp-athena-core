@@ -1,6 +1,19 @@
 import { LocaleFormat } from '../interfaces/localeFormat.js';
-import en from './languages/en.js'; // Importing the English Locale
+import ar from './languages/ar.js'; // Importing the Arabic Locale
+import cs from './languages/cs.js'; // Importing the Czech Locale
+import da from './languages/da.js'; // Importing the Danish Locale
 import de from './languages/de.js'; // Importing the German Locale
+import en from './languages/en.js'; // Importing the English Locale
+import es from './languages/es.js'; // Importing the Spanish Locale
+import fr from './languages/fr.js'; // Importing the French Locale
+import it from './languages/it.js'; // Importing the Italian Locale
+import nl from './languages/nl.js'; // Importing the Dutch Locale
+import pl from './languages/pl.js'; // Importing the Polish Locale
+import pt from './languages/pt.js'; // Importing the Portuguese Locale
+import ru from './languages/ru.js'; // Importing the Russian Locale
+import tr from './languages/tr.js'; // Importing the Turkish Locale
+import uk from './languages/uk.js'; // Importing the Ukrainian Locale
+import zh from './languages/zh.js'; // Importing the Chinese Locale
 export const placeholder = `_%_`;
 
 /**
@@ -19,20 +32,42 @@ export const placeholder = `_%_`;
  */
 
 export enum LOCALE {
-    English = 'en',
+    Arabic = 'ar',
+    Czech = 'cs',
+    Danish = 'da',
     German = 'de',
-    French = 'fr',
+    English = 'en',
     Spanish = 'es',
+    French = 'fr',
     Italian = 'it',
+    Dutch = 'nl',
+    Polish = 'pl',    
     Portuguese = 'pt',
     Russian = 'ru',
+    Turkish = 'tr',
+    Ukrainian = 'uk',
+    Chinese = 'zh',
+
     // Additional languages can be added here...
 }
 
 const translations: LocaleFormat = {
-    [LOCALE.English]: en,
+    [LOCALE.Arabic]: ar,
+    [LOCALE.Czech]: cs,
+    [LOCALE.Danish]: da,
     [LOCALE.German]: de,
-// de,
+    [LOCALE.English]: en,
+    [LOCALE.Spanish]: es,    
+    [LOCALE.French]: fr,    
+    [LOCALE.Italian]: it,
+    [LOCALE.Dutch]: nl,
+    [LOCALE.Polish]: pl,    
+    [LOCALE.Portuguese]: pt,
+    [LOCALE.Russian]: ru,
+    [LOCALE.Turkish]: tr,
+    [LOCALE.Ukrainian]: uk,
+    [LOCALE.Chinese]: zh,
+
     // Additional languages can be added here...
 };
 
@@ -112,5 +147,13 @@ export class LocaleController {
         }
 
         return translations[iso639][key];
+    }
+
+    static getDefaultLocale(): LOCALE {
+        return defaultLanguage;
+    }
+
+    static isLocaleValid(iso639: string): boolean {
+        return !!translations[iso639];
     }
 }

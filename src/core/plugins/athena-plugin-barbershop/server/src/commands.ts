@@ -40,7 +40,7 @@ export class BarbershopCommands {
 
         const customer = Athena.systems.identifier.getPlayer(id);
         if (!customer || !customer.valid) {
-            Athena.player.emit.message(hairDresser, LocaleController.get(LOCALE_KEYS.CANNOT_FIND_PLAYER));
+            Athena.player.emit.message(hairDresser, Athena.locale.get(hairDresser, LOCALE_KEYS.CANNOT_FIND_PLAYER));
             return;
         }
 

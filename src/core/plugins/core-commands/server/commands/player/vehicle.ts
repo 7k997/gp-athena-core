@@ -5,7 +5,7 @@ import { LOCALE_KEYS } from '@AthenaShared/locale/languages/keys.js';
 import { LocaleController } from '@AthenaShared/locale/locale.js';
 import { VEHICLE_EVENTS } from '@AthenaShared/enums/vehicle.js';
 
-const SeatbeltState: Array<{ id: number; vehicle_id: number; state: boolean }> = [];
+export const SeatbeltState: Array<{ id: number; vehicle_id: number; state: boolean }> = [];
 Athena.commands.register('vehengine', '/vehengine - Toggle Vehicle Engine', [], (player: alt.Player) => {
     if (!player || !player.valid || !player.vehicle) {
         return;
@@ -88,14 +88,40 @@ Athena.commands.register('seatbelt', '/seatbelt', [], (player: alt.Player) => {
 
     const currentState = SeatbeltState[index].state;
     if (currentState) {
-        Athena.player.emit.sound2D(player, 'seatbelt_on', 0.75);
+        // Athena.player.emit.sound2D(player, 'seatbelt_on', 0.75);
+        // Athena.player.emit.sound3D(player, 'seatbelt_on', player, 'seatbelt');
+        Athena.systems.sound.playSoundInArea({
+            audioName: 'seatbelt_on',
+            vehicle: player.vehicle,
+            volume: 1,
+        });
+
+        Athena.systems.sound.playSoundInArea({
+            audioName: 'car_unlock',
+            pos: player.vehicle.pos,
+            vehicle: player.vehicle,
+            volume: 0.15,
+        });
     } else {
-        Athena.player.emit.sound2D(player, 'seatbelt_off', 0.75);
+        // Athena.player.emit.sound2D(player, 'seatbelt_off', 0.75);
+        Athena.systems.sound.playSoundInArea({
+            audioName: 'seatbelt_off',
+            vehicle: player.vehicle,
+            volume: 0.75,
+        });
+
+        Athena.systems.sound.playSoundInArea({
+            audioName: 'seatbelt_off',
+            pos: player.vehicle.pos,
+            vehicle: player.vehicle,
+            volume: 0.15,
+        });
+        // Athena.player.emit.sound3D(player, 'seatbelt_on', player, 'seatbelt');
     }
 
     currentState
-        ? Athena.player.emit.notification(player, LocaleController.get(LOCALE_KEYS.PLAYER_SEATBELT_ON))
-        : Athena.player.emit.notification(player, LocaleController.get(LOCALE_KEYS.PLAYER_SEATBELT_OFF));
+        ? Athena.player.emit.notification(player, Athena.locale.get(player, LOCALE_KEYS.PLAYER_SEATBELT_ON))
+        : Athena.player.emit.notification(player, Athena.locale.get(player, LOCALE_KEYS.PLAYER_SEATBELT_OFF));
 
     alt.emitClient(player, VEHICLE_EVENTS.SET_SEATBELT, currentState);
 });

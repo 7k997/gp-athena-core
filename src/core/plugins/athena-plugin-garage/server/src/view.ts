@@ -146,14 +146,12 @@ export class GarageFunctions {
         const garageTypesExcluded = activeGarages[index].typesExcluded;
 
         // 2
-        alt.logWarning(`open - 2`);
+        // TODO: Check for keys / faction access and so on!
         let playerVehicles = await Athena.vehicle.get.ownedVehiclesByPlayer(player);
         // let playerVehicles = await Athena.player.get.allVehicles(player);
 
         // 3
-        alt.logWarning(`open - 3`);
         const validVehicles = playerVehicles.filter((vehicle) => {
-            alt.logWarning(`open - 3 - filter - ${vehicle.model}`);
             // 4
             // Check if the VehicleData has this vehicle model.
             let data = null;
@@ -239,9 +237,10 @@ export class GarageFunctions {
             }
 
             // Append vehicles that have been spawned that the player has access to to this list.
-            if (Athena.vehicle.spawn.temporary({ model: vehicle.model, pos: player.pos, rot: player.rot })) {
-                return true;
-            }
+            // FIXME: For what is that?
+            // if (Athena.vehicle.spawn.temporary({ model: vehicle.model, pos: player.pos, rot: player.rot })) {
+            //     return true;
+            // }
 
             return false;
         });
@@ -251,7 +250,7 @@ export class GarageFunctions {
 
         if (validVehicles.length <= 0) {
             Athena.player.emit.soundFrontend(player, 'Hack_Failed', 'DLC_HEIST_BIOLAB_PREP_HACKING_SOUNDS');
-            Athena.player.emit.notification(player, LocaleController.get(LOCALE_KEYS.VEHICLE_NO_VEHICLES_IN_GARAGE));
+            Athena.player.emit.notification(player, Athena.locale.get(player, LOCALE_KEYS.VEHICLE_NO_VEHICLES_IN_GARAGE));
             return;
         }
 
@@ -315,7 +314,7 @@ export class GarageFunctions {
 
         // if (Athena.vehicle.funcs.hasBeenSpawned(data.id)) {
         //     Athena.player.emit.soundFrontend(player, 'Hack_Failed', 'DLC_HEIST_BIOLAB_PREP_HACKING_SOUNDS');
-        //     Athena.player.emit.notification(player, LocaleController.get(LOCALE_KEYS.VEHICLE_ALREADY_SPAWNED));
+        //     Athena.player.emit.notification(player, Athena.locale.get(player, LOCALE_KEYS.VEHICLE_ALREADY_SPAWNED));
         //     alt.emitClient(player, GARAGE_INTERACTIONS.CLOSE);
         //     return;
         // }
@@ -331,7 +330,7 @@ export class GarageFunctions {
         const openSpot = GarageFunctions.findOpenSpot(shopIndex);
         if (!openSpot) {
             Athena.player.emit.soundFrontend(player, 'Hack_Failed', 'DLC_HEIST_BIOLAB_PREP_HACKING_SOUNDS');
-            Athena.player.emit.notification(player, LocaleController.get(LOCALE_KEYS.VEHICLE_NO_PARKING_SPOTS));
+            Athena.player.emit.notification(player, Athena.locale.get(player, LOCALE_KEYS.VEHICLE_NO_PARKING_SPOTS));
             alt.emitClient(player, GARAGE_INTERACTIONS.CLOSE);
             return;
         }
@@ -394,7 +393,7 @@ export class GarageFunctions {
         // Check if the vehicle is either close to a parking spot or the garage itself.
         if (dist >= 10 && !GarageFunctions.isCloseToSpot(vehicleData.pos, garage.parking)) {
             Athena.player.emit.soundFrontend(player, 'Hack_Failed', 'DLC_HEIST_BIOLAB_PREP_HACKING_SOUNDS');
-            Athena.player.emit.notification(player, LocaleController.get(LOCALE_KEYS.VEHICLE_TOO_FAR));
+            Athena.player.emit.notification(player, Athena.locale.get(player, LOCALE_KEYS.VEHICLE_TOO_FAR));
             return;
         }
 

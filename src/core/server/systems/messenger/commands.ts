@@ -54,11 +54,13 @@ export function get(commandName: string) {
 /**
  * Register a new command that can be called.
  *
+ * @param {string} name
+ * @param {string | string[]} desc for multilanguage translation: [LOCALE_KEY,Placholder1,Placholder2,...]
  * @param {MessageCommand} command
  */
 export function register(
     name: string,
-    desc: string,
+    desc: string | string[],
     perms: Array<string>,
     callback: CommandCallback<alt.Player>,
     isCharacterPermission = false,
@@ -112,9 +114,14 @@ export function populateCommands(player: alt.Player) {
             return;
         }
 
+        let desc = command.description;
+        if (Array.isArray(desc)) {
+            desc = Athena.locale.get(player, desc[0], desc.slice(1));
+        }
+
         validCommands.push({
             name: key,
-            description: command.description,
+            description: desc,
             permissions: command.permissions,
             isCharacterPermission: command.isCharacterPermission,
         });

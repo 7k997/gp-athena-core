@@ -17,6 +17,7 @@ let readyInterval: number;
 let noDiscard = true;
 let noName = true;
 let totalCharacters = 0;
+let languageName = 'English';
 
 native.requestModel(fModel);
 native.requestModel(mModel);
@@ -32,11 +33,13 @@ class InternalFunctions {
         _noDiscard = true,
         _noName = true,
         _totalCharacters = 0,
+        _languageName: string = 'English'
     ) {
         oldCharacterData = _oldCharacterData;
         noDiscard = _noDiscard;
         noName = _noName;
         totalCharacters = _totalCharacters;
+        languageName = _languageName
 
         await PedCharacter.destroy();
         await alt.Utils.wait(100);
@@ -80,7 +83,7 @@ class InternalFunctions {
 
     static async waitForReady() {
         const view = await AthenaClient.webview.get();
-        view.emit(CHARACTER_CREATOR_WEBVIEW_EVENTS.READY, noDiscard, noName);
+        view.emit(CHARACTER_CREATOR_WEBVIEW_EVENTS.READY, noDiscard, noName, languageName);
     }
 
     static async handleReadyDone() {

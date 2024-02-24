@@ -63,27 +63,27 @@ export class GPFactionStorageSystem {
     static async openStorage(player: alt.Player, storageName: string, storageID: string): Promise<Boolean> {
         const playerData = Athena.document.character.get(player);
         if (!playerData.faction) {
-            Athena.player.emit.message(player, LocaleController.get(LOCALE_KEYS.FACTION_STORAGE_NO_ACCESS));
+            Athena.player.emit.message(player, Athena.locale.get(player, LOCALE_KEYS.FACTION_STORAGE_NO_ACCESS));
             return false;
         }
 
         const faction = FactionHandler.get(playerData.faction);
         if (!faction) {
-            Athena.player.emit.message(player, LocaleController.get(LOCALE_KEYS.FACTION_STORAGE_NO_ACCESS));
+            Athena.player.emit.message(player, Athena.locale.get(player, LOCALE_KEYS.FACTION_STORAGE_NO_ACCESS));
             return false;
         }
 
         let rank = FactionPlayerFuncs.getPlayerFactionRank(player);
         if (!rank || !rank.rankPermissions.canOpenStorages) {
             if (!FactionPlayerFuncs.isOwner(player)) {
-                Athena.player.emit.notification(player, LocaleController.get(LOCALE_KEYS.FACTION_STORAGE_NO_ACCESS));
+                Athena.player.emit.notification(player, Athena.locale.get(player, LOCALE_KEYS.FACTION_STORAGE_NO_ACCESS));
                 return false;
             }
         }
 
         let storageIndex = faction.storages.findIndex((x) => x.name === storageName);
         if (storageIndex < 0) {
-            Athena.player.emit.message(player, LocaleController.get(LOCALE_KEYS.FACTION_STORAGE_NO_ACCESS));
+            Athena.player.emit.message(player, Athena.locale.get(player, LOCALE_KEYS.FACTION_STORAGE_NO_ACCESS));
             return false;
         }
 

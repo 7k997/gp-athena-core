@@ -11,7 +11,7 @@ Athena.commands.register('quitjob', '/quitjob', [], (player: alt.Player) => {
     const job = Athena.systems.job.instance.get(player);
 
     if (!job) {
-        Athena.player.emit.notification(player, LocaleController.get(LOCALE_KEYS.JOB_NOT_WORKING));
+        Athena.player.emit.notification(player, Athena.locale.get(player, LOCALE_KEYS.JOB_NOT_WORKING));
         return;
     }
 

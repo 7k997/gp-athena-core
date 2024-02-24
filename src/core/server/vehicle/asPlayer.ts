@@ -3,7 +3,11 @@ import * as Athena from '@AthenaServer/api/index.js';
 import { VEHICLE_EVENTS } from '@AthenaShared/enums/vehicle.js';
 import { ANIMATION_FLAGS } from '@AthenaShared/flags/animationFlags.js';
 
-function sharedOwnershipChecks(player: alt.Player, vehicle: alt.Vehicle) {
+export async function sharedOwnershipChecks(player: alt.Player, vehicle: alt.Vehicle) {
+    if (Overrides.sharedOwnershipChecks) {
+        return Overrides.sharedOwnershipChecks(player, vehicle);
+    }
+
     if (!vehicle || !vehicle.valid) {
         return false;
     }
@@ -22,7 +26,7 @@ function sharedOwnershipChecks(player: alt.Player, vehicle: alt.Vehicle) {
         includeGroupPermissions: true,
     };
 
-    if (!Athena.vehicle.ownership.isOwner(player, vehicle, options)) {
+    if (!await Athena.vehicle.ownership.isOwner(player, vehicle, options)) {
         return false;
     }
 
@@ -44,7 +48,7 @@ export async function toggleLock(player: alt.Player, vehicle: alt.Vehicle) {
         vehicle = player.vehicle;
     }
 
-    if (!sharedOwnershipChecks(player, vehicle)) {
+    if (!await sharedOwnershipChecks(player, vehicle)) {
         return;
     }
 
@@ -55,10 +59,18 @@ export async function toggleLock(player: alt.Player, vehicle: alt.Vehicle) {
     // 1. Different animations for car lock/unlock inside/outside vehicle
     // 2. TODO: No sound for player. React on doors-locked/doors-unlocked events to play sound.
 
-    if (!player.vehicle) Athena.player.emit.animation(player, 'anim@heists@keycard@', 'idle_a', ANIMATION_FLAGS.NORMAL, 1000);
-    if (player.vehicle) Athena.player.emit.animation(player, 'anim@heists@keycard@', 'idle_a', ANIMATION_FLAGS.NORMAL, 1000); //TODO: Use another animation if in car!
+    if (!player.vehicle) Athena.player.emit.animation(player, 'anim@heists@keycard@', 'idle_a', ANIMATION_FLAGS.UPPERBODY_ONLY, 1000);
+    if (player.vehicle) Athena.player.emit.animation(player, 'anim@heists@keycard@', 'idle_a', ANIMATION_FLAGS.UPPERBODY_ONLY, 1000); //TODO: Use another animation if in car!
 
-    Athena.player.emit.sound2D(player, soundName);
+    // Athena.player.emit.sound2D(player, soundName, 0.5, 'vehicle-lock');
+    // Athena.player.emit.sound3D(player, soundName, vehicle, 'vehicle-lock')
+
+    Athena.systems.sound.playSoundInArea({
+        audioName: soundName,
+        pos: vehicle.pos,
+        vehicle: player.vehicle,
+        volume: 0.15,
+    });
 
     const eventToEmit = isLocked ? 'doors-locked' : 'doors-unlocked';
     Athena.vehicle.events.trigger(eventToEmit, vehicle, player);
@@ -81,7 +93,7 @@ export async function toggleEngine(player: alt.Player, vehicle: alt.Vehicle) {
         vehicle = player.vehicle;
     }
 
-    if (!sharedOwnershipChecks(player, vehicle)) {
+    if (!await sharedOwnershipChecks(player, vehicle)) {
         return;
     }
 
@@ -110,7 +122,7 @@ export async function toggleDoor(player: alt.Player, vehicle: alt.Vehicle, door:
         return;
     }
 
-    if (!sharedOwnershipChecks(player, vehicle)) {
+    if (!await sharedOwnershipChecks(player, vehicle)) {
         return;
     }
 
@@ -119,6 +131,7 @@ export async function toggleDoor(player: alt.Player, vehicle: alt.Vehicle, door:
     }
 
     const newState = await Athena.vehicle.controls.toggleDoor(vehicle, door);
+    alt.logWarning(`[Athena] Vehicle Door Toggled: ${newState}, door: ${door}`);
     const eventToEmit = newState ? 'door-opened' : 'door-closed';
     Athena.vehicle.events.trigger(eventToEmit, vehicle, door, player);
 }
@@ -143,7 +156,7 @@ export async function openDoor(player: alt.Player, vehicle: alt.Vehicle, door: 0
         return;
     }
 
-    if (!sharedOwnershipChecks(player, vehicle)) {
+    if (!await sharedOwnershipChecks(player, vehicle)) {
         return;
     }
 
@@ -152,6 +165,7 @@ export async function openDoor(player: alt.Player, vehicle: alt.Vehicle, door: 0
     }
 
     const eventToEmit = 'door-opened'
+    await Athena.vehicle.controls.openDoor(vehicle, door);
     Athena.vehicle.events.trigger(eventToEmit, vehicle, door, player);
 }
 
@@ -175,7 +189,7 @@ export async function closeDoor(player: alt.Player, vehicle: alt.Vehicle, door: 
         return;
     }
 
-    if (!sharedOwnershipChecks(player, vehicle)) {
+    if (!await sharedOwnershipChecks(player, vehicle)) {
         return;
     }
 
@@ -196,6 +210,7 @@ interface VehicleAsPlayerFuncs {
     openDoor: typeof openDoor;
     closeDoor: typeof closeDoor;
     toggleEngine: typeof toggleEngine;
+    sharedOwnershipChecks: typeof sharedOwnershipChecks;
 }
 
 const Overrides: Partial<VehicleAsPlayerFuncs> = {};
@@ -205,6 +220,7 @@ export function override(functionName: 'toggleDoor', callback: typeof toggleDoor
 export function override(functionName: 'closeDoor', callback: typeof closeDoor);
 export function override(functionName: 'openDoor', callback: typeof openDoor);
 export function override(functionName: 'toggleEngine', callback: typeof toggleEngine);
+export function override(functionName: 'sharedOwnershipChecks', callback: typeof sharedOwnershipChecks);
 /**
  * Used to override vehicle control as a player functionality
  *

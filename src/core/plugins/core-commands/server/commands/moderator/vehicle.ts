@@ -78,14 +78,14 @@ Athena.commands.register(
 
 Athena.commands.register(
     'setVehicleLivery',
-    LocaleController.get(LOCALE_KEYS.COMMAND_SET_VEHICLE_LIVERY, null, '/setVehicleLivery'),
+    [LOCALE_KEYS.COMMAND_SET_VEHICLE_LIVERY, '/setVehicleLivery'],
     ['admin'],
     setLivery,
 );
 
 Athena.commands.register(
     'svl',
-    LocaleController.get(LOCALE_KEYS.COMMAND_SET_VEHICLE_LIVERY, null, '/svl'),
+    [LOCALE_KEYS.COMMAND_SET_VEHICLE_LIVERY, '/svl'],
     ['admin'],
     setLivery,
 );
@@ -108,7 +108,7 @@ function setLivery(player: alt.Player, livery: string) {
     }
 
     if (vehicle.modKit == 0) {
-        Athena.player.emit.message(player, LocaleController.get(LOCALE_KEYS.VEHICLE_HAS_NO_MOD_KIT));
+        Athena.player.emit.message(player, Athena.locale.get(player, LOCALE_KEYS.VEHICLE_HAS_NO_MOD_KIT));
         return;
     }
 
@@ -134,14 +134,14 @@ function setLivery(player: alt.Player, livery: string) {
 
 Athena.commands.register(
     'setvehicledirtLevel',
-    LocaleController.get(LOCALE_KEYS.COMMAND_SET_VEH_DIRT_LEVEL, null, '/setvehicledirtLevel'),
+    [LOCALE_KEYS.COMMAND_SET_VEH_DIRT_LEVEL, '/setvehicledirtLevel'],
     ['admin'],
     setVehicleDirtlevel,
 );
 
 Athena.commands.register(
     'svdl',
-    LocaleController.get(LOCALE_KEYS.COMMAND_SET_VEH_DIRT_LEVEL, null, '/svdl'),
+    [LOCALE_KEYS.COMMAND_SET_VEH_DIRT_LEVEL, '/svdl'],
     ['admin'],
     setVehicleDirtlevel,
 );
@@ -179,7 +179,7 @@ function setVehicleDirtlevel(player: alt.Player, dirtLevel: string) {
 
 Athena.commands.register(
     'sessionvehicle',
-    LocaleController.get(LOCALE_KEYS.COMMAND_SESSION_VEHICLE, null, '/sessionvehicle'),
+    [LOCALE_KEYS.COMMAND_SESSION_VEHICLE, '/sessionvehicle'],
     ['admin'],
     (player: alt.Player, model: string) => {
         if (!model) {
@@ -198,7 +198,7 @@ Athena.commands.register(
 
 Athena.commands.register(
     'fullTuneVehicle',
-    LocaleController.get(LOCALE_KEYS.COMMAND_FULL_TUNE_VEHICLE, null, '/fullTuneVehicle'),
+    [LOCALE_KEYS.COMMAND_FULL_TUNE_VEHICLE, '/fullTuneVehicle'],
     ['admin'],
     (player: alt.Player) => {
         const vehicle = player.vehicle ? player.vehicle : Athena.utility.closest.getClosestVehicle(player.pos);
@@ -218,7 +218,7 @@ Athena.commands.register(
         }
 
         if (vehicle.modKit == 0) {
-            Athena.player.emit.message(player, LocaleController.get(LOCALE_KEYS.VEHICLE_HAS_NO_MOD_KIT));
+            Athena.player.emit.message(player, Athena.locale.get(player, LOCALE_KEYS.VEHICLE_HAS_NO_MOD_KIT));
             return;
         }
 
@@ -264,7 +264,7 @@ Athena.commands.register(
         }
 
         if (vehicle.modKit == 0) {
-            Athena.player.emit.message(player, LocaleController.get(LOCALE_KEYS.VEHICLE_HAS_NO_MOD_KIT));
+            Athena.player.emit.message(player, Athena.locale.get(player, LOCALE_KEYS.VEHICLE_HAS_NO_MOD_KIT));
             return;
         }
 
@@ -366,7 +366,7 @@ Athena.commands.register('deactivateExtra', '/deactivateExtra [id]', ['admin'], 
 
 //     @command(
 //         ['setVehicleHandling', 'sh'],
-//         LocaleController.get(LOCALE_KEYS.COMMAND_SET_VEHICLE_HANDLING, '/sh'),
+//         Athena.locale.get(player, LOCALE_KEYS.COMMAND_SET_VEHICLE_HANDLING, '/sh'),
 //         PERMISSIONS.ADMIN,
 //     )
 //     private static setVehicleHandlingCommand(player: alt.Player, key: string, value: string): void {
@@ -383,7 +383,7 @@ Athena.commands.register('deactivateExtra', '/deactivateExtra [id]', ['admin'], 
 
 //     @command(
 //         ['toggleneonlights', 'tnl'],
-//         LocaleController.get(LOCALE_KEYS.COMMAND_TOGGLE_VEH_NEON_LIGHTS, '/tnl'),
+//         Athena.locale.get(player, LOCALE_KEYS.COMMAND_TOGGLE_VEH_NEON_LIGHTS, '/tnl'),
 //         PERMISSIONS.ADMIN,
 //     )
 //     private static toggleVehicleNeonLightsCommand(player: alt.Player): void {
@@ -399,7 +399,7 @@ Athena.commands.register('deactivateExtra', '/deactivateExtra [id]', ['admin'], 
 
 //     @command(
 //         ['setneonlights', 'snl'],
-//         LocaleController.get(LOCALE_KEYS.COMMAND_SET_VEH_NEON_LIGHTS, '/snl'),
+//         Athena.locale.get(player, LOCALE_KEYS.COMMAND_SET_VEH_NEON_LIGHTS, '/snl'),
 //         PERMISSIONS.ADMIN,
 //     )
 //     private static setVehicleNeonLightsCommand(

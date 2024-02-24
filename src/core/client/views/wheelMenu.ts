@@ -122,7 +122,7 @@ export async function open(label: string, options: Array<IWheelOptionExt>, setMo
         if (!_options[i].uid) {
             _options[i].uid = `option-${i}`;
         }
-        _options[i].name = AthenaClient.locale.get(_options[i].name, alt.Player.local.meta.language);
+        _options[i].name = AthenaClient.locale.get(_options[i].name);
     }
 
     // This is where we bind our received events from the WebView to
@@ -174,7 +174,7 @@ export function update(label: string, options: Array<IWheelOptionExt>, setMouseT
         if (!_options[i].uid) {
             _options[i].uid = `option-${i}`;
         }
-        _options[i].name = AthenaClient.locale.get(_options[i].name, alt.Player.local.meta.language);
+        _options[i].name = AthenaClient.locale.get(_options[i].name);
     }
 
     if (setMouseToCenter) {

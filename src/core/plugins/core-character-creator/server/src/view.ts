@@ -61,7 +61,7 @@ class InternalFunctions {
         InternalFunctions.show(player, CreatorList[player.id] ? CreatorList[player.id] : 0);
     }
 
-    static show(player: alt.Player, totalCharacters: number) {
+    static show(player: alt.Player, totalCharacters: number, languageName: string = 'English') {
         CreatorList[player.id] = totalCharacters;
 
         player.visible = false;
@@ -82,6 +82,7 @@ class InternalFunctions {
             true,
             false,
             totalCharacters,
+            languageName
         ); // _oldCharacterData, _noDiscard, _noName
     }
 }

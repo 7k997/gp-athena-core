@@ -31,5 +31,5 @@ export interface Meta {
     mainLockIDs: number[];
 
     // Multilanguage
-    language: LOCALE;
+    displayLanguage: LOCALE;
 }

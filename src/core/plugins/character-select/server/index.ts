@@ -3,6 +3,7 @@ import * as Athena from '@AthenaServer/api/index.js';
 import { Character } from '@AthenaShared/interfaces/character.js';
 import Database from '@stuyk/ezmongodb';
 import { CharSelectEvents } from '../shared/events.js';
+import { LOCALE } from '@AthenaShared/locale/locale.js';
 
 const PLUGIN_NAME = 'Character Select';
 const Characters: { [player_id: string]: Array<Character> } = {};
@@ -96,7 +97,7 @@ async function handleDelete(player: alt.Player) {
     showCharacter(player, 0);
 }
 
-function handleSelect(player: alt.Player) {
+async function updateLanguage(player: alt.Player, languageName: string) {
     if (!player || !player.valid) {
         return;
     }
@@ -115,6 +116,35 @@ function handleSelect(player: alt.Player) {
 
     Athena.player.emit.fadeScreenToBlack(player, 200);
     const character = Characters[player.id][CurrentIndex[player.id]];
+    character.info.displayLanguage = LOCALE[languageName];
+
+    // Update the character's language. Not here. Only after select.
+    // await Database.updatePartialData(character._id, { info: character.info }, Athena.database.collections.Characters);
+
+    showCharacter(player, CurrentIndex[player.id]);
+}
+
+async function handleSelect(player: alt.Player, languageName: string) {
+    if (!player || !player.valid) {
+        return;
+    }
+
+    if (typeof Characters[player.id] === 'undefined') {
+        return;
+    }
+
+    if (typeof CurrentIndex[player.id] === 'undefined') {
+        return;
+    }
+
+    if (typeof Characters[player.id][CurrentIndex[player.id]] === 'undefined') {
+        return;
+    }
+
+    Athena.player.emit.fadeScreenToBlack(player, 200);
+    const character = Characters[player.id][CurrentIndex[player.id]];
+    character.info.displayLanguage = LOCALE[languageName];
+    await Database.updatePartialData(character._id, { info: character.info }, Athena.database.collections.Characters);
     Athena.systems.character.select(player, character);
 
     player.emit(CharSelectEvents.toClient.done);
@@ -122,7 +152,7 @@ function handleSelect(player: alt.Player) {
     delete CurrentIndex[player.id];
 }
 
-function handleNew(player: alt.Player) {
+function handleNew(player: alt.Player, languageName: string) {
     if (typeof Characters[player.id] === 'undefined') {
         return;
     }
@@ -141,7 +171,7 @@ function handleNew(player: alt.Player) {
     delete CurrentIndex[player.id];
 
     player.emit(CharSelectEvents.toClient.done);
-    Athena.systems.character.invokeCreator(player, Characters[player.id]);
+    Athena.systems.character.invokeCreator(player, Characters[player.id], languageName);
 }
 
 function handleNext(player: alt.Player) {
@@ -190,6 +220,7 @@ Athena.systems.plugins.registerPlugin(PLUGIN_NAME, () => {
     alt.onClient(CharSelectEvents.toServer.select, handleSelect);
     alt.onClient(CharSelectEvents.toServer.delete, handleDelete);
     alt.onClient(CharSelectEvents.toServer.new, handleNew);
+    alt.onClient(CharSelectEvents.toServer.updateLanguage, updateLanguage);
 
     alt.log(`~lg~${PLUGIN_NAME} was Loaded`);
 });

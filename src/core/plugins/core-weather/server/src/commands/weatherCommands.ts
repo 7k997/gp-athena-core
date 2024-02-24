@@ -11,14 +11,14 @@ export class WeatherCommands {
 
         Athena.systems.messenger.commands.register(
             'setweather',
-            LocaleController.get(LOCALE_KEYS.COMMAND_SET_WEATHER, null, '/setweather'),
+            [LOCALE_KEYS.COMMAND_SET_WEATHER, '/setweather'],
             ['admin'],
             WeatherCommands.setWeather,
         );
 
         Athena.systems.messenger.commands.register(
             'clearweather',
-            LocaleController.get(LOCALE_KEYS.COMMAND_CLEAR_WEATHER, null, '/clearweather'),
+            [LOCALE_KEYS.COMMAND_CLEAR_WEATHER, '/clearweather'],
             ['admin'],
             WeatherCommands.clearWeather,
         );

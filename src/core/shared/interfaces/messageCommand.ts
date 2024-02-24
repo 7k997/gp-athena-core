@@ -22,7 +22,7 @@ export interface MessageCommand<T> {
      * @type {string}
      *
      */
-    description: string;
+    description: string | string[];
 
     /**
      * An array of individual permission strings required to run this command.

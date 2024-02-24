@@ -14,18 +14,18 @@ Athena.commands.register('noclip', '/noclip', ['admin'], (player: alt.Player) =>
 
     if (!isNoClipping && !data.isDead) {
         player.setSyncedMeta('NoClipping', true);
-        Athena.player.emit.message(player, `No Clip: ${LocaleController.get(LOCALE_KEYS.LABEL_ON)}`);
+        Athena.player.emit.message(player, `No Clip: ${Athena.locale.get(player, LOCALE_KEYS.LABEL_ON)}`);
         player.visible = false;
         return;
     }
 
     if (data.isDead) {
-        Athena.player.emit.message(player, LocaleController.get(LOCALE_KEYS.CANNOT_PERFORM_WHILE_DEAD));
+        Athena.player.emit.message(player, Athena.locale.get(player, LOCALE_KEYS.CANNOT_PERFORM_WHILE_DEAD));
     }
 
     player.spawn(player.pos.x, player.pos.y, player.pos.z, 0);
     player.setSyncedMeta('NoClipping', false);
-    Athena.player.emit.message(player, `No Clip: ${LocaleController.get(LOCALE_KEYS.LABEL_OFF)}`);
+    Athena.player.emit.message(player, `No Clip: ${Athena.locale.get(player, LOCALE_KEYS.LABEL_OFF)}`);
     player.visible = true;
     player.health = 199;
 });

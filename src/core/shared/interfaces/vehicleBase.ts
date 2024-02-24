@@ -78,6 +78,22 @@ export interface BaseVehicle {
     keys: Array<string>;
 
     /**
+     * The vehicles lock id.
+     *
+     * @type {number}
+     *
+     */
+    lockID?: number;
+
+    /**
+     * The lock type of the vehicle.
+     *
+     * @type {string}
+     *
+     */
+    lockType?: string;
+
+    /**
      * A list of character permissions that have access to this vehicle
      *
      * @type {Array<string>}

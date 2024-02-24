@@ -202,7 +202,7 @@ const NoClip = {
         }
 
         AthenaClient.screen.text.drawText2D(
-            LocaleController.get(LOCALE_KEYS.NOCLIP_SPEED_INFO),
+            AthenaClient.locale.get(LOCALE_KEYS.NOCLIP_SPEED_INFO),
             { x: 0.5, y: 0.89 },
             0.4,
             new alt.RGBA(255, 255, 255, 200),
@@ -210,7 +210,7 @@ const NoClip = {
         );
 
         AthenaClient.screen.text.drawText2D(
-            `${LocaleController.get(LOCALE_KEYS.NOCLIP_SPEED)}: ${sens.toFixed(2)}`,
+            `${AthenaClient.locale.get(LOCALE_KEYS.NOCLIP_SPEED)}: ${sens.toFixed(2)}`,
             { x: 0.5, y: 0.92 },
             0.4,
             new alt.RGBA(255, 255, 255, 200),

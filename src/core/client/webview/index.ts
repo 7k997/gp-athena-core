@@ -520,9 +520,6 @@ export async function openStaticPage(
         return; //No static page slot free! Cannot open page.
     }
 
-    alt.logWarning('!!!!!!!! open static page: ' + staticPageName);
-    alt.logWarning('!!!!!!!! freeIndex ' + staticFreeIndex);
-
     StaticPages[staticFreeIndex] = { name: staticPageName };
 
     const view = await get();
@@ -558,8 +555,6 @@ export async function closeStaticPage(staticPageName: string, showOverlays = fal
         return;
     }
 
-    alt.logWarning('!!!!!!!! close static page: ' + staticPageName);
-    alt.logWarning('!!!!!!!! replace with ' + staticEmptyPageNamePrefix + staticPageIndex);
     StaticPages[staticPageIndex] = { name: staticEmptyPageNamePrefix + staticPageIndex };
 
     if (showOverlays) {

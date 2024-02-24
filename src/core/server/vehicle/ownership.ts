@@ -14,17 +14,18 @@ import Database from '@stuyk/ezmongodb';
  * @param {{ includePermissions?: boolean; includeKeys?: boolean; includeAdminOverride?: boolean; preventWhileAttached?: boolean; }}
  * @return {boolean}
  */
-export function isOwner(
+export async function isOwner(
     player: alt.Player,
     vehicle: alt.Vehicle,
     options: {
+        ignoreOwner?: boolean; // There are situations where you want to ignore owner of the vehicle. Example: Owner has no keys -> Prevent opening vehicle!
         includePermissions?: boolean;
         includeKeys?: boolean;
         includeAdminOverride?: boolean;
         includeGroupPermissions?: boolean;
         preventWhileAttached?: boolean;
     } = {},
-): boolean {
+): Promise<boolean> {
     if (Overrides.isOwner) {
         return Overrides.isOwner(player, vehicle, options);
     }
@@ -56,7 +57,7 @@ export function isOwner(
         return true;
     }
 
-    if (options.includeKeys && Athena.vehicle.ownership.hasKeys(player, vehicle)) {
+    if (options.includeKeys && await Athena.vehicle.ownership.hasKeys(player, vehicle)) {
         return true;
     }
 
@@ -64,7 +65,12 @@ export function isOwner(
         return true;
     }
 
-    return data.owner === playerData._id;
+    //Corechange: Ignore Owner
+    if (!options.ignoreOwner && data.owner === playerData._id) {
+        return true;
+    }
+
+    return false;
 }
 
 /**
@@ -157,7 +163,7 @@ export function hasGroupPermission(player: alt.Player, vehicle: alt.Vehicle): bo
  * @param {alt.Vehicle} vehicle An alt:V Vehicle Entity
  * @return {boolean}
  */
-export function hasKeys(player: alt.Player, vehicle: alt.Vehicle): boolean {
+export async function hasKeys(player: alt.Player, vehicle: alt.Vehicle): Promise<boolean> {
     if (Overrides.hasKeys) {
         return Overrides.hasKeys(player, vehicle);
     }

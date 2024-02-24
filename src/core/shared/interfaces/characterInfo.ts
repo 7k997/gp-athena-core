@@ -25,8 +25,17 @@ export interface CharacterInfo {
 
     /**
      * A custom field for character information about language.
+     * Will not used for display language.
      * @type {string}
      *
      */
     language?: LOCALE;
+
+    /**
+     * The display language for the character. This is the language which is choosen before char select.
+     * It can be differs from the language of the character and be changed any time.
+     * @type {string}
+     *
+     */
+    displayLanguage?: LOCALE;
 }

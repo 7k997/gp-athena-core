@@ -1,18 +1,25 @@
 <template>
     <div class="container-char-select">
+        <div class="language" >
+            <Dropdown :options="languageOptions"
+            v-on:selected="switchLanguage"
+            :placeholder="selectedLanguageOptionName"                            
+            :maxItem="50"
+            style="z-index: 99;"/>          
+        </div>
         <div class="selection">
             <div class="stack" v-if="!isDeleting">
                 <div class="options" v-if="!isSelecting">
-                    <div @mouseover="hover" @click="selectCharacter" class="item hover-blue"># Select</div>
+                    <div @mouseover="hover" @click="selectCharacter" class="item hover-blue"># {{ locales.BUTTON_SELECT }}</div>
                     <div @mouseover="hover" @click="deleteCharacter" class="item hover-red" v-if="characterCount >= 2">
-                        x Delete
+                        x {{ locales.BUTTON_DELETE }}
                     </div>
-                    <div @mouseover="hover" @click="newCharacter" class="item hover-green">+ New</div>
+                    <div @mouseover="hover" @click="newCharacter" class="item hover-green">+ {{ locales.BUTTON_NEW }} </div>
                 </div>
                 <div class="options" v-else="!isSelecting">
-                    <div class="item-no-hover grey--text text--darken-1"># Select</div>
-                    <div class="item-no-hover grey--text text--darken-1" v-if="characterCount >= 2">x Delete</div>
-                    <div class="item-no-hover grey--text text--darken-1">+ New</div>
+                    <div class="item-no-hover grey--text text--darken-1"># {{ locales.BUTTON_SELECT }}</div>
+                    <div class="item-no-hover grey--text text--darken-1" v-if="characterCount >= 2">x {{ locales.BUTTON_DELETE }}</div>
+                    <div class="item-no-hover grey--text text--darken-1">+ {{ locales.BUTTON_NEW }}</div>
                 </div>
                 <div class="split" v-if="!isSelecting">
                     <div class="left-column">
@@ -50,9 +57,35 @@
 import { onMounted, ref } from 'vue';
 import Icon from '@ViewComponents/Icon.vue';
 import CharDelete from './components/CharDelete.vue';
+import Dropdown from './components/DropDown.vue';
 import WebViewEvents from '@utility/webViewEvents.js';
+import { LOCALES } from '../shared/locale/locale.js';
+import { LocaleController, LOCALE } from '@AthenaShared/locale/locale.js'; 
 import { CharSelectEvents } from '../shared/events.js';
 
+export interface iOption {
+    id: string;
+    name: string;
+}
+
+//detect browser language only on char creator. 
+//Verify if language is supported and if not, use default language
+const browserLanguage = navigator.language.split('-')[0];
+let language = ref(LocaleController.getDefaultLocale().toString());
+if( LocaleController.isLocaleValid(browserLanguage) && !!LOCALES[browserLanguage] ){
+    language.value = browserLanguage;
+}
+
+let selectedLanguageOptionName = '';
+let languageOptions = [];
+for (const [key, value] of Object.entries(LOCALE)) {
+    languageOptions.push({ id: value, name: key });
+    if(value === language.value){
+        selectedLanguageOptionName = key
+    }
+}
+
+let locales = ref(LOCALES[language.value]);
 let isSelecting = ref(false);
 let isDeleting = ref(false);
 let characterName = ref('Test Long Name');
@@ -70,10 +103,25 @@ function deleteCharacterForSure() {
     WebViewEvents.emitServer(CharSelectEvents.toServer.delete);
 }
 
-function setData(name: string, count: number = 0) {
+function setData(name: string, displayLanguage: string, count: number = 0) {
     characterName.value = name;
     characterCount.value = count;
     isSelecting.value = false;
+    if(LocaleController.isLocaleValid(displayLanguage) && !!LOCALES[displayLanguage] ){
+        language.value = displayLanguage;
+        locales.value = LOCALES[language.value];
+
+        for (const [key, value] of Object.entries(LOCALE)) {       
+            if(value === language.value){
+                selectedLanguageOptionName = key
+            }
+        }
+
+    }
+}
+
+function switchLanguage(languageOption: iOption) { 
+    WebViewEvents.emitServer(CharSelectEvents.toServer.updateLanguage, languageOption.name);   
 }
 
 function hover() {
@@ -94,7 +142,7 @@ function prev() {
 
 function selectCharacter() {
     WebViewEvents.playSoundFrontend('SELECT', 'HUD_FRONTEND_DEFAULT_SOUNDSET');
-    WebViewEvents.emitServer(CharSelectEvents.toServer.select);
+    WebViewEvents.emitServer(CharSelectEvents.toServer.select, selectedLanguageOptionName);
 }
 
 function deleteCharacter() {
@@ -104,7 +152,7 @@ function deleteCharacter() {
 
 function newCharacter() {
     WebViewEvents.playSoundFrontend('SELECT', 'HUD_FRONTEND_DEFAULT_SOUNDSET');
-    WebViewEvents.emitServer(CharSelectEvents.toServer.new);
+    WebViewEvents.emitServer(CharSelectEvents.toServer.new, selectedLanguageOptionName);
 }
 
 onMounted(async () => {
@@ -211,4 +259,14 @@ onMounted(async () => {
     flex-direction: row;
     justify-content: space-between;
 }
+
+.language {    
+    opacity: 0.9;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 99;
+}
+
+
 </style>

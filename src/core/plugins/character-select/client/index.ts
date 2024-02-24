@@ -24,6 +24,7 @@ function updateName() {
     AthenaClient.webview.emit(
         CharSelectEvents.toWebview.updateName,
         currentCharacter.name.replace(/\_/gm, ' '),
+        currentCharacter.info.displayLanguage,
         characterCount,
     );
 }

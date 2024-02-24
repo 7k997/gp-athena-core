@@ -7,7 +7,7 @@ export class DeathCommands {
     static init() {
         Athena.systems.messenger.commands.register(
             'revive',
-            LocaleController.get(LOCALE_KEYS.COMMAND_REVIVE, null, '/revive'),
+            [LOCALE_KEYS.COMMAND_REVIVE, '/revive'],
             ['admin'],
             DeathCommands.handleRevive,
         );
@@ -29,7 +29,7 @@ export class DeathCommands {
 
         const target = Athena.systems.identifier.getPlayer(id);
         if (!target) {
-            Athena.player.emit.message(player, LocaleController.get(LOCALE_KEYS.CANNOT_FIND_PLAYER));
+            Athena.player.emit.message(player, Athena.locale.get(player, LOCALE_KEYS.CANNOT_FIND_PLAYER));
             return;
         }
 

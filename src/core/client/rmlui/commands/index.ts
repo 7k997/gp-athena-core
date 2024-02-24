@@ -159,7 +159,8 @@ function updateSuggestions(suggestions: Array<Omit<MessageCommand<alt.Player>, '
             continue;
         }
 
-        element.innerRML = suggestion.description;
+        const desc = Array.isArray(suggestion.description) ? suggestion.description[0] : suggestion.description;
+        element.innerRML = desc;
     }
 }
 

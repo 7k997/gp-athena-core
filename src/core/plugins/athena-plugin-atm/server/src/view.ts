@@ -145,7 +145,7 @@ class InternalFunctions {
                 return false;
             }
 
-            const msg = LocaleController.get(LOCALE_KEYS.PLAYER_RECEIVED_BLANK, data.info.language, `$${amount}`, data.name);
+            const msg = Athena.locale.get(player, LOCALE_KEYS.PLAYER_RECEIVED_BLANK, `$${amount}`, data.name);
             Athena.player.emit.message(onlinePlayer, msg);
         } else {
             // Update by Document Route
@@ -207,7 +207,7 @@ class InternalFunctions {
             return false;
         }
 
-        const msg = LocaleController.get(LOCALE_KEYS.PLAYER_RECEIVED_BLANK, data.info.language, `$${amount}`, data.name);
+        const msg = Athena.locale.get(player, LOCALE_KEYS.PLAYER_RECEIVED_BLANK, `$${amount}`, data.name);
         Athena.player.emit.message(target, msg);
         return true;
     }

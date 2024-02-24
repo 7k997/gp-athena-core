@@ -193,7 +193,7 @@ export async function select(player: alt.Player, character: Character) {
         player.visible = true;
 
         //Init language
-        Athena.player.emit.meta(player, "language", data.language);
+        Athena.player.emit.meta(player, "displayLanguage", data.info.displayLanguage);
 
         Athena.player.emit.fadeScreenFromBlack(player, 2000);
         Athena.player.events.trigger('selected-character', player);
