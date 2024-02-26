@@ -233,7 +233,7 @@ const InternalFunctions = {
         }
 
         if (dist >= DEFAULT_CONFIG.MAX_INTERACTION_DISTANCE) {
-            Athena.player.emit.notification(player, LocaleController.get(LOCALE_KEYS.INTERACTION_TOO_FAR_AWAY));
+            Athena.player.emit.notification(player, Athena.locale.get(player, LOCALE_KEYS.INTERACTION_TOO_FAR_AWAY));
             return;
         }
 

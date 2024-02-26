@@ -28,7 +28,7 @@ export async function banPlayer(player: alt.Player, reason: string): Promise<boo
         return false;
     }
 
-    player.kick(`${LocaleController.get(LOCALE_KEYS.LABEL_BANNED)} ${reason}`);
+    player.kick(`${Athena.locale.get(player, LOCALE_KEYS.LABEL_BANNED)} ${reason}`);
     await Athena.document.account.setBulk(player, { banned: true, reason });
 
     if (player.discord && player.discord.id) {

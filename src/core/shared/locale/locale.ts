@@ -3,10 +3,20 @@ import ar from './languages/ar.js'; // Importing the Arabic Locale
 import cs from './languages/cs.js'; // Importing the Czech Locale
 import da from './languages/da.js'; // Importing the Danish Locale
 import de from './languages/de.js'; // Importing the German Locale
+import de_bar from './languages/de-bar.js'; // Importing the Bavarian Locale
+import de_frr from './languages/de-frr.js'; // Importing the Frisian Locale
+import de_gsw from './languages/de-gsw.js'; // Importing the Alemannic Locale
+import de_hsb from './languages/de-hsb.js'; // Importing the Sorbian Locale
+import de_ksh from './languages/de-ksh.js'; // Importing the Colognian Locale
+import de_nds from './languages/de-nds.js'; // Importing the Low German Locale
+import el from './languages/el.js'; // Importing the Greek Locale
+import el_grc from './languages/el-grc.js'; // Importing the Ancient Greek Locale
 import en from './languages/en.js'; // Importing the English Locale
 import es from './languages/es.js'; // Importing the Spanish Locale
 import fr from './languages/fr.js'; // Importing the French Locale
+import hu from './languages/hu.js'; // Importing the Hungarian Locale
 import it from './languages/it.js'; // Importing the Italian Locale
+import la from './languages/la.js'; // Importing the Latin Locale
 import nl from './languages/nl.js'; // Importing the Dutch Locale
 import pl from './languages/pl.js'; // Importing the Polish Locale
 import pt from './languages/pt.js'; // Importing the Portuguese Locale
@@ -19,6 +29,9 @@ export const placeholder = `_%_`;
 /**
  * All locales have a base language in ISO-639-1.
  * Example for English is: 'en'.
+ *
+ * For dialects, the ISO-639-1 code is extended with a hyphen and the dialect code in ISO-639-3.
+ * Example for Bavarian is: 'de-bar'.
  *
  * Variables are replaced in their respective orders.
  * Variable placeholders are written with: _%_
@@ -36,10 +49,22 @@ export enum LOCALE {
     Czech = 'cs',
     Danish = 'da',
     German = 'de',
+    //German dialects start
+    Bavarian = 'de-bar',
+    Frisian = 'de-frr',
+    Alemannic = "de-gsw",
+    Colognian = 'de-ksh',
+    LowGerman = 'de-nds',
+    Sorbian = "de-hsb",
+    //German dialects end
+    Greek = 'el',
+    AncientGreek = 'el-grc',
     English = 'en',
     Spanish = 'es',
     French = 'fr',
+    Hungarian = 'hu', 
     Italian = 'it',
+    Latin = 'la',
     Dutch = 'nl',
     Polish = 'pl',    
     Portuguese = 'pt',
@@ -56,10 +81,20 @@ const translations: LocaleFormat = {
     [LOCALE.Czech]: cs,
     [LOCALE.Danish]: da,
     [LOCALE.German]: de,
+    [LOCALE.Alemannic]: de_gsw,
+    [LOCALE.Bavarian]: de_bar,
+    [LOCALE.Frisian]: de_frr,
+    [LOCALE.LowGerman]: de_nds,
+    [LOCALE.Colognian]: de_ksh,
+    [LOCALE.Sorbian]: de_hsb,
+    [LOCALE.Greek]: el,
+    [LOCALE.AncientGreek]: el_grc,
     [LOCALE.English]: en,
     [LOCALE.Spanish]: es,    
     [LOCALE.French]: fr,    
+    [LOCALE.Hungarian]: hu,
     [LOCALE.Italian]: it,
+    [LOCALE.Latin]: la,
     [LOCALE.Dutch]: nl,
     [LOCALE.Polish]: pl,    
     [LOCALE.Portuguese]: pt,
@@ -72,6 +107,9 @@ const translations: LocaleFormat = {
 };
 
 let defaultLanguage = LOCALE.English; // Change to your default language. Make sure that all keys are present for the default language!
+
+export const stringToEnumValue = <T, K extends keyof T>(enumObj: T, value: string): T[keyof T] | undefined =>
+    enumObj[Object.keys(enumObj).filter((k) => enumObj[k as K].toString() === value)[0] as keyof typeof enumObj];
 
 export class LocaleController {
     /**
@@ -111,6 +149,13 @@ export class LocaleController {
 
         if (!translations[iso639][key]) {
             if (iso639 !== defaultLanguage) {
+                // if (iso639.includes('-')) {
+                //     // If the requested language is a dialect, try to find the key in the base language
+
+                //     let baseStr = iso639.split('-')[0];
+                //     const localeEnumValue = stringToEnumValue(LOCALE, baseStr);
+                //     return this.get(key, localeEnumValue, ...args);
+                // }
                 // Key not find in the requested language, try to find it in the default language
                 return this.get(key, defaultLanguage, ...args);
             }
