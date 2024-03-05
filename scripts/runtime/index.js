@@ -9,8 +9,12 @@ import { runPluginsCompiler } from '../plugins/core.js';
 import { copyPluginFiles } from '../plugins/files.js';
 import { compileWebviewPlugins } from '../plugins/webview.js';
 import { updatePluginDependencies } from '../plugins/update-dependencies.js';
+import express from 'express';
+import path from 'path';
+import toml from '@iarna/toml';
 
-const DEBUG = true;
+const cdnApp = express();
+const cdnPort = 80;
 
 const NO_SPECIAL_CHARACTERS = new RegExp(/^[ A-Za-z0-9_-]*$/gm);
 
@@ -136,6 +140,9 @@ async function handleViteDevServer() {
 }
 
 async function handleServerProcess(shouldAutoRestart = false) {
+    const file = fs.readFileSync('server.toml').toString();
+    const serverConfig = toml.parse(file);
+
     if (lastServerProcess && !lastServerProcess.killed) {
         lastServerProcess.kill();
     }
@@ -158,7 +165,19 @@ async function handleServerProcess(shouldAutoRestart = false) {
     await areKeyResourcesReady();
 
     if (passedArguments.includes('cdn')) {
-        lastServerProcess = spawn(serverBinary, ['--justpack'], { stdio: 'inherit' });
+        console.log(
+            'Dirty hack (IPV6/4 Issues) - temporarily replace toml host with cdnHostHint, to pack files for a CDN.',
+        );
+        serverConfig.host = serverConfig.cdnHostHint;
+        fs.writeFileSync('server.toml', toml.stringify(serverConfig));
+        console.log(
+            `Packing files for a CDN: ${serverBinary} --justpack --host ${serverConfig.cdnHostHint} --port ${serverConfig.port}`,
+        );
+        lastServerProcess = spawn(
+            serverBinary,
+            ['--justpack', `--host ${serverConfig.cdnHostHint}`, `--port ${serverConfig.port}`],
+            { stdio: 'inherit' },
+        );
 
         lastServerProcess.once('exit', () => {
             const finalDestination = `${process.cwd()}/cdn_upload`.replace(/\\/g, '/');
@@ -304,4 +323,60 @@ if (passedArguments.includes('start')) {
     }
 
     runServer();
+}
+
+if (passedArguments.includes('localCDN')) {
+    try {
+        // HTTPS-Optionen: Zertifikat und privater Schlüssel
+        // const options = {
+        //     key: fs.readFileSync('pfad/zum/privaten-schluessel.pem'),
+        //     cert: fs.readFileSync('pfad/zum/zertifikat.pem')
+        // };
+
+        // Define source and destination directories
+        const sourceDir = process.cwd() + '/cdn_upload';
+        const destDir = process.cwd() + '/webserver';
+
+        // Cleanup webserver directory
+        // Read the contents of the directory
+        // Read the contents of the destination directory
+        const files = fs.readdirSync(destDir);
+
+        // Iterate over each file in the directory and delete if it matches the condition
+        for (const file of files) {
+            const filePath = path.join(destDir, file);
+
+            // Check if the file has one of the desired extensions
+            if (file.endsWith('.resource') || file.endsWith('.json')) {
+                // Delete the file
+                fs.unlinkSync(filePath);
+                console.log(`File ${filePath} successfully deleted.`);
+            }
+        }
+
+        // Copy files from source to destination directory
+        const sourceFiles = fs.readdirSync(sourceDir);
+        for (const file of sourceFiles) {
+            const sourceFile = path.join(sourceDir, file);
+            const destFile = path.join(destDir, file);
+
+            // Copy the file to the destination directory
+            fs.copyFileSync(sourceFile, destFile);
+            console.log(`Copied ${sourceFile} to ${destFile}`);
+        }
+
+        console.log(process.cwd() + '/webserver');
+        cdnApp.use(express.static(process.cwd() + '/webserver'));
+        cdnApp.listen(cdnPort, () => {
+            console.log(`CDN Locale Server running on http://localhost:${cdnPort}, path: ${process.cwd()}\webserver`);
+            console.log(`Remark: For testing purposes only! For production use a real CDN!`);
+        });
+
+        // // Express-Server mit HTTPS starten
+        // https.createServer(options, app).listen(port, () => {
+        // console.log(`Server läuft auf https://localhost:${port}`);
+        // });
+    } catch (err) {
+        console.error('Error:', err);
+    }
 }

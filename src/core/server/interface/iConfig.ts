@@ -1,3 +1,5 @@
+import { IServerConfig } from "alt-server";
+
 export interface IConfig {
     DISCORD_BOT?: string;
     DISCORD_SERVER_ID?: string;
@@ -12,4 +14,8 @@ export interface IConfig {
     VUE_DEBUG?: string | boolean;
     USE_ALTV_RECONNECT?: boolean;
     USE_DEV_MODE?: boolean;
+}
+
+export interface IServerConfigAthena extends IServerConfig {
+    vueathena: boolean;
 }

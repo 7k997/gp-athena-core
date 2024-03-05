@@ -15,7 +15,7 @@ export default defineConfig({
             },
         }),
     ],
-    assetsInclude: ['**/*.ogv', '**/*.ogg'],
+    assetsInclude: ['**/*.ogv', '**/*.ogg', '**/*.mp3'],
     base: './',
     build: {
         outDir: '../resources/webviews',

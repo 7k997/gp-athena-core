@@ -1,12 +1,14 @@
 import * as alt from 'alt-server';
-import { IConfig } from '../interface/iConfig.js';
+import { IConfig, IServerConfigAthena } from '../interface/iConfig.js';
 import fs from 'fs';
+import toml from '@iarna/toml';
 
 const DefaultServerCFGName = 'server.toml';
 const DefaultVitePort = 3000;
 const DefaultConfigName = 'AthenaConfig.json';
 const defaultViteServer = 'localhost';
 let configCache: IConfig;
+let serverConfigCache: IServerConfigAthena
 let firstRun = true;
 let isVueDebug = false;
 
@@ -33,12 +35,13 @@ export async function get(): Promise<IConfig | undefined> {
         process.exit(1);
     }
 
-    const file = fs.readFileSync(DefaultServerCFGName).toString();
-    if (file.includes(`env: "dev"`) || file.includes('env = "dev"')) {
+    // Fetch the server configuration
+    const serverConfig = await getAthenaServerConfig();
+    if (serverConfig.env === 'dev') {
         config.USE_DEV_MODE = true;
     }
 
-    if (file.includes('vue-athena')) {
+    if (serverConfig.vueathena) {
         isVueDebug = true;
         alt.log(`~c~Vue Server: ~lg~http://${defaultViteServer}:3000`);
     }
@@ -47,6 +50,16 @@ export async function get(): Promise<IConfig | undefined> {
     configCache = config;
     firstRun = false;
     return config;
+}
+
+export async function getAthenaServerConfig(): Promise<IServerConfigAthena | undefined> {
+    // Return the cached server config to prevent reading twice.
+    if (serverConfigCache) {
+        return serverConfigCache;
+    }
+    const file = fs.readFileSync(DefaultServerCFGName).toString();
+    serverConfigCache = toml.parse(file) as IServerConfigAthena;
+    return serverConfigCache;
 }
 /**
  * Check if the current server instance is running in dev mode.
