@@ -40,7 +40,8 @@ function writeServerImports(plugins) {
 
     content = content + `\n\nplugins.init();\n`;
 
-    const importPath = sanitizePath(path.join(process.cwd(), 'resources/core/plugins/athena/server/imports.js'));
+    //Corechange: Renaming core to gp-core to avoid conflicts with openai
+    const importPath = sanitizePath(path.join(process.cwd(), 'resources/gp-core/plugins/athena/server/imports.js'));
     writeFile(importPath, content);
 }
 
@@ -56,7 +57,8 @@ function writeClientImports(plugins) {
             })
             .join('\n');
 
-    const importPath = sanitizePath(path.join(process.cwd(), 'resources/core/plugins/athena/client/imports.js'));
+    //Corechange: Renaming core to gp-core to avoid conflicts with openai
+    const importPath = sanitizePath(path.join(process.cwd(), 'resources/gp-core/plugins/athena/client/imports.js'));
     writeFile(importPath, content + '\n');
 }
 

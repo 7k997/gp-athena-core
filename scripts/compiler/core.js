@@ -72,7 +72,8 @@ function resolvePaths(file, rawCode) {
     pathSplit.pop(); // Remove current file
     let depth = 0;
 
-    while (pathSplit[pathSplit.length - 1] !== 'core') {
+    //Corechange: Renaming core to gp-core to avoid conflicts with openai
+    while (pathSplit[pathSplit.length - 1] !== 'core' && pathSplit[pathSplit.length - 1] !== 'gp-core') {
         pathSplit.pop();
         depth += 1;
     }
@@ -90,7 +91,7 @@ function resolvePaths(file, rawCode) {
  * @param {Promise<void>} file
  */
 async function transpileFile(file) {
-    const targetPath = file.replace('src/', 'resources/').replace('.ts', '.js');
+    const targetPath = file.replace('src/core/', 'resources/gp-core/').replace('.ts', '.js');
     let result;
 
     try {
@@ -155,7 +156,11 @@ export async function runCoreCompiler() {
     for (const fileOrDirectory of filesAndDirectories) {
         const fullPath = sanitizePath(path.join(resourcesFolder, fileOrDirectory)).replace(/\\/g, '/');
         //Corechange prevent deletion of resources/folder like resources/mods if the project or path contains "*core*" or "*webviews*"
-        if (!fullPath.includes('resources/core') && !fullPath.includes('resources/webviews')) {
+        if (
+            !fullPath.includes('resources/core') &&
+            !fullPath.includes('resources/gp-core') &&
+            !fullPath.includes('resources/webviews')
+        ) {
             continue;
         }
 
@@ -165,7 +170,7 @@ export async function runCoreCompiler() {
     }
 
     for (const file of filesToCopy) {
-        const targetPath = file.replace('src/', 'resources/');
+        const targetPath = file.replace('src/core/', 'resources/gp-core/');
         if (file === targetPath) {
             continue;
         }

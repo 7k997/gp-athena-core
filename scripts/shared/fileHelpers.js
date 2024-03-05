@@ -148,11 +148,12 @@ export async function copyAsync(path, destination) {
 }
 
 export async function areKeyResourcesReady() {
+    //Corechange: Renaming core to gp-core to avoid conflicts with openai
     const keyFiles = [
-        sanitizePath(path.join(process.cwd(), './resources/core/resource.toml')),
-        sanitizePath(path.join(process.cwd(), './resources/core/plugins/athena/server/imports.js')),
-        sanitizePath(path.join(process.cwd(), './resources/core/plugins/athena/client/imports.js')),
-        sanitizePath(path.join(process.cwd(), './resources/core/server/systems/plugins.js')),
+        sanitizePath(path.join(process.cwd(), './resources/gp-core/resource.toml')),
+        sanitizePath(path.join(process.cwd(), './resources/gp-core/plugins/athena/server/imports.js')),
+        sanitizePath(path.join(process.cwd(), './resources/gp-core/plugins/athena/client/imports.js')),
+        sanitizePath(path.join(process.cwd(), './resources/gp-core/server/systems/plugins.js')),
     ];
 
     for (let keyFile of keyFiles) {

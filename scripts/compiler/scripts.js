@@ -59,7 +59,8 @@ async function copyFiles() {
 
     for (const file of files) {
         const originalPath = file;
-        let newPath = file.replace('src/', 'resources/');
+        //Corechange: Renaming core to gp-core to avoid conflicts with openai
+        let newPath = file.replace('src/core/', 'resources/gp-core/');
         copySync(originalPath, newPath);
     }
 
@@ -86,11 +87,11 @@ async function compileFiles(files) {
             },
             sourceMaps: true,
         }).then(async (output) => {
-            let newPath = file.replace('src/', 'resources/').replace('.ts', '.js');
+            let newPath = file.replace('src/core/', 'resources/gp-core').replace('.ts', '.js');
 
             if (file.includes('scripts')) {
                 console.log(file);
-                newPath = file.replace('src/', 'dist/').replace('.ts', '.js');
+                newPath = file.replace('src/core/', 'dist/gp-core/').replace('.ts', '.js');
             }
 
             const coreFile = {

@@ -37,7 +37,13 @@ async function cleanup() {
         fs.rmSync('athena-cache', { recursive: true, force: true });
     }
 
-    const coreResourcesPath = sanitizePath(path.join('resources', 'core'));
+    //Corechange: Renaming core to gp-core to avoid conflicts with openai
+    const oldCoreResourcesPath = sanitizePath(path.join('resources', 'core'));
+    if (fs.existsSync(oldCoreResourcesPath)) {
+        fs.rmSync(oldCoreResourcesPath, { recursive: true, force: true });
+    }
+
+    const coreResourcesPath = sanitizePath(path.join('resources', 'gp-core'));
     if (fs.existsSync(coreResourcesPath)) {
         console.log(`Removing resources/core`);
         fs.rmSync(coreResourcesPath, { recursive: true, force: true });
