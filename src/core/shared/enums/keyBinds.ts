@@ -51,10 +51,10 @@ export const KEY_BINDS = {
     FACTIONS: 75,
     //F4
     // F4: 115,
-    // T
+    // T - long press!
     WALKIETALKIE_TALK: 84,
-    // F5
-    CHAT: 116,
+    // T - short press!
+    CHAT: 84,
     // X - Toogles Locks, e.g vehicle locks
     TOGGLE_LOCK: 88,
     // Y
