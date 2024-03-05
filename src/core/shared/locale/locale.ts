@@ -1,4 +1,4 @@
-import { LocaleFormat } from '../interfaces/localeFormat.js';
+import { LocaleFormat, LocaleFormatItem } from '../interfaces/localeFormat.js';
 import ar from './languages/ar.js'; // Importing the Arabic Locale
 import cs from './languages/cs.js'; // Importing the Czech Locale
 import da from './languages/da.js'; // Importing the Danish Locale
@@ -24,9 +24,11 @@ import ru from './languages/ru.js'; // Importing the Russian Locale
 import tr from './languages/tr.js'; // Importing the Turkish Locale
 import uk from './languages/uk.js'; // Importing the Ukrainian Locale
 import zh from './languages/zh.js'; // Importing the Chinese Locale
+import { Item } from '@AthenaShared/interfaces/item.js';
 export const placeholder = `_%_`;
 
 /**
+ * 
  * All locales have a base language in ISO-639-1.
  * Example for English is: 'en'.
  *
@@ -104,6 +106,38 @@ const translations: LocaleFormat = {
     [LOCALE.Chinese]: zh,
 
     // Additional languages can be added here...
+    // Use registerLocaleKey to add new keys on server startup
+};
+
+const itemTranslations: LocaleFormatItem = {
+    [LOCALE.Arabic]: null,
+    [LOCALE.Czech]: null,
+    [LOCALE.Danish]: null,
+    [LOCALE.German]: null,
+    [LOCALE.Alemannic]: null,
+    [LOCALE.Bavarian]: null,
+    [LOCALE.Frisian]: null,
+    [LOCALE.LowGerman]: null,
+    [LOCALE.Colognian]: null,
+    [LOCALE.Sorbian]: null,
+    [LOCALE.Greek]: null,
+    [LOCALE.AncientGreek]: null,
+    [LOCALE.English]: null,
+    [LOCALE.Spanish]: null,
+    [LOCALE.French]: null,
+    [LOCALE.Hungarian]: null,
+    [LOCALE.Italian]: null,
+    [LOCALE.Latin]: null,
+    [LOCALE.Dutch]: null,
+    [LOCALE.Polish]: null,
+    [LOCALE.Portuguese]: null,
+    [LOCALE.Russian]: null,
+    [LOCALE.Turkish]: null,
+    [LOCALE.Ukrainian]: null,
+    [LOCALE.Chinese]: null,
+
+// Additional languages can be added here...
+// Use registerLocaleItemKey to add new keys on server startup
 };
 
 let defaultLanguage = LOCALE.English; // Change to your default language. Make sure that all keys are present for the default language!
@@ -135,6 +169,21 @@ export class LocaleController {
     }
 
     /**
+    * Register locale item keys on runtime. This method can be called by plugins to add new keys.
+    * Attention: You have to call this method twice, once for the server and once for the client. 
+    * 
+    * @param {string} dbName, dbname of the item
+    * @param {string[]} value, array with the name and description of the item
+    **/
+    static registerLocaleItemKey(dbName: string, value: string[], iso639: LOCALE) {
+        if (!translations[iso639]) {
+            translations[iso639] = {};
+        }
+
+        translations[iso639][dbName] = value;
+    }
+
+    /**
      * Get a locale based on its key value.
      * @static
      * @param {string} key
@@ -149,13 +198,12 @@ export class LocaleController {
 
         if (!translations[iso639][key]) {
             if (iso639 !== defaultLanguage) {
-                // if (iso639.includes('-')) {
-                //     // If the requested language is a dialect, try to find the key in the base language
-
-                //     let baseStr = iso639.split('-')[0];
-                //     const localeEnumValue = stringToEnumValue(LOCALE, baseStr);
-                //     return this.get(key, localeEnumValue, ...args);
-                // }
+                if (iso639.includes('-')) {
+                    // If the requested language is a dialect, try to find the key in the base language
+                    let baseStr = iso639.split('-')[0];
+                    const localeEnumValue = stringToEnumValue(LOCALE, baseStr);
+                    return this.get(key, localeEnumValue, ...args);
+                }
                 // Key not find in the requested language, try to find it in the default language
                 return this.get(key, defaultLanguage, ...args);
             }
@@ -169,6 +217,43 @@ export class LocaleController {
         }
 
         return message;
+    }
+
+    static getItem(item: Item, iso639?: LOCALE): Item {
+        if (!iso639) {
+            iso639 = defaultLanguage;
+        }
+
+        if (!itemTranslations[defaultLanguage]) return item;
+        if (!item.dbName) return item;
+        if (iso639 === defaultLanguage) return item;
+
+        if (itemTranslations[defaultLanguage][item.dbName][0] !== item.name) {
+            //Item renamed by player. Do not translate!
+            return item;
+        }
+
+        if (!translations[iso639][item.dbName]) {
+            if (iso639 !== defaultLanguage) {
+                if (iso639.includes('-')) {
+                    // If the requested language is a dialect, try to find the key in the base language
+                    let baseStr = iso639.split('-')[0];
+                    const localeEnumValue = stringToEnumValue(LOCALE, baseStr);
+                    return this.getItem(item, localeEnumValue);
+                }
+                // Key not find in the requested language, try to find it in the default language
+                return this.getItem(item, defaultLanguage);
+            }
+            console.log(`Translation for ${item.dbName} was not found`);
+            return item;
+        }
+
+        if (item.name) {
+            item.name = translations[iso639][item.dbName][0];
+            item.description = translations[iso639][item.dbName][1];
+        }
+
+        return item;
     }
 
     /**

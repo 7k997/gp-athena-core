@@ -1,6 +1,7 @@
 import { InventoryType } from '@AthenaPlugins/core-inventory/shared/interfaces.js';
 import { Character } from '@AthenaShared/interfaces/character.js';
 import { StoredItem } from '@AthenaShared/interfaces/item.js';
+import { LOCALE } from '@AthenaShared/locale/locale.js';
 import * as alt from 'alt-server';
 
 export type AthenaPlayerEvents =
@@ -10,6 +11,7 @@ export type AthenaPlayerEvents =
     | 'item-unequipped'
     | 'pickup-item'
     | 'character-data-change'
+    | 'character-language-change'
     | 'player-account-created'
     | 'player-character-created'
     | 'player-armour-set'
@@ -26,6 +28,7 @@ export type AthenaPlayerEvents =
     | 'player-weapon-unequipped'
     | 'player-weapon-equipped'
     | 'respawned'
+    | 'select-character'
     | 'selected-character'
     | 'set-account-data'
     | 'spawned';
@@ -197,6 +200,24 @@ export function on(eventName: 'pickup-item', callback: (player: alt.Player, _id:
  * @param {(player: alt.Player) => void} callback
  */
 export function on(eventName: 'character-data-change', callback: (player: alt.Player, typeSafeFieldName: string, value: any, oldValue: any) => void);
+
+/**
+ * Called when language changed for a player.
+ *
+ *
+ * @param {'character-language-change'} eventName
+ * @param {(player: alt.Player, _id: string) => void} callback
+ */
+export function on(eventName: 'character-language-change', callback: (player: alt.Player, locale: LOCALE) => void);
+
+/**
+ * Called when a char selector loaded for player.
+ *
+ *
+ * @param {'select-character'} eventName
+ * @param {(player: alt.Player, _id: string) => void} callback
+ */
+export function on(eventName: 'select-character', callback: (player: alt.Player, char: Character) => void);
 
 /**
  * Called when a player selects a character
