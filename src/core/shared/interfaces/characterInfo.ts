@@ -38,4 +38,18 @@ export interface CharacterInfo {
      *
      */
     displayLanguage?: LOCALE;
+
+    /**
+     * A custom field for character information about TextToSpeach functionality.
+     * @type {string}
+     *
+     */
+    ttsEnabled?: boolean;
+
+    /**
+     * A custom field for character information about TextToSpeach Translation functionality.
+     * @type {string}
+     *
+     */
+    ttsAutoTranslate?: string;
 }

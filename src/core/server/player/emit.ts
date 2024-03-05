@@ -309,12 +309,12 @@ export function sound2D(player: alt.Player, audioName: string, volume: number = 
  * @param {string} soundInstantID, optional unique id to play sound instant
  *
  */
-export function sound3D(player: alt.Player, audioName: string, target: alt.Entity, soundInstantID?: string): void {
+export function sound3D(player: alt.Player, audioName: string, target: alt.Entity, volume: number = 0.35, soundInstantID?: string): void {
     if (Overrides.sound3D) {
-        return Overrides.sound3D(player, audioName, target, soundInstantID);
+        return Overrides.sound3D(player, audioName, target, volume, soundInstantID);
     }
 
-    alt.emitClient(player, SYSTEM_EVENTS.PLAYER_EMIT_SOUND_3D, target, audioName, soundInstantID);
+    alt.emitClient(player, SYSTEM_EVENTS.PLAYER_EMIT_SOUND_3D, target, audioName, volume, soundInstantID);
 }
 
 /**

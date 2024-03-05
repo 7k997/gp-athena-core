@@ -5,6 +5,10 @@ export default function resolvePath(currentPath: string, pluginName = ''): strin
         return '';
     }
 
+    if (currentPath.includes('http')) {
+        return currentPath;
+    }
+
     // Handles @plugins pathing
     if (currentPath.includes('@plugins') || currentPath.includes('@AthenaPlugins')) {
         for (const pluginFolder of pluginFolders) {

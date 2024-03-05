@@ -75,6 +75,7 @@ export default defineComponent({
             duration = -1,
             soundInstantID?: string,
         ) {
+            console.log('Play Audio: ' + soundName + ' Pan: ' + pan + ' Volume: ' + volume + ' Duration: ' + duration + ' ID: ' + soundInstantID); ;  
             if (soundInstantID) {
                 this.handleAudio(soundName, pan, volume, duration, soundInstantID);
             } else {
@@ -93,11 +94,20 @@ export default defineComponent({
             duration = -1,
             soundInstantID?: string,
         ) {
-            if (!soundName.includes('.ogg')) {
+            console.log("Soundname:" + soundName);
+            if (!soundName.includes('.ogg') && !soundName.includes('.mp3')) {
                 soundName += `.ogg`;
             }
 
-            const path = ResolvePath(`../../assets/sounds/${soundName}`);
+            let path = null;
+            if(soundName.includes('http')) {
+                path = ResolvePath(soundName);
+            } else {
+                path = ResolvePath(`../../assets/sounds/${soundName}`);
+            }
+
+            console.log("Audiopath:" + path);
+            
 
             let soundID = queueIdentifier; //All queued sounds have the same id
             if (soundInstantID) {
@@ -131,7 +141,7 @@ export default defineComponent({
                 this._audio[soundID].play();
             } catch (err) {
                 console.log(err);
-                if (!soundInstantID) this.isReady = false;
+                if (!soundInstantID) this.isReady = true;
             }
         },
         async stopAudio(soundInstantID?: string) {
