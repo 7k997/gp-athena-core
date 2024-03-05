@@ -4,6 +4,7 @@ import { Character } from '@AthenaShared/interfaces/character.js';
 import Database from '@stuyk/ezmongodb';
 import { CharSelectEvents } from '../shared/events.js';
 import { LOCALE } from '@AthenaShared/locale/locale.js';
+import * as PlayerEvents from '@AthenaServer/player/events.js';
 
 const PLUGIN_NAME = 'Character Select';
 const Characters: { [player_id: string]: Array<Character> } = {};
@@ -39,6 +40,7 @@ async function show(player: alt.Player) {
     showCharacter(player, 0);
     Athena.player.emit.clearSpinner(player);
     player.setDateTime(1, 1, 2023, 15, 2, 0);
+    PlayerEvents.trigger('select-character', player, Characters[player.id][0]);
 }
 
 async function showCharacter(player: alt.Player, index: number) {
@@ -122,6 +124,7 @@ async function updateLanguage(player: alt.Player, languageName: string) {
     // await Database.updatePartialData(character._id, { info: character.info }, Athena.database.collections.Characters);
 
     showCharacter(player, CurrentIndex[player.id]);
+    PlayerEvents.trigger('character-language-change', player, character.info.displayLanguage);
 }
 
 async function handleSelect(player: alt.Player, languageName: string) {
