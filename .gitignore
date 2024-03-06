@@ -47,6 +47,7 @@ yarn.lock
 
 # Resources
 resources/core/**
+resources/gp-core/**
 resources/webviews/**
 
 #typedefs.d.ts
@@ -69,3 +70,13 @@ typedefs.d.ts
 .server-crashes-cache/
 
 server.log-*
+
+#Webserver and CDN
+cdn_upload/*
+webserver/*
+!webserver/static
+!webserver/tmp/*.md
+!webserver/tmp/
+!webserver/tmp/**/
+cdn-meta.bin
+

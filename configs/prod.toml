@@ -14,7 +14,7 @@ useEarlyAuth = false
 streamingDistance = 400
 migrationDistance = 150
 modules = ["js-module"]
-resources = ["webviews", "core"]
+resources = ["webviews", "gp-core"]
 tags = ["athena","framework","version","5"]
 log-streams = ["console", "file", "stdconsole"]
 
