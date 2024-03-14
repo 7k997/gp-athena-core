@@ -8,6 +8,7 @@ import { PedCharacter } from '@AthenaClient/utility/characterPed.js';
 import { disableAllControls } from '@AthenaClient/utility/disableControls.js';
 import { Appearance } from '@AthenaShared/interfaces/appearance.js';
 import { CHARACTER_CREATOR_EVENTS, CHARACTER_CREATOR_WEBVIEW_EVENTS } from '../../shared/events.js';
+import { PedBone } from '@AthenaShared/enums/boneIds.js';
 
 const PAGE_NAME = 'CharacterCreator';
 const fModel = alt.hash('mp_f_freemode_01');
@@ -18,6 +19,80 @@ let noDiscard = true;
 let noName = true;
 let totalCharacters = 0;
 let languageName = 'English';
+let lastSection = null;
+
+interface CamParams {
+    fov?: number;
+    x?: number;
+    y?: number;
+    z?: number;
+};
+interface BonesByTitle {
+    [sectionName: string]: {
+        section: number;
+        bone: number;
+        camParams?: CamParams;
+    }
+};
+
+const bonesByTitle: BonesByTitle = {
+    'Appearance': {
+        section: 0,
+        bone: PedBone.SKEL_Head,
+        camParams: {
+            fov: 60,
+            z: -.3,
+            x: .15,
+            y: .15,
+        }
+    },
+    'Hair': {
+        section: 1,
+        bone: PedBone.FACIAL_facialRoot,
+        camParams: {
+            fov: 15,
+            z: .05,
+            x: .15,
+        }
+    },
+    'Structure': {
+        section: 1,
+        bone: PedBone.FACIAL_facialRoot,
+        camParams: {
+            fov: 15,
+            z: .05,
+            x: .15,
+        }
+    },
+    'Overlays': {
+        section: 1,
+        bone: PedBone.FACIAL_facialRoot,
+        camParams: {
+            fov: 15,
+            z: .05,
+            x: .15,
+        }
+    },
+    'Makeup': {
+        section: 1,
+        bone: PedBone.FACIAL_facialRoot,
+        camParams: {
+            fov: 15,
+            z: .05,
+            x: .15,
+        }
+    },
+    'Info': {
+        section: 0,
+        bone: PedBone.SKEL_Head,
+        camParams: {
+            fov: 60,
+            z: -.3,
+            x: .15,
+            y: .15,
+        }
+    },
+}
 
 native.requestModel(fModel);
 native.requestModel(mModel);
@@ -50,6 +125,7 @@ class InternalFunctions {
         view.on(CHARACTER_CREATOR_WEBVIEW_EVENTS.SYNC, InternalFunctions.handleSync);
         view.on(CHARACTER_CREATOR_WEBVIEW_EVENTS.VERIFY_NAME, InternalFunctions.handleCheckName);
         view.on(CHARACTER_CREATOR_WEBVIEW_EVENTS.DISABLE_CONTROLS, InternalFunctions.handleDisableControls);
+        view.on(CHARACTER_CREATOR_WEBVIEW_EVENTS.CHANGE_CAM, InternalFunctions.handleChangeCam);
         AthenaClient.webview.openPages([PAGE_NAME]);
         AthenaClient.webview.focus();
         AthenaClient.webview.showCursor(true);
@@ -57,7 +133,7 @@ class InternalFunctions {
         await PedCharacter.create(true, pos, heading);
         await alt.Utils.wait(100);
         await PedCharacter.setHidden(true);
-        await AthenaClient.camera.pedEdit.create(PedCharacter.get(), { x: -0.25, y: 0, z: 0 });
+        await AthenaClient.camera.pedEdit.create(PedCharacter.get(), { x: 0.0, y: 0, z: 0 });
         await AthenaClient.camera.pedEdit.setCamParams(0.6, 50);
         await CharacterSystem.applyEquipment(PedCharacter.get(), null, true);
         readyInterval = alt.setInterval(InternalFunctions.waitForReady, 100);
@@ -104,6 +180,13 @@ class InternalFunctions {
 
     static handleCheckName(name: string): void {
         alt.emitServer(CHARACTER_CREATOR_EVENTS.VERIFY_NAME, name);
+    }
+
+    static async handleChangeCam(type: string) {
+        const dataByTitle = bonesByTitle[type]
+        if (lastSection == dataByTitle.section) return
+        lastSection = dataByTitle.section;
+        await AthenaClient.camera.pedEdit.setCamParamsToBone(PedCharacter.get(), dataByTitle.bone, dataByTitle.camParams);
     }
 
     static async handleNameFinish(result: boolean) {

@@ -198,6 +198,25 @@ export function setCamParams(_zpos: number = null, _fov: number = null, _easeTim
     camUpdateQueue.push({ zpos: _zpos, fov: _fov, easeTime: _easeTime });
 }
 
+/**
+ * Point the Camera and position
+ * @static
+ * @param {*} value
+ * 
+ */
+interface CamParams {
+    fov?: number;
+    x?: number;
+    y?: number;
+    z?: number;
+}
+export async function setCamParamsToBone(entityId: number, _bone: number, _additionalParams: CamParams ) {
+    const worldPositionOfEntityBone = native.getWorldPositionOfEntityBone(entityId, _bone);
+    if (!camera) return;
+    native.pointCamAtCoord(camera, worldPositionOfEntityBone.x + (_additionalParams.x || 0), worldPositionOfEntityBone.y + (_additionalParams.y || 0), worldPositionOfEntityBone.z + (_additionalParams.z || 0));
+    if (_additionalParams.fov) native.setCamFov(camera, _additionalParams.fov);
+}
+
 export async function runQueue() {
     if (Overrides.runQueue) {
         return Overrides.runQueue();
@@ -278,6 +297,10 @@ export function handleControls() {
     native.disableControlAction(0, 33, true); // s
     native.disableControlAction(0, 34, true); // a
     native.disableControlAction(0, 35, true); // d
+    native.disableControlAction(0, 300, true); // up
+    native.disableControlAction(0, 299, true); // down
+    native.disableControlAction(0, 308, true); // left
+    native.disableControlAction(0, 397, true); // right
 
     if (camera === null || camera === undefined) {
         return;
@@ -330,7 +353,7 @@ export function handleControls() {
         }
     }
 
-    if (native.isDisabledControlPressed(0, 32)) {
+    if (native.isDisabledControlPressed(0, 300)) {
         zpos += 0.01;
 
         if (zpos > 1.2) {
@@ -343,7 +366,7 @@ export function handleControls() {
         native.renderScriptCams(true, false, 0, true, false, 0);
     }
 
-    if (native.isDisabledControlPressed(0, 33)) {
+    if (native.isDisabledControlPressed(0, 299)) {
         zpos -= 0.01;
 
         if (zpos < -1.2) {
@@ -356,7 +379,7 @@ export function handleControls() {
         native.renderScriptCams(true, false, 0, true, false, 0);
     }
 
-    // rmb
+    /* // rmb
     if (native.isDisabledControlPressed(0, 25)) {
         // Rotate Negative
         if (_x < width / 2) {
@@ -369,16 +392,16 @@ export function handleControls() {
             const newHeading = (oldHeading += 2);
             native.setEntityHeading(isLocalPlayer ? alt.Player.local.scriptID : scriptID, newHeading);
         }
-    }
+    } */
 
     // d
-    if (native.isDisabledControlPressed(0, 35)) {
+    if (native.isDisabledControlPressed(0, 307)) {
         const newHeading = (oldHeading += 2);
         native.setEntityHeading(isLocalPlayer ? alt.Player.local.scriptID : scriptID, newHeading);
     }
 
     // a
-    if (native.isDisabledControlPressed(0, 34)) {
+    if (native.isDisabledControlPressed(0, 308)) {
         const newHeading = (oldHeading -= 2);
         native.setEntityHeading(isLocalPlayer ? alt.Player.local.scriptID : scriptID, newHeading);
     }

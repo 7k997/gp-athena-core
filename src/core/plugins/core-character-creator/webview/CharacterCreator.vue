@@ -151,6 +151,8 @@ export default defineComponent({
 
             this.selection += 1;
 
+            alt.emit(CHARACTER_CREATOR_WEBVIEW_EVENTS.CHANGE_CAM, this.navOptions[this.selection]);
+
             if (this.selection >= this.navOptions.length - 1 && this.controlsEnabled) {
                 if ('alt' in window) {
                     alt.emit(CHARACTER_CREATOR_WEBVIEW_EVENTS.DISABLE_CONTROLS, true);
@@ -174,6 +176,7 @@ export default defineComponent({
             }
 
             this.selection -= 1;
+            alt.emit(CHARACTER_CREATOR_WEBVIEW_EVENTS.CHANGE_CAM, this.navOptions[this.selection]);
         },
         setReady(noDiscard = true, noName = true, languageName = 'English') {
             if (this.show) {
@@ -364,6 +367,7 @@ export default defineComponent({
             this.data.colorOverlays.push(overlayData);
         });
 
+        alt.emit(CHARACTER_CREATOR_WEBVIEW_EVENTS.CHANGE_CAM, this.navOptions[this.selection]);
         if ('alt' in window) {
             alt.on(CHARACTER_CREATOR_WEBVIEW_EVENTS.READY, this.setReady);
             alt.on(CHARACTER_CREATOR_WEBVIEW_EVENTS.SET_DATA, this.setData);

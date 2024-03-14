@@ -17,4 +17,5 @@ export const CHARACTER_CREATOR_WEBVIEW_EVENTS = {
     READY_SETUP_COMPLETE: `${PAGE_NAME}:ReadySetupComplete`,
     DONE: `${PAGE_NAME}:Done`,
     DISABLE_CONTROLS: `${PAGE_NAME}:DisableControls`,
+    CHANGE_CAM: `${PAGE_NAME}:ChangeCam`,
 };
